@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+<!-- Picture/Advertisement for category -->
+<!-- Picture/Advertisement for category -->
+
+<!-- Breadcrumbs -->
+{% block breadcrumbs %}
+    <a href="{% url 'home' %}">Home</a>
+    >
+    <a href="{% url 'products:list' %}">Shop</a>
+    >
+    <a href="{% url 'products:list' %}{{view.kwargs.category}}">{{view.kwargs.category}}</a>
+{% endblock %}
+<!-- Breadcrumbs -->
+
+<!-- Category Page Header -->
+<!-- Category Page Header -->
+<!-- Sorting Sidebar -->
+<!-- Sorting Sidebar -->
+<!-- Number search results -->
+{% block content %}
+    
+    <div class="container">
+        <!-- Category Name Header -->
+        <h1 class="text-center">{{view.kwargs.category}}</h1>
+        <!-- Category Name Header -->
+
+        <!-- Sorting drop down menu -->
+        <label>Sort By: 
+            <select name="action" required="">
+                <option value="" selected="">---------</option>
+            </select>
+        </label>
+        <!-- Sorting drop down menu -->
+
+        <!-- Product Cards -->
+        <div class="row">
+        {% for product in product_list %}
+            <div class="col-md-4">
+                <a href="{% url 'products:detail' product.id %}">
+                    <img src="{{ product.productimage_set.first.prod_image.url }}" alt="{{ product.prod_name }}" height="364" width="300">
+                </a>
+                <h2 class="text-center">{{product.prod_name}}</h2>
+                <h4 class="text-center">${{product.prod_price}}</h4>
+            </div>
+        {% endfor %}
+        </div>
+        <hr>
+        <!-- Product Cards -->
+
+        <!-- Pagination. Django has a Paginator module/template at https://docs.djangoproject.com/en/2.1/topics/pagination/#using-paginator-in-view -->
+        <!-- Pagination -->
+    </div> <!-- /container -->
+
+{% endblock %}

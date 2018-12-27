@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>{% block title %}Ashley's Site{% endblock %}</title>
+  </head>
+  <body>
+
+    <!-- Nav Bar --> 
+    {% load static %}
+    <nav class="navbar navbar-expand-sm bg-white justify-content-center">
+      <a class="navbar" href="#">
+        <img src="{% static 'logo.jpg' %}" alt="Logo">
+      </a>
+      {% if not user.is_authenticated %}
+        <a class="btn btn-outline-primary" href="{% url 'users:login'%}?next={{request.path}}">Login</a>
+        <a class="btn btn-outline-primary" href="{% url 'users:signup'%}?next={{request.path}}">Sign up</a>
+      {% else %}
+        <a class="btn btn-outline-primary" href="#">{{ user.username }}</a>
+        <a class="btn btn-outline-primary" href="{% url 'users:logout'%}?next={{request.path}}">Logout</a>
+      {% endif %}
+    </nav>
+
+
+    <nav class="navbar navbar-expand-sm bg-warning navbar-light justify-content-center">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Dresses/">Dresses</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Tops/">Tops</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Outerwear/">Outerwear</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Bottoms/">Bottoms</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Jeans/">Jeans</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Accessories/">Accessories</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Shoes/">Shoes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'products:list' %}Sales/">Sales</a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /Nav Bar --> 
+
+    <div class="container">
+
+      <!-- Jumbotron -->
+      {% if is_jumbotron %}
+        {% block jumbotron %}
+          <div class="jumbotron">
+              <div class="container">
+              </div>
+          </div>
+        {% endblock %}
+      {% endif %}
+      <!-- Jumbotron -->
+
+      <!-- Breadcrumbs -->
+      <div class="breadcrumbs">
+        {% block breadcrumbs %}
+        {% endblock %}
+      </div>
+      <!-- Breadcrumbs -->
+
+    </div>
+
+    {% block content %}{% endblock %}
+
+    {% block footer %}
+    <footer class="container">
+      <p>&copy; Company 2017-2018</p>
+    </footer>
+    {% endblock %}
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+<!-- Breadcrumbs -->
+{% block breadcrumbs %}
+    <a href="{% url 'home' %}">Home</a>
+    >
+    <a href="{% url 'products:list' %}">Shop</a>
+    >
+    <a href="{% url 'products:list' %}{{ product.prod_name }}">{{ product.productimage_set.first.prod_image.url|wordcount }}</a>
+    >
+    <a href="{% url 'products:detail' product.id %}">{{product.prod_name}}</a>
+{% endblock %}
+<!-- Breadcrumbs -->
+
+{% block content %}
+    
+    <div class="container">
+        <div class="row">
+            <div class="col col-lg-2 bg-warning">
+                <div class="row">
+                    <p>Mini pics here.</p>
+                </div>
+            </div>
+            <div class="col-md-6 bg-secondary">
+                <img src="{{ product.productimage_set.first.prod_image.url }}" alt="{{ product.prod_name }}" height="364" width="300">
+            </div>
+            <div class="col-md-4 bg-warning">
+                <h2>{{product.prod_name}}</h2>
+                <h4>{{product.prod_price}}</h4>
+                <p>{{product.prod_color}}</p>
+                <p>{{product.prod_size}}</p>
+                <p>{{product.prod_description}}</p>
+                <button>Add to Bag</button>
+            </div>
+        </div>
+    </div> <!-- /container -->
+
+{% endblock %}
