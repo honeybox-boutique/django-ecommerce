@@ -37,11 +37,11 @@
         <div class="row">
         {% for product in product_list %}
             <div class="col-md-4">
-                <a href="{% url 'products:detail' product.id %}">
-                    <img src="{{ product.productimage_set.first.prod_image.url }}" alt="{{ product.prod_name }}" height="364" width="300">
+                <a href="{% url 'products:detail' product.productID %}">
+                    <img src="{{ product.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}" height="364" width="300">
                 </a>
-                <h2 class="text-center">{{product.prod_name}}</h2>
-                <h4 class="text-center">${{product.prod_price}}</h4>
+                <h2 class="text-center">{{product.productName}}</h2>
+                <h4 class="text-center">${{product.productPrice}}</h4>
             </div>
         {% endfor %}
         </div>

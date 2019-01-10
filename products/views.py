@@ -10,8 +10,7 @@ class ProductList(ListView):
 
     def get_queryset(self):
         if 'category' in self.kwargs:
-            pSet = Product.objects.filter(prod_categories__category_name=self.kwargs['category'])
-            return pSet
+            return Product.objects.filter(productCategories__categoryName=self.kwargs['category'])
         else:
             return Product.objects.all()
 
