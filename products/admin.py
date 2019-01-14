@@ -9,7 +9,7 @@ class ProdImgInline(admin.StackedInline):
 class ProductAdmin(admin.ModelAdmin):
     inlines = [
         ProdImgInline,
-    ] 
+    ]
 admin.site.register(Product, ProductAdmin)
 
 
@@ -19,5 +19,5 @@ class CatImgInline(admin.StackedInline):
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [
         CatImgInline,
-    ] 
+    ]
 admin.site.register(Category, CategoryAdmin)

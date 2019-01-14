@@ -1,8 +1,21 @@
 from django.db import models
 from django.conf import settings
-from products.models import Product, Vendor
+from products.models import Product
 
 # Create your models here.
+
+class Vendor(models.Model):
+    vendorID = models.AutoField(primary_key=True)
+    vendorName = models.CharField(max_length=200)
+    vendorDescription = models.CharField(max_length=200)
+    vendorNotes = models.CharField(max_length=200)
+    vendorWebsite = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = 'vendor'
+
+    def __str__(self):
+        return self.vendorName
 
 class TransactionType(models.Model):
     transactionTypeID = models.AutoField(primary_key=True)
@@ -29,7 +42,7 @@ class Transaction(models.Model):
         db_table = 'transaction'
 
     def __str__(self):
-        return self.transactionID
+        return self.transactionNote
 
 class PurchaseItems(models.Model):
     prodStockID = models.AutoField(primary_key=True)
