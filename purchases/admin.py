@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .forms import PurchaseItemsForm, PurchaseItemsFormSet, TransactionItemsForm 
+from .forms import PurchaseItemsForm, PurchaseItemsFormSet, TransactionItemsForm
 from .models import Vendor, Transaction, PurchaseItems, TransactionType
 # Register your models here.
 

@@ -6,10 +6,10 @@ from products.models import Product
 
 class Vendor(models.Model):
     vendorID = models.AutoField(primary_key=True)
-    vendorName = models.CharField(max_length=200)
-    vendorDescription = models.CharField(max_length=200)
-    vendorNotes = models.CharField(max_length=200)
-    vendorWebsite = models.CharField(max_length=200)
+    vendorName = models.CharField(max_length=40)
+    vendorDescription = models.TextField(max_length=200)
+    vendorNotes = models.TextField(max_length=200)
+    vendorWebsite = models.URLField(max_length=200)
 
     class Meta:
         db_table = 'vendor'
@@ -19,8 +19,8 @@ class Vendor(models.Model):
 
 class TransactionType(models.Model):
     transactionTypeID = models.AutoField(primary_key=True)
-    transactionTypeName = models.CharField(max_length=200)
-    transactionTypeDescription = models.CharField(max_length=200)
+    transactionTypeName = models.CharField(max_length=40)
+    transactionTypeDescription = models.TextField(max_length=200)
 
     class Meta:
         db_table = 'transaction_type'
@@ -31,8 +31,8 @@ class TransactionType(models.Model):
 class Transaction(models.Model):
     transactionID = models.AutoField(primary_key=True)
     transactionDate = models.DateTimeField('date purchased')
-    transactionNote = models.CharField(max_length=200)
-    transactionStatus = models.CharField(max_length=200)
+    transactionNote = models.TextField(max_length=200)
+    transactionStatus = models.CharField(max_length=40)
 
     productID = models.ManyToManyField(Product, through='PurchaseItems')
     transactionTypeID = models.ForeignKey(TransactionType, on_delete=models.CASCADE)
@@ -47,10 +47,10 @@ class Transaction(models.Model):
 class PurchaseItems(models.Model):
     prodStockID = models.AutoField(primary_key=True)
     piPrice = models.DecimalField(max_digits=8, decimal_places=3)
-    piSize = models.CharField(max_length=200)
-    piColor = models.CharField(max_length=200)
-    piCondition = models.CharField(max_length=200)
-    piNotes = models.CharField(max_length=200)
+    piSize = models.CharField(max_length=20)
+    piColor = models.CharField(max_length=40)
+    piCondition = models.CharField(max_length=50)
+    piNotes = models.TextField(max_length=200)
     piBarcode = models.ImageField(upload_to='barcodes')
 
     transactionID = models.ForeignKey(Transaction, on_delete=models.CASCADE)
