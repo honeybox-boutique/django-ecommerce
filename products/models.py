@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -25,7 +26,7 @@ class Product(models.Model):
     productID = models.AutoField(primary_key=True)
     productName = models.CharField(max_length=200)
     productDescription = models.CharField(max_length=200)
-
+    productSlug = models.SlugField(unique=False)
     productCategories = models.ManyToManyField(Category)
 
     class Meta:
@@ -34,6 +35,12 @@ class Product(models.Model):
     def __str__(self):
         return self.productName
 
+    def save(self, *args, **kwargs):
+        if not self.productID:
+            # Newly created object, so set slug
+            self.productSlug = slugify(self.productName)
+
+        super(Product, self).save(*args, **kwargs)
 
 class ProductImage(models.Model):
     productImageID = models.AutoField(primary_key=True)

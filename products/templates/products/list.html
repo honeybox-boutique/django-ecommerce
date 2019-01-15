@@ -37,7 +37,7 @@
         <div class="row">
         {% for product in product_list %}
             <div class="col-md-4">
-                <a href="{% url 'products:detail' product.productID %}">
+                <a href="{% url 'products:detail' view.kwargs.category product.productSlug %}">
                     <img src="{{ product.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}" height="364" width="300">
                 </a>
                 <h2 class="text-center">{{product.productName}}</h2>

@@ -7,6 +7,7 @@ class ProdImgInline(admin.StackedInline):
     model = ProductImage
 
 class ProductAdmin(admin.ModelAdmin):
+    readonly_fields = ['productSlug']
     inlines = [
         ProdImgInline,
     ]
