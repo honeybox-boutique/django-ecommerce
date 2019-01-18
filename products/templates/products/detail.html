@@ -7,7 +7,7 @@
     <a href="{% url 'products:list' %}">Shop</a>
     >
     <a href="{% url 'products:category' view.kwargs.category %}">{{view.kwargs.category}}</a>
-    >
+    > 
     <a href="{% url 'products:detail' view.kwargs.category product.productSlug %}">{{product.productName}}</a>
 {% endblock %}
 <!-- Breadcrumbs -->
@@ -19,6 +19,7 @@
             <div class="col col-lg-2 bg-warning">
                 <div class="row">
                     <p>Mini pics here.</p>
+                    <p>{{category.categoryName}}</p>
                 </div>
             </div>
             <div class="col-md-6 bg-secondary">
@@ -26,9 +27,21 @@
             </div>
             <div class="col-md-4 bg-warning">
                 <h2>{{product.productName}}</h2>
-                <h4>{{product.productPrice}}</h4>
-                <p>{{product.prod_color}}</p>
-                <p>{{product.prod_size}}</p>
+                <h4>{{product.pricing_set.first.pricingBasePrice}}</h4>
+                <ul>
+                    {% for purchaseitem in product.purchaseitems_set.all %}
+                        <li>{{purchaseitem.piColor}}</li>
+                    {% endfor %}
+                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Size
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        {% for purchaseitem in product.purchaseitems_set.all %}
+                            <li>{{purchaseitem.piSize}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
                 <p>{{product.productDescription}}</p>
                 <button>Add to Bag</button>
             </div>
