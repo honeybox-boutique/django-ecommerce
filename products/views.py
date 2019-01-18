@@ -48,3 +48,9 @@ class ProductDetail(generic.DetailView):
         # Create any data and add it to the context
         context['product'] = productQuerySet
         return context
+
+    # def load_sizes(self, **kwargs):
+    # # This method will populate the available sizes based on color selection
+        # country_id = request.GET.get('')
+        # sizes = PurchaseItems.objects.filter(productID__productSlug=self.kwargs['productSlug']).distinct('piColor')
+        # return render(request, 'hr/city_dropdown_list_options.html', {'cities': cities})
