@@ -24,7 +24,7 @@ class PDiscount(models.Model):
     pDiscountName = models.CharField(max_length=40)
     pDiscountDescription = models.TextField(max_length=200)
     pDiscountType = models.CharField(max_length=30)
-    pDiscountAmount = models.DecimalField(max_digits=8, decimal_places=3)
+    pDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)
     pDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
     pDiscountDateValidFrom = models.DateTimeField('valid from')
     pDiscountDateValidUntil = models.DateTimeField('valid until')
@@ -40,12 +40,21 @@ class PDiscount(models.Model):
     def __str__(self):
         return self.pDiscountName
 
+    @property
+    def get_discount_price(self, price):
+        if self.pDiscountType == 'Percent':
+            discount_amount = price - (price * self.pDiscountValue)
+            return discount_amount
+        elif self.pDiscountType == 'Amount':
+            discount_amount = price - self.pDiscountValue
+            return discount_amount
+
 class CDiscount(models.Model):
     cDiscountID = models.AutoField(primary_key=True)
     cDiscountName = models.CharField(max_length=40)
     cDiscountDescription = models.TextField(max_length=200)
     cDiscountType = models.CharField(max_length=30)
-    cDiscountAmount = models.DecimalField(max_digits=8, decimal_places=3)
+    cDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)
     cDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
     cDiscountDateValidFrom = models.DateTimeField('valid from')
     cDiscountDateValidUntil = models.DateTimeField('valid until')
@@ -60,6 +69,14 @@ class CDiscount(models.Model):
 
     def __str__(self):
         return self.cDiscountName
+
+    def get_discount_price(self, price):
+        if self.cDiscountType == 'Percent':
+            discount_amount = price - (price * self.cDiscountValue)
+            return discount_amount
+        elif self.cDiscountType == 'Amount':
+            discount_amount = price - self.cDiscountValue
+            return discount_amount
 
 # class TDiscount(models.Model):
     # tDiscountID = models.AutoField(primary_key=True)
