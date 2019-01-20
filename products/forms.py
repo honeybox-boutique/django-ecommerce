@@ -4,7 +4,7 @@ from purchases.models import PurchaseItems
 class ProductSizeColorForm(forms.ModelForm):
     class Meta:
         model = PurchaseItems
-        fields = ('piColor', 'piSize')
+        fields = ('piColor', 'piSize', 'post')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

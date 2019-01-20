@@ -1,9 +1,9 @@
 from django.views import generic
 from django.db.models import Prefetch
-from pricing.models import Product, Pricing, PDiscount, CDiscount
-from purchases.models import PurchaseItems
-from django.shortcuts import get_object_or_404, render
+from django.views.generic.edit import FormMixin
 from django.utils import timezone
+from pricing.models import Product, Pricing
+from purchases.models import PurchaseItems
 
 # Create your views here.
 
@@ -26,7 +26,7 @@ class ProductList(generic.ListView):
         context['product_list'] = productListQuerySet
         return context
 
-class ProductDetail(generic.DetailView):
+class ProductDetail(FormMixin, generic.DetailView):
     model = Product
     template_name = 'products/detail.html'
     slug_url_kwarg = 'productSlug'
@@ -37,11 +37,8 @@ class ProductDetail(generic.DetailView):
         context = super(ProductDetail, self).get_context_data(**kwargs)
         # Get pricing table queryset filtered for current valid pricing
         pricingDateQuery = Pricing.objects.filter(pricingStartDate__lte=timezone.now(), pricingEndDate__gte=timezone.now())
-        pricingDateQuery = pricingDateQuery.filter(productID__pdiscount__pDiscountDateValidFrom__lte=timezone.now(), productID__pdiscount__pDiscountDateValidUntil__gte=timezone.now())
+        # pDiscountDateQuery = pricingDateQuery.filter(productID__pdiscount__pDiscountDateValidFrom__lte=timezone.now(), productID__pdiscount__pDiscountDateValidUntil__gte=timezone.now())
         # discountAmount = pricingDateQuery.first.productID.pdiscount_set.first.get_discount_price(self, )
-        # Get discount queryset for current discounts
-        pDiscountDateQuery = PDiscount.objects.filter(pDiscountDateValidFrom__lte=timezone.now())
-        pDiscountDateQuery = pDiscountDateQuery.filter(pDiscountDateValidUntil__gte=timezone.now())
         # Get purchaseItems queryset filtered on product ID
         purchaseItemsQuery = PurchaseItems.objects.filter(productID__productSlug=self.kwargs['productSlug']).distinct()
         # set pricingDateQuery prefetch query variable
@@ -54,8 +51,8 @@ class ProductDetail(generic.DetailView):
         context['product'] = productQuerySet
         return context
 
-    # def load_sizes(self, **kwargs):
-    # # This method will populate the available sizes based on color selection
-        # country_id = request.GET.get('')
-        # sizes = PurchaseItems.objects.filter(productID__productSlug=self.kwargs['productSlug']).distinct('piColor')
-        # return render(request, 'hr/city_dropdown_list_options.html', {'cities': cities})
+# def load_sizes(self, **kwargs):
+# # This method will populate the available sizes based on color selection
+    # country_id = request.GET.get('')
+    # sizes = PurchaseItems.objects.filter(productID__productSlug=self.kwargs['productSlug']).distinct('piColor')
+    # return render(request, 'hr/city_dropdown_list_options.html', {'cities': cities})

@@ -33,7 +33,7 @@
                     <s>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</s>
                     <h4>${% get_discount_price product.pricing_set.first.pricingBasePrice as discounted_price %}{{discounted_price|floatformat:2}}</h4>
                 {% else %}
-                    <h4>${{product.pricing_set.first.pricingBasePrice}}</h4>
+                    <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
                 {% endif %}
                 <ul>
                     {% for purchaseitem in product.purchaseitems_set.all %}

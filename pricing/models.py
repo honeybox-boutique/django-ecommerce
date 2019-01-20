@@ -6,7 +6,7 @@ from products.models import Product, Category
 class Pricing(models.Model):
     pricingID = models.AutoField(primary_key=True)
     pricingBasePrice = models.DecimalField(max_digits=8, decimal_places=3)
-    pricingDateCreated = models.DateTimeField('date created')
+    pricingDateCreated = models.DateTimeField('date created', auto_now_add=True)
     pricingStartDate = models.DateTimeField('start date')
     pricingEndDate = models.DateTimeField('end date')
     pricingNote = models.TextField(max_length=200)
@@ -40,15 +40,6 @@ class PDiscount(models.Model):
     def __str__(self):
         return self.pDiscountName
 
-    @property
-    def get_discount_price(self, price):
-        if self.pDiscountType == 'Percent':
-            discount_amount = price - (price * self.pDiscountValue)
-            return discount_amount
-        elif self.pDiscountType == 'Amount':
-            discount_amount = price - self.pDiscountValue
-            return discount_amount
-
 class CDiscount(models.Model):
     cDiscountID = models.AutoField(primary_key=True)
     cDiscountName = models.CharField(max_length=40)
@@ -69,14 +60,6 @@ class CDiscount(models.Model):
 
     def __str__(self):
         return self.cDiscountName
-
-    def get_discount_price(self, price):
-        if self.cDiscountType == 'Percent':
-            discount_amount = price - (price * self.cDiscountValue)
-            return discount_amount
-        elif self.cDiscountType == 'Amount':
-            discount_amount = price - self.cDiscountValue
-            return discount_amount
 
 # class TDiscount(models.Model):
     # tDiscountID = models.AutoField(primary_key=True)
