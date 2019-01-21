@@ -35,6 +35,7 @@
                 {% else %}
                     <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
                 {% endif %}
+                <!--{% product_size_color_form %}-->
                 <ul>
                     {% for purchaseitem in product.purchaseitems_set.all %}
                         <li>{{purchaseitem.piColor}}</li>

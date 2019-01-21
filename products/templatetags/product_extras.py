@@ -1,5 +1,5 @@
 from django import template
-
+from ..forms import ProductSizeColorForm
 register = template.Library()
 
 # def __init__(self, obj):
@@ -17,6 +17,11 @@ def get_discount_price(context, price):
         context['price'] = discount_amount
         return discount_amount
 
+@register.inclusion_tag('products/_form.html', takes_context=True)
+def product_size_color_form(context):
+    form = ProductSizeColorForm()
+    context['form'] = form
+    return {'form': form}
 # def get_discount_price(self, price):
     # if self.pDiscountType == 'Percent':
         # discount_amount = price - (price * self.pDiscountValue)

@@ -1,0 +1,10 @@
+<form method="GET" action="">
+    {% csrf_token %}
+    {% for purchaseitem in product.purchaseitems_set.all %}
+        <label class="radio-inline"><input type="radio" name="color" checked>{{purchaseitem.piColor}}</label>
+    {% endfor %}
+    {% for purchaseitem in product.purchaseitems_set.all %}
+        <label class="radio-inline"><input type="radio" name="color" checked>{{purchaseitem.piSize}}</label>
+    {% endfor %}
+    <input type="submit" value="Add to Bag">
+</form>
