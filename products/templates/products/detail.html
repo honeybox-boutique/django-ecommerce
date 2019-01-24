@@ -21,14 +21,13 @@
             <div class="col col-lg-2 bg-warning">
                 <div class="row">
                     <p>Mini pics here.</p>
-                    <p>{{category.categoryName}}</p>
                 </div>
             </div>
             <div class="col-md-6 bg-secondary">
                 <img src="{{ product.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}" height="364" width="300">
             </div>
             <div class="col-md-4 bg-warning">
-                <h2>{{product.productName}}</h2>
+                <h2>{{product1.first.productName}}</h2>
                 {% if product.pricing_set.first.productID.pdiscount_set.first.pDiscountType %}
                     <s>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</s>
                     <h4>${% get_discount_price product.pricing_set.first.pricingBasePrice as discounted_price %}{{discounted_price|floatformat:2}}</h4>
@@ -36,20 +35,46 @@
                     <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
                 {% endif %}
                 <!--{% product_size_color_form %}-->
-                <ul>
-                    {% for purchaseitem in product.purchaseitems_set.all %}
-                        <li>{{purchaseitem.piColor}}</li>
-                    {% endfor %}
-                </ul>
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Size
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        {% for purchaseitem in product.purchaseitems_set.all %}
-                            <li>{{purchaseitem.piSize}}</li>
+
+                <!--
+                <form method="post" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}" novalidate>
+                    <select id="test">
+                        {% for productcolor in product1.first.productcolor_set.all %}
+                            <option value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
                         {% endfor %}
-                    </ul>
-                </div>
+                    </select>
+                    {% csrf_token %}
+                    <button type="submit">Save</button>
+                </form>
+                -->
+                <form method="post" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}" novalidate>
+                    <select id="color">
+                        {% for productcolor in product1.first.productcolor_set.all %}
+                            <option value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
+                        {% endfor %}
+                    </select>
+                    <select id="size">
+                            <option value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
+                    </select>
+                </form>
+                <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+                <script>
+                    $("#color").change(function () {
+                    var url = $("#shopCartForm").attr("data-sizes-url");  // get the url of the `load_cities` view
+                    var productColorName = $(this).val();  // get the selected country ID from the HTML input
+
+                    $.ajax({                       // initialize an AJAX request
+                        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+                        data: {
+                        'productColorName': productColorName       // add the country id to the GET parameters
+                        },
+                        success: function (data) {   // `data` is the return of the `load_cities` view function
+                        $("#size").html(data);  // replace the contents of the city input with the data that came from the server
+                        }
+                    });
+
+                    });
+                </script>
                 <p>{{product.productDescription}}</p>
                 <button>Add to Bag</button>
             </div>

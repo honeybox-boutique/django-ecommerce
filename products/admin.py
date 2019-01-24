@@ -1,15 +1,33 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Product, Category, ProductImage, CategoryImage
+from .models import Product, Category, ProductImage, CategoryImage, ProductColor, Color
 
-class ProdImgInline(admin.StackedInline):
+class ProdColorInline(admin.StackedInline):
+    model = ProductColor
+
+class ProductImageInline(admin.StackedInline):
     model = ProductImage
+
+class ProductColorAdmin(admin.ModelAdmin):
+    model = ProductColor
+    inlines = [
+        ProductImageInline
+    ]
+admin.site.register(ProductColor, ProductColorAdmin)
+
+class ColorAdmin(admin.ModelAdmin):
+    model = Color
+    inlines = [
+        ProdColorInline,
+    ]
+admin.site.register(Color, ColorAdmin)
+
 
 class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ['productSlug']
     inlines = [
-        ProdImgInline,
+        ProdColorInline,
     ]
 admin.site.register(Product, ProductAdmin)
 

@@ -11,4 +11,5 @@ urlpatterns = [
     path('<category>/', views.ProductList.as_view(), name='category'),
     # path('<int:pk>/detail/', views.ProductDetail.as_view(), name='detail'),
     path('<str:category>/<slug:productSlug>/', views.ProductDetail.as_view(), name='detail'),
+    path('ajax/load-sizes', views.load_sizes, name='ajax_load_sizes'),
 ] 
