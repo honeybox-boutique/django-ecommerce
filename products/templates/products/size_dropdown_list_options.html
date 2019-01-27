@@ -3,5 +3,5 @@
     <option value="{{size.pk}}">{{size.piSize}}</option>
 {% endfor %}
 {% for image in images %}
-    <img src="{{ image.productImagePath.url }}" alt="" class="img-thumbnail">
+    <img src="{{ image.productImagePath.url }}" alt="" class="img-fluid">
 {% endfor %}
