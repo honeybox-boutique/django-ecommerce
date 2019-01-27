@@ -73,6 +73,7 @@ class ProductColor(models.Model):
 class ProductImage(models.Model):
     productImageID = models.AutoField(primary_key=True)
     productImagePath = models.ImageField(upload_to='products')
+    # Add alt text field here - productImageAltText = models.CharField(max_length=40)
 
     productColorID = models.ForeignKey(ProductColor, on_delete=models.CASCADE)
 

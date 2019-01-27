@@ -38,18 +38,22 @@
         <div class="row">
         {% for product in product_list %}
             <div class="col-md-4">
-                <a href="{% url 'products:detail' view.kwargs.category product.productSlug %}">
-                    <img src="{{ product.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}" height="364" width="300">
-                </a>
-                <h2 class="text-center">{{product.productName}}</h2>
-                {% if product.pricing_set.first.productID.pdiscount_set.first.pDiscountType %}
-                    <div class="text-center">
-                        <s>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</s>
-                        <h4>${% get_discount_price product.pricing_set.first.pricingBasePrice as discounted_price %}{{discounted_price|floatformat:2}}</h4>
-                    </div>
-                {% else %}
-                    <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
-                {% endif %}
+                <div class="thumbnail">
+                    <a class="text-center" href="{% url 'products:detail' view.kwargs.category product.productSlug %}">
+                        <img style="width:100%" src="{{ product.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
+                    </a>
+                    <h2 class="text-center">{{product.productName}}</h2>
+                    {% if product.pricing_set.first.productID.pdiscount_set.first.pDiscountType %}
+                        <div class="text-center">
+                            <s>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</s>
+                            <h4>${% get_discount_price product.pricing_set.first.pricingBasePrice as discounted_price %}{{discounted_price|floatformat:2}}</h4>
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         {% endfor %}
         </div>

@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.utils import timezone
 from pricing.models import Product, Pricing
 from purchases.models import PurchaseItems
+from products.models import ProductImage
+from django.http import JsonResponse
 # import django_filters
 # Create your views here.
 
@@ -66,7 +68,7 @@ class ProductDetail(generic.DetailView):
         # Get pricing table queryset filtered for current valid pricing
         pricingDateQuery = Pricing.objects.filter(pricingStartDate__lte=timezone.now(), pricingEndDate__gte=timezone.now())
         # Get colorset for product
-        product_color_query = Product.objects.filter(productSlug__exact=self.kwargs['productSlug'], productcolor__productColorID__isnull=False)
+        product_color_query = Product.objects.filter(productSlug__exact=self.kwargs['productSlug'], productcolor__productimage__isnull=False)
         # Get purchaseItems queryset filtered on product ID
         purchaseItemsQuery = PurchaseItems.objects.filter(productID__productSlug=self.kwargs['productSlug']).distinct('piColor')
         # set pricingDateQuery prefetch query variable
@@ -81,6 +83,10 @@ class ProductDetail(generic.DetailView):
 
 def load_sizes(request):
     """ This method will populate the available purchaseitem sizes based on color selection """
-    productColorName = request.GET.get('productColorName')
-    sizes = PurchaseItems.objects.filter(piColor__iexact=productColorName).distinct('piSize')
-    return render(request, 'products/size_dropdown_list_options.html', {'sizes': sizes})
+    productColorID = request.GET.get('productColorID')
+    productSlug = request.GET.get('productSlug')
+    sizes = PurchaseItems.objects.filter(piColor__colorName__exact=productColorID, productID__productSlug__iexact=productSlug).distinct('piSize').values('piSize')
+    # data = [{'piSize': size.piSize} for size in size_list]
+    images = ProductImage.objects.filter(productColorID__colorID__colorName__iexact=productColorID, productColorID__productID__productSlug__iexact=productSlug)# .values('productImagePath')
+    # return render(request, 'products/size_dropdown_list_options.html', {'sizes': sizes, 'images': images})
+    return render(request, 'products/size_dropdown_list_options.html', {'sizes': sizes, 'images': images})

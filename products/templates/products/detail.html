@@ -19,59 +19,82 @@
     <div class="container">
         <div class="row">
             <div class="col col-lg-2 bg-warning">
-                <div class="row">
-                    <p>Mini pics here.</p>
+                <div id="data-product-small-image" class="row">
+                    {% for productImage in product1.first.productcolor_set.first.productimage_set.all|slice:"1:" %}
+                    <img style="width:100%" class="img-thumbnail" src="{{ productImage.productImagePath.url }}" alt="">-->
+                    {% endfor %}
                 </div>
             </div>
-            <div class="col-md-6 bg-secondary">
-                <img src="{{ product.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}" height="364" width="300">
+            <div id="data-product-big-image" class="col-md-6">
+                <img style="width:100%" src="{{ product1.first.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
             </div>
             <div class="col-md-4 bg-warning">
-                <h2>{{product1.first.productName}}</h2>
+                <h2 id="product" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h2>
                 {% if product.pricing_set.first.productID.pdiscount_set.first.pDiscountType %}
                     <s>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</s>
                     <h4>${% get_discount_price product.pricing_set.first.pricingBasePrice as discounted_price %}{{discounted_price|floatformat:2}}</h4>
                 {% else %}
                     <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
                 {% endif %}
-                <!--{% product_size_color_form %}-->
-
-                <!--
                 <form method="post" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}" novalidate>
-                    <select id="test">
+                    <!--<select id="color">
                         {% for productcolor in product1.first.productcolor_set.all %}
-                            <option value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
+                            <option value="{{productcolor.colorID}}">{{productcolor.colorID.colorName}}</li>
                         {% endfor %}
-                    </select>
-                    {% csrf_token %}
-                    <button type="submit">Save</button>
-                </form>
-                -->
-                <form method="post" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}" novalidate>
-                    <select id="color">
+                    </select>-->
+                    <div id="color" class="btn-group btn-group-toggle" data-toggle="buttons">
                         {% for productcolor in product1.first.productcolor_set.all %}
-                            <option value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
+                        <!-- if first loop iteration then use checked>-->
+                        <label>
+                            <input type="radio" name="colorradio" value="{{productcolor.colorID}}" autocomplete="off"> {{productcolor.colorID.colorName}}
+                        </label>
                         {% endfor %}
-                    </select>
+                        <!-- else use unchecked 
+                        <label class="btn btn-secondary active">
+                            <input type="radio" value="{{productcolor.colorID}}" autocomplete="off"> {{productcolor.colorID.colorName}}
+                        </label>-->
+                    </div>
                     <select id="size">
                             <option value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
                     </select>
                 </form>
                 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
                 <script>
-                    $("#color").change(function () {
-                    var url = $("#shopCartForm").attr("data-sizes-url");  // get the url of the `load_cities` view
-                    var productColorName = $(this).val();  // get the selected country ID from the HTML input
+                    $('input[type="radio"]').on("click", function() {
+                        var url = $("#shopCartForm").attr("data-sizes-url");  // get the url of the `load_cities` view
+                        var productColorID = $(this).val();  // get the selected country ID from the HTML input
+                        var productSlug = $("#product").attr("data-product-slug");
+                        $(this).checked = true;
 
-                    $.ajax({                       // initialize an AJAX request
-                        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-                        data: {
-                        'productColorName': productColorName       // add the country id to the GET parameters
-                        },
-                        success: function (data) {   // `data` is the return of the `load_cities` view function
-                        $("#size").html(data);  // replace the contents of the city input with the data that came from the server
-                        }
-                    });
+                        $.ajax({                       // initialize an AJAX request
+                            url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+
+                            data: {
+                            'productColorID': productColorID,       // add the country id to the GET parameters
+                            'productSlug': productSlug       // add the country id to the GET parameters
+                            },
+
+                            success: function (data) {   // `data` is the return of the `load_cities` view function
+                                $("#size").html(data);  // replace the contents of the city input with the data that came from the server
+                                // split response into array on newline
+                                var array = data.split("\n");
+                                // initialize containers for sizes and images
+                                var sizeArray = [];
+                                var imgArray = [];
+                                // for loop to get size options and image tags into array
+                                for(var x in array){
+
+                                    if(array[x].includes("<option") == true){
+                                        sizeArray[x] = array[x];
+                                    }
+                                    else if(array[x].includes("<img") == true){
+                                        imgArray[x] = array[x];
+                                    }
+
+                                }
+                                $("#data-product-small-image").html(imgArray)
+                            }
+                        });
 
                     });
                 </script>
