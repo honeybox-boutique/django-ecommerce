@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.db.models.signals import pre_save, post_save, m2m_changed
 from purchases.models import PurchaseItems
 
 User = settings.AUTH_USER_MODEL
@@ -9,19 +10,26 @@ User = settings.AUTH_USER_MODEL
 class ShopCartManager(models.Manager):
 
     def get_or_new(self, request):
-        shopcart_id = request.session.get('shopcart_id', None)
-        qs = self.get_queryset().filter(id=shopcart_id)
+        cart_id = request.session.get('cart_id', None)
+        qs = self.get_queryset().filter(id=cart_id)
         if qs.count() == 1:
             new_obj = False
             cart_obj = qs.first()
-            if request.user.is_authenticated() and cart_obj.user is None:
+            if request.user.is_authenticated and cart_obj.user is None:
                 cart_obj.user = request.user
                 cart_obj.save()
         else:
             new_obj = True
-            cart_obj = ShopCart.objects.new_cart(user=request.user)
+            cart_obj = ShopCart.objects.new(user=request.user)
             request.session['cart_id'] = cart_obj.id
         return cart_obj, new_obj
+
+    def new(self, user=None):
+        user_obj = None
+        if user is not None:
+            if user.is_authenticated:
+                user_obj = user
+        return self.model.objects.create(user=user_obj)
 
 class ShopCart(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
@@ -50,14 +58,12 @@ class ShopCart(models.Model):
     class Meta:
         db_table = 'shopcart'
 
-# class ShopCartItems(models.Model):
-    # shopCartItemID = models.AutoField(primary_key=True)
-
-    # shopCartID = models.ForeignKey(ShopCart, on_delete=models.PROTECT)
-    # prodStockID = models.ForeignKey(PurchaseItems, on_delete=models.PROTECT)
-
-    # def __str__(self):
-        # return str(self.id)
-
-    # class Meta:
-        # db_table = 'shopcart_items'
+def pre_save_shopcart_receiver(sender, instance, action, *args, **kwargs):
+    if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+        shopcart_items = instance.shopCartItems.all().select_related('productID')
+        subtotal = 0
+        for item in shopcart_items:
+            subtotal += item.productID.pricing_set.first().pricingBasePrice
+        instance.shopCartSubTotal = subtotal
+        instance.save()
+m2m_changed.connect(pre_save_shopcart_receiver, sender=ShopCart.shopCartItems.through)
