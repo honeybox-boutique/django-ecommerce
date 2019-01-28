@@ -18,25 +18,27 @@
     
     <div class="container">
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-lg-2"><!-- small images column -->
                 <div id="data-product-small-image" class="thumbnail">
                     {% for productImage in product1.first.productcolor_set.first.productimage_set.all %}
                     <img class="img-fluid" style="width:100%" src="{{ productImage.productImagePath.url }}" alt="">
                     {% endfor %}
                 </div>
             </div>
-            <div id="data-product-big-image" class="col-md-6">
+            <div id="data-product-big-image" class="col-md-6"><!-- big image column -->
                 <img style="width:100%" src="{{ product1.first.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4"><!-- details column -->
                 <h2 id="product" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h2>
-                {% if product.pricing_set.first.productID.pdiscount_set.first.pDiscountType %}
+
+                {% if product.pricing_set.first.productID.pdiscount_set.first.pDiscountType %}<!-- pricing logic -->
                     <s>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</s>
                     <h4>${% get_discount_price product.pricing_set.first.pricingBasePrice as discounted_price %}{{discounted_price|floatformat:2}}</h4>
                 {% else %}
                     <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
                 {% endif %}
-                <form action="thiswillbeshopcart-update" method="POST" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}">
+
+                <form action="thiswillbeshopcart-update" method="POST" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}"><!-- cart form -->
                     <div id="color">
                         {% for productcolor in product1.first.productcolor_set.all %}
                         <label>
@@ -49,6 +51,7 @@
                     </select>
                     <button type="submit">Add to Bag</button>
                 </form>
+
                 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
                 <script>
                     $('input[type="radio"]').on("click", function() {
@@ -90,6 +93,10 @@
                     });
                 </script>
                 <p>{{product.productDescription}}</p>
+                <p>CartID: {{ shopcart }}</p>
+                {% for item in shopcart.shopCartItems.all %}
+                    <p>{{ item.productID }}</p>
+                {% endfor %}
             </div>
         </div>
     </div> <!-- /container -->

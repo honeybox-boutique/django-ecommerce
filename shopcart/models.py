@@ -12,10 +12,11 @@ class ShopCartManager(models.Manager):
     def get_or_new(self, request):
         cart_id = request.session.get('cart_id', None)
         qs = self.get_queryset().filter(id=cart_id)
-        if qs.count() == 1:
+        if qs.count() == 1:# Check if session cart exists
             new_obj = False
             cart_obj = qs.first()
-            if request.user.is_authenticated and cart_obj.user is None:
+            if request.user.is_authenticated and cart_obj.user is None:# If auth and shoppincart user not set
+                # add check if user has existing cart
                 cart_obj.user = request.user
                 cart_obj.save()
         else:
@@ -58,12 +59,16 @@ class ShopCart(models.Model):
     class Meta:
         db_table = 'shopcart'
 
-def pre_save_shopcart_receiver(sender, instance, action, *args, **kwargs):
+def m2m_changed_shopcart_receiver(sender, instance, action, *args, **kwargs):
     if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
-        shopcart_items = instance.shopCartItems.all().select_related('productID')
+        shopcart_items = instance.shopCartItems.all().select_related('productID')# may need optimizing
         subtotal = 0
-        for item in shopcart_items:
+        for item in shopcart_items:# this loop needs optimizing, pretty sure querying for every loop
             subtotal += item.productID.pricing_set.first().pricingBasePrice
         instance.shopCartSubTotal = subtotal
         instance.save()
-m2m_changed.connect(pre_save_shopcart_receiver, sender=ShopCart.shopCartItems.through)
+m2m_changed.connect(m2m_changed_shopcart_receiver, sender=ShopCart.shopCartItems.through)
+
+# def pre_save_shopcart_receiver(sender, instance, *args, **kwargs):
+    # instance.
+# pre_save.connect(pre_save_shopcart_receiver, sender=ShopCart.shopCartItems.through)

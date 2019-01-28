@@ -5,7 +5,7 @@ from django.utils import timezone
 from pricing.models import Product, Pricing
 from purchases.models import PurchaseItems
 from products.models import ProductImage
-from django.http import JsonResponse
+from shopcart.models import ShopCart
 # import django_filters
 # Create your views here.
 
@@ -47,10 +47,8 @@ class ProductDetail(generic.DetailView):
     slug_url_kwarg = 'productSlug'
     slug_field = 'productSlug'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         """ queries database for a product using the criteria below and adds it to context:
-
-
 
         prefetches pricing queryset:
             product pricing StartDate before now
@@ -64,7 +62,7 @@ class ProductDetail(generic.DetailView):
             productslug = kwarg
         """
         # Call the base implementation first to get the context
-        context = super(ProductDetail, self).get_context_data(**kwargs)
+        context = super(ProductDetail, self).get_context_data(*args, **kwargs)
         # Get pricing table queryset filtered for current valid pricing
         pricingDateQuery = Pricing.objects.filter(pricingStartDate__lte=timezone.now(), pricingEndDate__gte=timezone.now())
         # Get colorset for product
@@ -76,7 +74,10 @@ class ProductDetail(generic.DetailView):
         purchasePrefetch = Prefetch('purchaseitems_set', queryset=purchaseItemsQuery)
         # Do query for product queryset and include prefetch queryset
         productQuerySet = Product.objects.prefetch_related(pricingPrefetch, purchasePrefetch).get(productSlug__exact=self.kwargs['productSlug'])
+        # get or add cart
+        cart_obj, new_obj = ShopCart.objects.get_or_new(self.request)
         # Create any data and add it to the context
+        context['shopcart'] = cart_obj
         context['product1'] = product_color_query
         context['product'] = productQuerySet
         return context

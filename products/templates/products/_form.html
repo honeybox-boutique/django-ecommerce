@@ -1,10 +1,13 @@
-<form method="GET" action="">
-    {% csrf_token %}
-    {% for purchaseitem in product.purchaseitems_set.all %}
-        <label class="radio-inline"><input type="radio" name="color" checked>{{purchaseitem.piColor}}</label>
-    {% endfor %}
-    {% for purchaseitem in product.purchaseitems_set.all %}
-        <label class="radio-inline"><input type="radio" name="color" checked>{{purchaseitem.piSize}}</label>
-    {% endfor %}
-    <input type="submit" value="Add to Bag">
+<form method="POST" action="{% url 'shopcart:update' %}" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}"><!-- cart form -->
+    <div id="color">
+        {% for productcolor in product1.first.productcolor_set.all %}
+        <label>
+            <input type="radio" name="color-selection" value="{{productcolor.colorID}}" autocomplete="off"> {{productcolor.colorID.colorName}}
+        </label>
+        {% endfor %}
+    </div>
+    <select id="size">
+            <option name="size-selection" value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
+    </select>
+    <button type="submit">Add to Bag</button>
 </form>
