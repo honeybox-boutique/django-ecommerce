@@ -1,6 +1,6 @@
 <option value="">---------</option>
 {% for size in sizes %}
-    <option value="{{size.pk}}">{{size.piSize}}</option>
+    <option name="size" value="{{size.pk}}">{{size.piSize}}</option>
 {% endfor %}
 {% for image in images %}
     <img src="{{ image.productImagePath.url }}" alt="" class="img-fluid">

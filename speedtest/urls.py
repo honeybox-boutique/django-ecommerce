@@ -27,4 +27,8 @@ urlpatterns = [
     path('shopcart/', include('shopcart.urls')),
     path('pricing/', include('pricing.urls')),
     path('', TemplateView.as_view(template_name="index.html"), name='home'),
+    path('returns/', TemplateView.as_view(template_name="returns.html"), name='returns'),
+    path('data-privacy/', TemplateView.as_view(template_name="data-privacy.html"), name='dataprivacy'),
+    path('terms-of-service/', TemplateView.as_view(template_name="terms-of-service.html"), name='tos'),
+    path('contact-us/', TemplateView.as_view(template_name="contact-us.html"), name='contact'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

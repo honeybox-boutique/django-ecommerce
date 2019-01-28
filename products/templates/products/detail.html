@@ -36,27 +36,18 @@
                 {% else %}
                     <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
                 {% endif %}
-                <form method="post" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}" novalidate>
-                    <!--<select id="color">
+                <form action="thiswillbeshopcart-update" method="POST" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}">
+                    <div id="color">
                         {% for productcolor in product1.first.productcolor_set.all %}
-                            <option value="{{productcolor.colorID}}">{{productcolor.colorID.colorName}}</li>
-                        {% endfor %}
-                    </select>-->
-                    <div id="color" class="btn-group btn-group-toggle" data-toggle="buttons">
-                        {% for productcolor in product1.first.productcolor_set.all %}
-                        <!-- if first loop iteration then use checked>-->
                         <label>
-                            <input type="radio" name="colorradio" value="{{productcolor.colorID}}" autocomplete="off"> {{productcolor.colorID.colorName}}
+                            <input type="radio" name="color-selection" value="{{productcolor.colorID}}" autocomplete="off"> {{productcolor.colorID.colorName}}
                         </label>
                         {% endfor %}
-                        <!-- else use unchecked 
-                        <label class="btn btn-secondary active">
-                            <input type="radio" value="{{productcolor.colorID}}" autocomplete="off"> {{productcolor.colorID.colorName}}
-                        </label>-->
                     </div>
                     <select id="size">
-                            <option value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
+                            <option name="size-selection" value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
                     </select>
+                    <button type="submit">Add to Bag</button>
                 </form>
                 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
                 <script>
@@ -99,7 +90,6 @@
                     });
                 </script>
                 <p>{{product.productDescription}}</p>
-                <button>Add to Bag</button>
             </div>
         </div>
     </div> <!-- /container -->

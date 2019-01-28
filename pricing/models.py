@@ -5,7 +5,7 @@ from products.models import Product, Category
 
 class Pricing(models.Model):
     pricingID = models.AutoField(primary_key=True)
-    pricingBasePrice = models.DecimalField(max_digits=8, decimal_places=3)
+    pricingBasePrice = models.DecimalField(max_digits=12, decimal_places=2)
     pricingDateCreated = models.DateTimeField('date created', auto_now_add=True)
     pricingStartDate = models.DateTimeField('start date')
     pricingEndDate = models.DateTimeField('end date')
@@ -24,13 +24,13 @@ class PDiscount(models.Model):
     pDiscountName = models.CharField(max_length=40)
     pDiscountDescription = models.TextField(max_length=200)
     pDiscountType = models.CharField(max_length=30)
-    pDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)
+    pDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)
     pDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
     pDiscountDateValidFrom = models.DateTimeField('valid from')
     pDiscountDateValidUntil = models.DateTimeField('valid until')
     pDiscountCouponCode = models.CharField(max_length=20)
-    pDiscountMaxDiscount = models.DecimalField(max_digits=8, decimal_places=3)
-    pDiscountMinOrderValue = models.DecimalField(max_digits=8, decimal_places=3)
+    pDiscountMaxDiscount = models.DecimalField(max_digits=12, decimal_places=2)
+    pDiscountMinOrderValue = models.DecimalField(max_digits=12, decimal_places=2)
 
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
 
@@ -45,13 +45,13 @@ class CDiscount(models.Model):
     cDiscountName = models.CharField(max_length=40)
     cDiscountDescription = models.TextField(max_length=200)
     cDiscountType = models.CharField(max_length=30)
-    cDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)
+    cDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)
     cDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
     cDiscountDateValidFrom = models.DateTimeField('valid from')
     cDiscountDateValidUntil = models.DateTimeField('valid until')
     cDiscountCouponCode = models.CharField(max_length=20)
-    cDiscountMaxDiscount = models.DecimalField(max_digits=8, decimal_places=3)
-    cDiscountMinOrderValue = models.DecimalField(max_digits=8, decimal_places=3)
+    cDiscountMaxDiscount = models.DecimalField(max_digits=12, decimal_places=2)
+    cDiscountMinOrderValue = models.DecimalField(max_digits=12, decimal_places=2)
 
     categoryID = models.ForeignKey(Category, on_delete=models.CASCADE)
 

@@ -84,7 +84,20 @@
 
     {% block footer %}
     <footer class="container bg-warning">
-      <p>&copy; Company 2017-2018</p>
+      <div class="row text-center">
+        <div class="col-md-4">
+            <p><a href="{% url 'returns' %}">Returns</a></p>
+            <p><a href="{% url 'contact' %}">Contact Us</a></p>
+            <p><a href="{% url 'dataprivacy' %}">Data Privacy Policy</a></p>
+            <p><a href="{% url 'tos' %}">Terms of Service</a></p>
+        </div>
+        <div class="col-md-4">
+          <p>&copy; Company 2017-2018</p>
+        </div>
+        <div class="col-md-4">
+          <p>&copy; Company 2017-2018</p>
+        </div>
+      </div>
     </footer>
     {% endblock %}
     <!-- Optional JavaScript -->
