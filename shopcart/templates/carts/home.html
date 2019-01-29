@@ -1,4 +1,27 @@
 {% extends 'layout.html' %}
 {% block content %}
 <h1>Cart</h1>
+{% if shopcart.shopCartItems.exists %}
+<table>
+    <tbody>
+        {% for item in shopcart.shopCartItems.all %}
+        <tr>
+            <th scope="row">-</th>
+            <td>{{ item.productID }}</td>
+            <td>{{ item.piColor }}</td>
+            <td>{{ item.piSize }}</td>
+            <td>{{ item.productID.pricing_set.first.pricingBasePrice}}</td>
+        </tr>
+        {% endfor %}
+
+        <tr>
+            <td colspan="4">-</td>
+            <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
+        </tr>
+
+    </tbody>
+</table>
+{% else %}
+<h2>Shopping cart is empty.</h2>
+{% endif %}
 {% endblock %}
