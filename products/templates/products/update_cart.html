@@ -1,0 +1,28 @@
+<form method="POST" action="{% url 'shopcart:update' %}" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}"> {% csrf_token %}
+    <input type="hidden" name="productSlug" value="{{ product1.first.productSlug }}"/>
+    <div id="color">
+        <label>Color: 
+        <div>
+        {% for productcolor in product1.first.productcolor_set.all %}
+            <input type="radio" name="color-selection" value="{{ productcolor.colorID }}"/> {{productcolor.colorID.colorName}}
+        {% endfor %}
+        </div>
+        </label>
+    </div>
+    <div>
+        <label>Sizes: 
+            <div id="size">
+            </div>
+        </label>
+    </div>
+    <div>
+        <label>Quantity
+            <input type="number" name="quantity" value="1"/>
+        </label>
+    </div>
+    <button type="submit">Add to Bag</button>
+    <p>CartID: {{ shopcart }}</p>
+    {% for item in shopcart.shopCartItems.all %}
+        <p>{{ item.productID }}</p>
+    {% endfor %}
+</form>

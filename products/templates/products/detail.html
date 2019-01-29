@@ -38,21 +38,11 @@
                     <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
                 {% endif %}
 
-                <form action="thiswillbeshopcart-update" method="POST" id="shopCartForm" data-sizes-url="{% url 'products:ajax_load_sizes' %}"><!-- cart form -->
-                    <div id="color">
-                        {% for productcolor in product1.first.productcolor_set.all %}
-                        <label>
-                            <input type="radio" name="color-selection" value="{{productcolor.colorID}}" autocomplete="off"> {{productcolor.colorID.colorName}}
-                        </label>
-                        {% endfor %}
-                    </div>
-                    <select id="size">
-                            <option name="size-selection" value="{{productcolor.productColorName}}">{{productcolor.productColorName}}</li>
-                    </select>
-                    <button type="submit">Add to Bag</button>
-                </form>
-
+                <!-- update_cart form -->
+                {% include 'products/update_cart.html' with productcolor=product1.first.productcolor_set.all shopcart=shopcart  %}
                 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+                <!-- ajax/load-sizes script -->
                 <script>
                     $('input[type="radio"]').on("click", function() {
                         var url = $("#shopCartForm").attr("data-sizes-url");  // get the url of the `load_cities` view
@@ -77,7 +67,7 @@
                                 // for loop to get size options and image tags into array
                                 for(var x in array){
 
-                                    if(array[x].includes("<option") == true){
+                                    if(array[x].includes("<input") == true){
                                         sizeArray[x] = array[x];
                                     }
                                     else if(array[x].includes("<img") == true){
@@ -93,10 +83,6 @@
                     });
                 </script>
                 <p>{{product.productDescription}}</p>
-                <p>CartID: {{ shopcart }}</p>
-                {% for item in shopcart.shopCartItems.all %}
-                    <p>{{ item.productID }}</p>
-                {% endfor %}
             </div>
         </div>
     </div> <!-- /container -->

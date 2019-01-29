@@ -1,6 +1,5 @@
-<option value="">---------</option>
 {% for size in sizes %}
-    <option name="size" value="{{size.pk}}">{{size.piSize}}</option>
+    <input type="radio" name="size-selection" value="{{ size.piSize }}"> {{ size.piSize }}
 {% endfor %}
 {% for image in images %}
     <img src="{{ image.productImagePath.url }}" alt="" class="img-fluid">
