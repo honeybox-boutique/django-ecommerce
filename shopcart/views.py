@@ -33,7 +33,12 @@ def cart_update(request):
     # if quantity + quantity in cart > purchase_item_query.count() return "not enough in stock to add these to cart"
     if not purchase_item_query:
         print('Not Enough')
+        request.session['cart_count'] = cart_obj.shopCartItems.count()
         return redirect('shopcart:home')
     purchase_item_obj = purchase_item_query.first()
     cart_obj.shopCartItems.add(purchase_item_obj)
+    request.session['cart_count'] = cart_obj.shopCartItems.count()
     return redirect('shopcart:home')
+
+# def checkout(request):
+    # return
