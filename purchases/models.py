@@ -17,16 +17,16 @@ class Vendor(models.Model):
     def __str__(self):
         return self.vendorName
 
-class TransactionType(models.Model):
-    transactionTypeID = models.AutoField(primary_key=True)
-    transactionTypeName = models.CharField(max_length=40)
-    transactionTypeDescription = models.TextField(max_length=200)
+# class TransactionType(models.Model):
+    # transactionTypeID = models.AutoField(primary_key=True)
+    # transactionTypeName = models.CharField(max_length=40)
+    # transactionTypeDescription = models.TextField(max_length=200)
 
-    class Meta:
-        db_table = 'transaction_type'
+    # class Meta:
+        # db_table = 'transaction_type'
 
-    def __str__(self):
-        return self.transactionTypeName
+    # def __str__(self):
+        # return self.transactionTypeName
 
 class Purchase(models.Model):
     purchaseID = models.AutoField(primary_key=True)
@@ -35,7 +35,6 @@ class Purchase(models.Model):
     purchaseStatus = models.CharField(max_length=40)
 
     productID = models.ManyToManyField(Product, through='PurchaseItems')
-    transactionTypeID = models.ForeignKey(TransactionType, on_delete=models.CASCADE)
     userID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:

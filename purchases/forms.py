@@ -14,5 +14,5 @@ PurchaseItemsFormSet = forms.inlineformset_factory(Purchase,
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
-        fields = ('transactionTypeID', 'userID', 'purchaseDate',
+        fields = ('userID', 'purchaseDate',
                   'purchaseStatus', 'purchaseNote')

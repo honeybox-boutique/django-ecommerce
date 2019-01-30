@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .forms import PurchaseItemsForm, PurchaseItemsFormSet, PurchaseForm
-from .models import Vendor, Purchase, PurchaseItems, TransactionType
+from .models import Vendor, Purchase, PurchaseItems
 # Register your models here.
 
 class VendorAdmin(admin.ModelAdmin):
@@ -19,8 +19,3 @@ class PurchaseAdmin(admin.ModelAdmin):
         PurchaseItemsInline,
     ]
 admin.site.register(Purchase, PurchaseAdmin)
-
-class TransactionTypeAdmin(admin.ModelAdmin):
-    inlines = [
-    ]
-admin.site.register(TransactionType, TransactionTypeAdmin)
