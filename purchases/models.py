@@ -28,21 +28,21 @@ class TransactionType(models.Model):
     def __str__(self):
         return self.transactionTypeName
 
-class Transaction(models.Model):
-    transactionID = models.AutoField(primary_key=True)
-    transactionDate = models.DateTimeField('date purchased')
-    transactionNote = models.TextField(max_length=200)
-    transactionStatus = models.CharField(max_length=40)
+class Purchase(models.Model):
+    purchaseID = models.AutoField(primary_key=True)
+    purchaseDate = models.DateTimeField('date purchased')
+    purchaseNote = models.TextField(max_length=200)
+    purchaseStatus = models.CharField(max_length=40)
 
     productID = models.ManyToManyField(Product, through='PurchaseItems')
     transactionTypeID = models.ForeignKey(TransactionType, on_delete=models.CASCADE)
     userID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'transaction'
+        db_table = 'purchase'
 
     def __str__(self):
-        return self.transactionNote
+        return self.purchaseNote
 
 class PurchaseItems(models.Model):
     prodStockID = models.AutoField(primary_key=True)
@@ -53,7 +53,7 @@ class PurchaseItems(models.Model):
     piBarcode = models.ImageField(upload_to='barcodes')
 
     piColor = models.ForeignKey(Color, on_delete=models.CASCADE)
-    transactionID = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+    purchaseID = models.ForeignKey(Purchase, on_delete=models.CASCADE)
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
     vendorID = models.ForeignKey(Vendor, on_delete=models.CASCADE)
 
