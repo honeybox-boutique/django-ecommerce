@@ -10,6 +10,7 @@ from .models import ShopCart, PurchaseItems
 
 def cart_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
+    request.session['cart_count'] = cart_obj.shopCartItems.count()
     return render(request, 'carts/home.html', {"shopcart": cart_obj})
 
 def cart_update(request):
@@ -23,10 +24,7 @@ def cart_update(request):
     color = request.POST.get('color-selection')
     size = request.POST.get('size-selection')
     quantity = request.POST.get('quantity')
-    product_id = 7
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)# get cart
-            # ^exclude pitems already in cart_obj
-    # purchase_item_obj = PurchaseItems.objects.get(prodStockID=product_id)
     purchase_item_query = PurchaseItems.objects.filter(productID__productSlug=product_slug, piColor__colorName=color).filter(piSize=size)
     for cart_item in cart_obj.shopCartItems.all():# exclude all pitems already in cart
         purchase_item_query = purchase_item_query.exclude(pk=cart_item.pk)

@@ -12,14 +12,40 @@ class ShopCartManager(models.Manager):
     def get_or_new(self, request):
         cart_id = request.session.get('cart_id', None)
         qs = self.get_queryset().filter(id=cart_id)
+        # if authenticated
+            # if user cart exists
+                #use user cart
+            #else
         if qs.count() == 1:# Check if session cart exists
             new_obj = False
             cart_obj = qs.first()
-            if request.user.is_authenticated and cart_obj.user is None:# If auth and shoppincart user not set
-                # add check if user has existing cart
-                cart_obj.user = request.user
-                cart_obj.save()
-        else:
+            if request.user.is_authenticated and cart_obj.user is None:# If authed and shoppincart user not set
+                # filter for user cart
+                user_cart = self.get_queryset().filter(user=request.user)
+                if user_cart.count() >= 1:
+                    print('has user cart')
+                    user_cart_obj = user_cart.first()# user cart
+                    items_to_add = cart_obj.shopCartItems.all()
+
+                    # filter out items already present in user cart
+                    for cart_item in user_cart_obj.shopCartItems.all():
+                        # if in usercart, exclude, then save
+                        items_to_add = items_to_add.exclude(pk=cart_item.pk)
+
+                    # add filtered items to user cart
+                    for item in items_to_add:
+                        print('added item to user cart')
+                        user_cart_obj.shopCartItems.add(item)
+
+                    # set cart_obj to modified usercartobj
+                    cart_obj = user_cart_obj
+
+                # if user cart doesn't exist just save session cart to user
+                elif user_cart is None:
+                    cart_obj.user = request.user
+                    cart_obj.save()
+
+        else:# if session cart doesn't exist
             new_obj = True
             cart_obj = ShopCart.objects.new(user=request.user)
             request.session['cart_id'] = cart_obj.id
@@ -33,7 +59,7 @@ class ShopCartManager(models.Manager):
         return self.model.objects.create(user=user_obj)
 
 class ShopCart(models.Model):
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     shopCartDateCreated = models.DateTimeField(auto_now_add=True)
     shopCartLastModified = models.DateTimeField(auto_now=True)
 
