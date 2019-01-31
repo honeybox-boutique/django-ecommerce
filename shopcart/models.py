@@ -7,6 +7,14 @@ from purchases.models import PurchaseItems
 User = settings.AUTH_USER_MODEL
 # Create your models here.
 
+# ShopCart Statuses
+OPEN, SAVED, FROZEN, SUBMITTED = ("Open", "Saved", "Frozen", "Submitted")
+STATUS_CHOICES = (
+    (OPEN, _("Open - currently active")),
+    (SAVED, _("Saved - for items to be purchased later")),
+    (FROZEN, _("Frozen - the basket cannot be modified")),
+    (SUBMITTED, _("Submitted - has been ordered at the checkout")),
+)
 class ShopCartManager(models.Manager):
 
     def get_or_new(self, request):
@@ -43,7 +51,7 @@ class ShopCartManager(models.Manager):
                     # set cart_obj to modified usercartobj
                     print('merging carts')
                     cart_obj = user_cart_obj
-                    print('flushing session cart')
+                    print('deleting session cart key')
                     del request.session['cart_id']
 
                 # if user cart doesn't exist just save session cart to user
@@ -88,14 +96,6 @@ class ShopCart(models.Model):
     shopCartDateCreated = models.DateTimeField(auto_now_add=True)
     shopCartLastModified = models.DateTimeField(auto_now=True)
 
-    # ShopCart Statuses
-    OPEN, SAVED, FROZEN, SUBMITTED = ("Open", "Saved", "Frozen", "Submitted")
-    STATUS_CHOICES = (
-        (OPEN, _("Open - currently active")),
-        (SAVED, _("Saved - for items to be purchased later")),
-        (FROZEN, _("Frozen - the basket cannot be modified")),
-        (SUBMITTED, _("Submitted - has been ordered at the checkout")),
-    )
     shopCartStatus = models.CharField(max_length=40, default=OPEN, choices=STATUS_CHOICES)
 
     shopCartDiscount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)

@@ -1,9 +1,9 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import pre_save, post_save
 
 from speedtest.utils import unique_sale_id_generator
 from purchases.models import PurchaseItems
+from shopcart.models import ShopCart
 
 
 class Sale(models.Model):
@@ -36,16 +36,20 @@ class Sale(models.Model):
     def __str__(self):
         return self.saleStringID
     
+    # Should probably be in model manager?
     # Computes final order total
-    # def get_final_total(self):
-        # sale_sub_total = ?
+    def get_final_total(self, request):
+        cart_obj, new_obj = ShopCart.objects.get_or_new(request)
+        # if new_obj? return you have nothing in cart?
+        cart_sub_total = cart_obj.shopCartSubTotal
         # sale_discount_amount = ?
         # sale_tax_amount = ?
-        # sale_shipping_charged = ?
-        # new_sale_total = sale_sub_total - sale_discount_amount + sale_tax_amount + sale_shipping_charged
+        # shipping_charged = ?
+        # new_sale_total = cart_sub_total - sale_discount_amount + sale_tax_amount + sale_shipping_charged
         # self.saleTotal = new_sale_total
         # self.save()
         # return new_sale_total
+        return cart_sub_total
 
 # Example add many to many relationship
 

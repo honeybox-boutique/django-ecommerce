@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from django.db.models.signals import pre_save, post_save
 from products.models import Product, Category
 
 # Create your models here.
@@ -10,6 +12,7 @@ class Pricing(models.Model):
     pricingStartDate = models.DateTimeField('start date')
     pricingEndDate = models.DateTimeField('end date')
     pricingNote = models.TextField(max_length=200)
+    pricingIsActive = models.BooleanField(default=False)
 
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
 
@@ -18,6 +21,18 @@ class Pricing(models.Model):
 
     def __str__(self):
         return self.pricingNote
+
+def pre_save_pricing_active(sender, instance, *args, **kwargs):
+    current_time = timezone.now()
+    # check if timezone.now is between start and endate of instance
+    print("checking if pricing active")
+    if instance.pricingStartDate < current_time < instance.pricingEndDate: 
+        #set active
+        instance.pricingIsActive = True
+    else:
+        # set not active
+        instance.pricingIsActive = False
+pre_save.connect(pre_save_pricing_active, sender=Pricing)
 
 class PDiscount(models.Model):
     pDiscountID = models.AutoField(primary_key=True)
