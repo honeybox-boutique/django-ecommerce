@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 
 from speedtest.utils import unique_sale_id_generator
 from purchases.models import PurchaseItems
@@ -35,6 +35,17 @@ class Sale(models.Model):
 
     def __str__(self):
         return self.saleStringID
+    
+    # Computes final order total
+    # def get_final_total(self):
+        # sale_sub_total = ?
+        # sale_discount_amount = ?
+        # sale_tax_amount = ?
+        # sale_shipping_charged = ?
+        # new_sale_total = sale_sub_total - sale_discount_amount + sale_tax_amount + sale_shipping_charged
+        # self.saleTotal = new_sale_total
+        # self.save()
+        # return new_sale_total
 
 # Example add many to many relationship
 
@@ -63,3 +74,10 @@ def pre_save_create_sale_id(sender, instance, *args, **kwargs):
     if not instance.saleStringID:
         instance.saleStringID = unique_sale_id_generator(instance)
 pre_save.connect(pre_save_create_sale_id, sender=Sale)
+
+# Might be used to call instance.get_final_total and retrieve all the calculated fields
+# def post_save_sale(sender, instance, created, *args, **kwargs):
+    # if created:# if order just created
+        # # do stuff
+        # pass
+# post_save.connect(post_save_sale, sender=Sale)

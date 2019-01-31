@@ -38,5 +38,11 @@ def cart_update(request):
     request.session['cart_count'] = cart_obj.shopCartItems.count()
     return redirect('shopcart:home')
 
-# def checkout(request):
-    # return
+def checkout_home(request):
+    cart_obj, new_obj = ShopCart.objects.get_or_new(request)# get cart
+    order_obj = None
+    if new_obj or cart_obj.shopCartItems.count() == 0:# if cart was just created redirect to cart home
+       redirect('shopcart:home')
+    else:# cart is not new, begin checkout
+       pass 
+    return render(request, 'carts/checkout.html', {"shopcart": cart_obj})

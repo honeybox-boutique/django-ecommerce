@@ -18,6 +18,10 @@
             <td colspan="4">-</td>
             <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
         </tr>
+        <tr>
+            <td colspan="4">-</td>
+            <td><a class="btn btn-block btn-success" href="{% url 'shopcart:checkout' %}">Checkout</a></td>
+        </tr>
 
     </tbody>
 </table>
