@@ -57,8 +57,13 @@ class Product(models.Model):
         super(Product, self).save(*args, **kwargs)
 
     #Calculate and return baseprice, discount amount, and saleprice for product
-    # def get_price(self, request):
-        # pricing_obj = self.pricing_set
+    # def get_pricings(self, request):
+        # pricing_obj = self.pricing_set.filter(pricingIsActive=True)
+        # prod_discount_obj = ?
+        # category_discount_obj = ?
+        # What if multiple product and multiple category?
+        # get highest discount amount among both and use that for prod discount amount
+        # if pricing_obj.count() == 1:
         # if context['product'].pricing_set.first().productID.pdiscount_set.first().pDiscountType == 'Percent':
             # discount_amount = price - (price * context['product'].pricing_set.first().productID.pdiscount_set.first().pDiscountValue)
             # context['price'] = discount_amount
@@ -67,6 +72,7 @@ class Product(models.Model):
             # discount_amount = price - context['product'].pricing_set.first().productID.pdiscount_set.first().pDiscountValue
             # context['price'] = discount_amount
             # return discount_amount
+        # return pricing_obj
 
 # Add many to many through purchitemcolor table
 class ProductColor(models.Model):

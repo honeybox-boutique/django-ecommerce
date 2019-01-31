@@ -25,18 +25,14 @@ class ProductList(generic.ListView):
         """ queries database for products using the criteria below and adds it to context:
 
         product categoryName = key word argument 'category'
-        product pricing basePrice is not null - this may not be needed
-        product pricing StartDate <= timenow
-        product pricing EndDate <= timenow
+        at least one product pricing is active
         """
         # Call the base implementation first to get the context
         context = super(ProductList, self).get_context_data(**kwargs)
-        # where categoryName == kwarg['category']
+        # filter products based on category kwarg
         product_list_query = Product.objects.filter(productCategories__categoryName=self.kwargs['category'])
-        # where pricingBasePrice is not null
-        product_list_query = product_list_query.filter(pricing__pricingBasePrice__isnull=False)
-        # where now() greater than pricingStartDate and now() less than pricingEndDate
-        product_list_query = product_list_query.filter(pricing__pricingStartDate__lte=timezone.now(), pricing__pricingEndDate__gte=timezone.now())
+        # filter products out with inactive pricings
+        product_list_query = product_list_query.filter(pricing__pricingIsActive=True)
         context['product_list'] = product_list_query
         return context
 

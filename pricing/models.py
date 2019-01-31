@@ -9,8 +9,8 @@ class Pricing(models.Model):
     pricingID = models.AutoField(primary_key=True)
     pricingBasePrice = models.DecimalField(max_digits=12, decimal_places=2)
     pricingDateCreated = models.DateTimeField('date created', auto_now_add=True)
-    pricingStartDate = models.DateTimeField('start date')
-    pricingEndDate = models.DateTimeField('end date')
+    pricingValidFrom = models.DateTimeField('start date')
+    pricingValidUntil = models.DateTimeField('end date')
     pricingNote = models.TextField(max_length=200)
     pricingIsActive = models.BooleanField(default=False)
 
@@ -26,7 +26,9 @@ def pre_save_pricing_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
     # check if timezone.now is between start and endate of instance
     print("checking if pricing active")
-    if instance.pricingStartDate < current_time < instance.pricingEndDate: 
+    if instance.pricingValidFrom < current_time < instance.pricingValidUntil: 
+        # change: check if product has other active pricings
+        # if has other active pricings then don't save and return error "already active pricing"
         #set active
         instance.pricingIsActive = True
     else:
@@ -46,6 +48,7 @@ class PDiscount(models.Model):
     pDiscountCouponCode = models.CharField(max_length=20)
     pDiscountMaxDiscount = models.DecimalField(max_digits=12, decimal_places=2)
     pDiscountMinOrderValue = models.DecimalField(max_digits=12, decimal_places=2)
+    pDiscountIsActive = models.BooleanField(default=False)
 
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
 
@@ -54,6 +57,20 @@ class PDiscount(models.Model):
 
     def __str__(self):
         return self.pDiscountName
+
+def pre_save_discount_active(sender, instance, *args, **kwargs):
+    current_time = timezone.now()
+    # check if timezone.now is between start and endate of instance
+    print("checking if pricing active")
+    if instance.pDiscountValidFrom < current_time < instance.pDiscountValidUntil: 
+        # change: check if product has other active discounts
+        # if has other active pricings then don't save and return error "already active pricing"
+        #set active
+        instance.pDiscountIsActive = True
+    else:
+        # set not active
+        instance.pDiscountIsActive = False
+pre_save.connect(pre_save_discount_active, sender=PDiscount)
 
 class CDiscount(models.Model):
     cDiscountID = models.AutoField(primary_key=True)
