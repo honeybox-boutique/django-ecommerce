@@ -2,7 +2,7 @@ from django.views import generic
 from django.db.models import Prefetch
 from django.shortcuts import render
 from django.utils import timezone
-from pricing.models import Product, Pricing
+from pricing.models import Product, Pricing, PDiscount
 from purchases.models import PurchaseItems
 from products.models import ProductImage
 from shopcart.models import ShopCart
@@ -59,8 +59,10 @@ class ProductDetail(generic.DetailView):
         """
         # Call the base implementation first to get the context
         context = super(ProductDetail, self).get_context_data(*args, **kwargs)
+        # test query for pricing manager
+        pricing_test = PDiscount.largestActive.get_largest_active(self)
         # Get pricing table queryset filtered for current valid pricing
-        pricingDateQuery = Pricing.objects.filter(pricingStartDate__lte=timezone.now(), pricingEndDate__gte=timezone.now())
+        pricingDateQuery = Pricing.objects.filter(pricingIsActive=True)
         # Get colorset for product
         product_color_query = Product.objects.filter(productSlug__exact=self.kwargs['productSlug'], productcolor__productimage__isnull=False)
         # Get purchaseItems queryset filtered on product ID

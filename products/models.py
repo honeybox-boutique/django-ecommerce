@@ -57,9 +57,9 @@ class Product(models.Model):
         super(Product, self).save(*args, **kwargs)
 
     #Calculate and return baseprice, discount amount, and saleprice for product
-    # def get_pricings(self, request):
+    # def get_pricing(self, request):
         # pricing_obj = self.pricing_set.filter(pricingIsActive=True)
-        # prod_discount_obj = ?
+        # prod_discount_obj = self.pdiscount_set.filter()
         # category_discount_obj = ?
         # What if multiple product and multiple category?
         # get highest discount amount among both and use that for prod discount amount
