@@ -1,8 +1,10 @@
+import decimal
 from django.db import models
 from django.utils import timezone
 from django.db.models.signals import pre_save, post_save
 from products.models import Product, Category
 
+ONE_HUNDRED_D = decimal.Decimal('100.00')
 # Create your models here.
 
 class Pricing(models.Model):
@@ -60,10 +62,9 @@ class PDiscount(models.Model):
 
     def get_active_p_discount_amount_or_multiplier(self):
         if self.pDiscountIsActive:
-            print('getting discount amount from pdiscounts')
             discount_type = self.pDiscountType
-            discount_value = self.pDiscountValue
-            discount_returned = 0
+            discount_value = decimal.Decimal(self.pDiscountValue)
+            discount_returned = decimal.Decimal("0.00")
             is_multiplier = False
             #if decimal
             if discount_type == 'Decimal':
@@ -73,20 +74,17 @@ class PDiscount(models.Model):
             elif discount_type == 'Percent':
                 is_multiplier = True
                 # return discount_value
-                discount_returned = (discount_value / 100)
+                discount_returned = discount_value / ONE_HUNDRED_D
             return discount_returned, is_multiplier
 
 def pre_save_pdiscount_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
     # check if timezone.now is between start and endate of instance
-    print("checking if pricing active")
     if instance.pDiscountDateValidFrom < current_time < instance.pDiscountDateValidUntil: 
         # change: check if product has other active discounts
         # if has other active pricings then don't save and return error "already active pricing"
-        print('set active')
         instance.pDiscountIsActive = True
     else:
-        print('set inactive')
         # set not active
         instance.pDiscountIsActive = False
 pre_save.connect(pre_save_pdiscount_active, sender=PDiscount)
@@ -116,11 +114,10 @@ class CDiscount(models.Model):
     def get_active_cdiscount_amount_or_multiplier(self):
         """ Returns discount_returned, the discount amount or multiplier """
         if self.cDiscountIsActive:
-            print('getting discount amount from cdiscounts')
             discount_type = self.cDiscountType
-            discount_value = self.cDiscountValue
+            discount_value = decimal.Decimal(self.cDiscountValue)
             is_multiplier = False
-            discount_returned = 0# amount or multiplier to return
+            discount_returned = decimal.Decimal("0.00")# amount or multiplier to return
             #if decimal
             if discount_type == 'Decimal':
                 # return discount_value
@@ -129,7 +126,7 @@ class CDiscount(models.Model):
             elif discount_type == 'Percent':
                 is_multiplier = True
                 # change: add logic to get category value
-                discount_returned = discount_value / 100
+                discount_returned = discount_value / ONE_HUNDRED_D
             return discount_returned, is_multiplier
         else:
             print('not active')
@@ -137,14 +134,11 @@ class CDiscount(models.Model):
 def pre_save_cdiscount_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
     # check if timezone.now is between start and endate of instance
-    print("checking if cdiscount active")
     if instance.cDiscountDateValidFrom < current_time < instance.cDiscountDateValidUntil: 
         # change: check if product has other active discounts
         # if has other active pricings then don't save and return error "already active pricing"
-        print('set active')
         instance.cDiscountIsActive = True
     else:
-        print('set inactive')
         # set not active
         instance.cDiscountIsActive = False
 pre_save.connect(pre_save_cdiscount_active, sender=CDiscount)
@@ -176,11 +170,10 @@ def post_save_pricing(sender, instance, created, *args, **kwargs):
     product_id = instance.productID.productID
 
     prod_query = Product.objects.filter(productID=product_id)
-    # call get_pricing to update pricing
+    # call update_pricing to update pricing
     if prod_query.count() == 1:
         prod_obj = prod_query.first()
-        prod_obj.get_pricing()
-    print('Updated one product pricing.')
+        prod_obj.update_pricing()
 post_save.connect(post_save_pricing, sender=Pricing)
 
 # PDiscount post_save
@@ -188,11 +181,10 @@ def post_save_p_discount(sender, instance, created, *args, **kwargs):
     # get prod_obj
     product_id = instance.productID.productID
     prod_query = Product.objects.filter(productID=product_id)
-    # call get_pricing to update pricing
+    # call update_pricing to update pricing
     if prod_query.count() == 1:
         prod_obj = prod_query.first()
-        prod_obj.get_pricing()
-    print('Updated one product pricing.')
+        prod_obj.update_pricing()
 post_save.connect(post_save_p_discount, sender=PDiscount)
 
 # CDiscount post_save
@@ -202,6 +194,5 @@ def post_save_c_discount(sender, instance, created, *args, **kwargs):
     # get category products_set
     category_products = Product.objects.filter(productCategories=category_id)
     for product in category_products.all():
-        product.get_pricing()
-        print('Updated one product pricing.')
+        product.update_pricing()
 post_save.connect(post_save_c_discount, sender=CDiscount)

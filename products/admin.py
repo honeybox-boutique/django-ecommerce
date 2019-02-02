@@ -25,7 +25,7 @@ admin.site.register(Color, ColorAdmin)
 
 
 class ProductAdmin(admin.ModelAdmin):
-    readonly_fields = ['productSlug', 'productBasePrice', 'productDiscountAmount', 'productSalePrice']
+    readonly_fields = ['productSlug', 'productBasePrice', 'productDiscountType', 'productDiscountValue', 'productDiscountAmount', 'productSalePrice']
     inlines = [
         ProdColorInline,
     ]
