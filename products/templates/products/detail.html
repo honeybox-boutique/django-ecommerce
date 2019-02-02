@@ -30,11 +30,20 @@
             <div class="col-md-4"><!-- details column -->
                 <h2 id="product" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h2>
 
-                {% if product.pricing_set.first.productID.pdiscount_set.first.pDiscountType %}<!-- pricing logic -->
-                    <s>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</s>
-                    <h4>${% get_discount_price product.pricing_set.first.pricingBasePrice as discounted_price %}{{discounted_price|floatformat:2}}</h4>
+
+                {% if product.productDiscountAmount %}
+
+                <div class="text-center">
+                    <s>${{ product.productBasePrice }}</s>
+                    <h4>${{ product.productSalePrice }}</h4>
+                </div>
+                
                 {% else %}
-                    <h4>${{product.pricing_set.first.pricingBasePrice|floatformat:2}}</h4>
+
+                <div class="text-center">
+                    <h4>${{ product.productSalePrice }}</h4>
+                </div>
+
                 {% endif %}
 
                 <!-- update_cart form -->
@@ -81,7 +90,7 @@
 
                     });
                 </script>
-                <p>{{product.productDescription}}</p>
+                <p>{{ product1.first.productDescription }}</p>
             </div>
         </div>
 
