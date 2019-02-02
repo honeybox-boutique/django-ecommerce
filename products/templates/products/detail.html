@@ -28,20 +28,20 @@
                 <img style="width:100%" src="{{ product1.first.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
             </div>
             <div class="col-md-4"><!-- details column -->
-                <h2 id="product" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h2>
+                <h3 id="product" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h3>
 
 
                 {% if product.productDiscountAmount %}
 
-                <div class="text-center">
+                <div>
                     <s>${{ product.productBasePrice }}</s>
-                    <h4>${{ product.productSalePrice }}</h4>
+                    <p>${{ product.productSalePrice }}</p>
                 </div>
                 
                 {% else %}
 
-                <div class="text-center">
-                    <h4>${{ product.productSalePrice }}</h4>
+                <div>
+                    <p>${{ product.productSalePrice }}</p>
                 </div>
 
                 {% endif %}
