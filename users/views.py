@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import FormView, CreateView
 from .forms import SignUpForm
+from django.contrib.auth import authenticate, login, logout
+from django.utils.http import is_safe_url
 # Create your views here.
 
 def dashboard(request):
@@ -9,4 +11,23 @@ def dashboard(request):
 class SignUpView(CreateView):
     form_class = SignUpForm
     template_name = 'users/signup.html'
-    success_url='/users/login/?next=/'
+
+    def get_success_url(self):
+        next_post = self.request.POST['next']
+        print(is_safe_url(next_post, self.request.get_host()))
+        if is_safe_url(next_post, self.request.get_host()):
+            success_url = next_post
+        else:
+            success_url = '/'
+        return success_url
+
+
+    def form_valid(self, form):
+        valid = super(SignUpView, self).form_valid(form)
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password1')
+        # redirect_url = form.cleaned_data.get('next')
+        new_user = authenticate(username=username, password=password)
+        if new_user is not None:
+            login(self.request, new_user)
+        return valid
