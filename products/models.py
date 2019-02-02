@@ -58,20 +58,40 @@ class Product(models.Model):
 
     #Calculate and return baseprice, discount amount, and saleprice for product
     # def get_pricing(self, request):
-        # pricing_obj = self.pricing_set.filter(pricingIsActive=True)
+    
+        # get product base price
+        # pricing_obj = self.pricing_set.filter(pricingIsActive=True).first()# change: add error checking to pre_save on pricing and replace this with get()
         # prod_discount_obj = self.pdiscount_set.filter()
-        # category_discount_obj = ?
-        # What if multiple product and multiple category?
-        # get highest discount amount among both and use that for prod discount amount
-        # if pricing_obj.count() == 1:
-        # if context['product'].pricing_set.first().productID.pdiscount_set.first().pDiscountType == 'Percent':
-            # discount_amount = price - (price * context['product'].pricing_set.first().productID.pdiscount_set.first().pDiscountValue)
-            # context['price'] = discount_amount
-            # return discount_amount
-        # elif context['product'].pricing_set.first().productID.pdiscount_set.first().pDiscountType == 'Amount':
-            # discount_amount = price - context['product'].pricing_set.first().productID.pdiscount_set.first().pDiscountValue
-            # context['price'] = discount_amount
-            # return discount_amount
+        # category_query = self.productCategories
+        # c_discount_value, is_multiplier = self.productCategories.cdiscount_set
+
+        # get highest pdiscount_amount
+
+        # get highest cdiscount_amount in categories
+
+        # c_discount_amount = 0
+        # for category in category_query
+            # get cdiscount_set.all
+            # for discount in cdiscount_set.all
+                # discount.get_cdiscount_amount_or_multiplier
+
+                # get the discount amount
+                # if multiplier:
+                    # calculate the things
+                    # new_c_discount_amount = (base price * discount_value)
+
+                    # if new_c_discount_amount > c_discount_amount:
+                        # c_discount_amount = new_c_discount_amount
+                # else:
+                    # new_c_discount_amount = discount_value
+                    # return new_c_discount_amount
+
+                    # check if bigger than discount_amount
+
+                    # if new_c_discount_amount > c_discount_amount:
+                        # assign to c_discount_amount
+                        # c_discount_amount = new_c_discount_amount
+
         # return pricing_obj
 
 # Add many to many through purchitemcolor table

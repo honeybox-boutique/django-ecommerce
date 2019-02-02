@@ -48,14 +48,14 @@ class PDiscountQuerySet(models.QuerySet):
         elif qs.count() == 1:
             print('getting ONLY active discount')
             # get first and return it
-            largest_discount = qs.first().get_discount_amount(self)
+            largest_discount = qs.first().get_active_discount_amount(self)
         else:
             print('getting largest of multiple')
             discount_amount = 0
             for item in qs.all():
                 print(item)
                 # get item discount amount
-                new_discount_amount = item.get_discount_amount(self)
+                new_discount_amount = item.get_active_discount_amount(self)
                 print(new_discount_amount)
                 # check if bigger than discount_amount
                 if new_discount_amount > discount_amount:
@@ -89,7 +89,7 @@ class PDiscount(models.Model):
     def __str__(self):
         return self.pDiscountName
 
-    def get_discount_amount(self, request):
+    def get_active_discount_amount(self, request):
         print('getting discount amount from pdiscounts')
         discount_type = self.pDiscountType
         discount_value = self.pDiscountValue
@@ -141,6 +141,27 @@ class CDiscount(models.Model):
 
     def __str__(self):
         return self.cDiscountName
+
+    def get_active_cdiscount_amount_or_multiplier(self, request):
+        """ Returns discount_returned, the discount amount or multiplier """
+        if self.cDiscountIsActive:
+            print('getting discount amount from cdiscounts')
+            discount_type = self.cDiscountType
+            discount_value = self.cDiscountValue
+            is_multiplier = False
+            discount_returned = 0# amount or multiplier to return
+            #if decimal
+            if discount_type == 'Decimal':
+                # return discount_value
+                discount_returned = discount_value
+            #if percent
+            elif discount_type == 'Percent':
+                is_multiplier = True
+                # change: add logic to get category value
+                discount_returned = discount_value / 100
+            return discount_returned, is_multiplier
+        else:
+            print('not active')
 
 def pre_save_cdiscount_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
