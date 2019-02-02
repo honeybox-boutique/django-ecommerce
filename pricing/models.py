@@ -36,36 +36,6 @@ def pre_save_pricing_active(sender, instance, *args, **kwargs):
         instance.pricingIsActive = False
 pre_save.connect(pre_save_pricing_active, sender=Pricing)
 
-class PDiscountQuerySet(models.QuerySet):
-    # Available on both Manager and QuerySet.
-    def get_largest_active(self, request):
-        largest_discount = 0
-        product_slug = request.kwargs['productSlug']
-        qs = self.filter(pDiscountIsActive=True, productID__productSlug__iexact=product_slug)# .order_by('pDiscount')
-        print(qs.count())
-        if qs.count() == 0:
-            print('no active discounts')
-        elif qs.count() == 1:
-            print('getting ONLY active discount')
-            # get first and return it
-            largest_discount = qs.first().get_active_discount_amount(self)
-        else:
-            print('getting largest of multiple')
-            discount_amount = 0
-            for item in qs.all():
-                print(item)
-                # get item discount amount
-                new_discount_amount = item.get_active_discount_amount(self)
-                print(new_discount_amount)
-                # check if bigger than discount_amount
-                if new_discount_amount > discount_amount:
-                    # assign to discount_amount
-                    discount_amount = new_discount_amount
-            # get largest and return
-            largest_discount = discount_amount
-            # print(largest_discount)
-        return largest_discount
-
 class PDiscount(models.Model):
     pDiscountID = models.AutoField(primary_key=True)
     pDiscountName = models.CharField(max_length=40)
@@ -82,7 +52,6 @@ class PDiscount(models.Model):
 
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
 
-    largestActive = PDiscountQuerySet.as_manager()
     class Meta:
         db_table = 'pdiscount'
 
@@ -218,7 +187,7 @@ post_save.connect(post_save_pricing, sender=Pricing)
 def post_save_p_discount(sender, instance, created, *args, **kwargs):
     # get prod_obj
     product_id = instance.productID.productID
-    prod_query = Product.objects.get(productID=product_id)
+    prod_query = Product.objects.filter(productID=product_id)
     # call get_pricing to update pricing
     if prod_query.count() == 1:
         prod_obj = prod_query.first()
