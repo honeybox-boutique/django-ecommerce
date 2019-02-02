@@ -101,7 +101,7 @@ def m2m_changed_shopcart_receiver(sender, instance, action, *args, **kwargs):
         shopcart_items = instance.shopCartItems.all().select_related('productID')# may need optimizing
         subtotal = 0
         for item in shopcart_items:# this loop needs optimizing, pretty sure querying for every loop
-            subtotal += item.productID.pricing_set.first().pricingBasePrice
+            subtotal += item.productID.productSalePrice
         instance.shopCartSubTotal = subtotal
         instance.save()
 m2m_changed.connect(m2m_changed_shopcart_receiver, sender=ShopCart.shopCartItems.through)

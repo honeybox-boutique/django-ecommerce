@@ -10,16 +10,18 @@
             <td>{{ item.productID }}</td>
             <td>{{ item.piColor }}</td>
             <td>{{ item.piSize }}</td>
-            <td>{{ item.productID.pricing_set.first.pricingBasePrice}}</td>
+            <td>{{ item.productID.productBasePrice }}</td>
+            <td>{{ item.productID.productDiscountAmount }}</td>
+            <td>{{ item.productID.productSalePrice }}</td>
         </tr>
         {% endfor %}
 
         <tr>
-            <td colspan="4">-</td>
+            <td colspan="6">-</td>
             <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
         </tr>
         <tr>
-            <td colspan="4">-</td>
+            <td colspan="6">-</td>
             <td><a class="btn btn-block btn-success" href="{% url 'shopcart:checkout' %}">Checkout</a></td>
         </tr>
 

@@ -40,9 +40,21 @@ def cart_update(request):
 
 def checkout_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)# get cart
+    user = request.user
     order_obj = None
     if new_obj or cart_obj.shopCartItems.count() == 0:# if cart was just created redirect to cart home
        redirect('shopcart:home')
     else:# cart is not new, begin checkout
+
+    # saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
+    # saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
+    # saleDiscountAmount = ? # change: determine if value appropriate: only sale-level discount amount, doesn't include p or c discount
+    # saleSalesTaxAmount = ? # change: add logic for sales tax calculation
+    # saleShipCostAmountCharged = models.DecimalField(default=7.00, max_digits=12, decimal_places=2)# change: integrate shipping API
+    # saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
+        # new_sale_obj = Sale(saleStatus='created', 
+        # shop_cart_items = cart_obj.shopCartItems.all()
+        # for item in shop_cart_items:
+             # new_sale_obj.objects.add(saleItems=)
        pass 
     return render(request, 'carts/checkout.html', {"shopcart": cart_obj})
