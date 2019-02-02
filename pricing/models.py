@@ -89,21 +89,23 @@ class PDiscount(models.Model):
     def __str__(self):
         return self.pDiscountName
 
-    def get_active_discount_amount(self, request):
-        print('getting discount amount from pdiscounts')
-        discount_type = self.pDiscountType
-        discount_value = self.pDiscountValue
-        product_base_price = self.productID.pricing_set.filter(pricingIsActive=True).first().pricingBasePrice
-        discount_amount = 0
-        #if decimal
-        if discount_type == 'Decimal':
-            # return discount_value
-            discount_amount = discount_value
-        #if percent
-        elif discount_type == 'Percent':
-            # return discount_value
-            discount_amount = (product_base_price * (discount_value / 100))
-        return discount_amount
+    def get_active_p_discount_amount_or_multiplier(self):
+        if self.pDiscountIsActive:
+            print('getting discount amount from pdiscounts')
+            discount_type = self.pDiscountType
+            discount_value = self.pDiscountValue
+            discount_returned = 0
+            is_multiplier = False
+            #if decimal
+            if discount_type == 'Decimal':
+                # return discount_value
+                discount_returned = discount_value
+            #if percent
+            elif discount_type == 'Percent':
+                is_multiplier = True
+                # return discount_value
+                discount_returned = (discount_value / 100)
+            return discount_returned, is_multiplier
 
 def pre_save_pdiscount_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
@@ -142,7 +144,7 @@ class CDiscount(models.Model):
     def __str__(self):
         return self.cDiscountName
 
-    def get_active_cdiscount_amount_or_multiplier(self, request):
+    def get_active_cdiscount_amount_or_multiplier(self):
         """ Returns discount_returned, the discount amount or multiplier """
         if self.cDiscountIsActive:
             print('getting discount amount from cdiscounts')
@@ -198,3 +200,39 @@ pre_save.connect(pre_save_cdiscount_active, sender=CDiscount)
 
     # def __str__(self):
         # return self.cDiscountName
+
+# Pricing post_save
+def post_save_pricing(sender, instance, created, *args, **kwargs):
+    # get prod_obj
+    product_id = instance.productID.productID
+
+    prod_query = Product.objects.filter(productID=product_id)
+    # call get_pricing to update pricing
+    if prod_query.count() == 1:
+        prod_obj = prod_query.first()
+        prod_obj.get_pricing()
+    print('Updated one product pricing.')
+post_save.connect(post_save_pricing, sender=Pricing)
+
+# PDiscount post_save
+def post_save_p_discount(sender, instance, created, *args, **kwargs):
+    # get prod_obj
+    product_id = instance.productID.productID
+    prod_query = Product.objects.get(productID=product_id)
+    # call get_pricing to update pricing
+    if prod_query.count() == 1:
+        prod_obj = prod_query.first()
+        prod_obj.get_pricing()
+    print('Updated one product pricing.')
+post_save.connect(post_save_p_discount, sender=PDiscount)
+
+# CDiscount post_save
+def post_save_c_discount(sender, instance, created, *args, **kwargs):
+    # get category
+    category_id = instance.categoryID
+    # get category products_set
+    category_products = Product.objects.filter(productCategories=category_id)
+    for product in category_products.all():
+        product.get_pricing()
+        print('Updated one product pricing.')
+post_save.connect(post_save_c_discount, sender=CDiscount)
