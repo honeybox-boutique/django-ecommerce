@@ -11,9 +11,9 @@ class Sale(models.Model):
         ('created', 'Order created and being processed'),
         ('payed', 'Order payment completed and shipment being prepared'),
         ('shipped', 'Order has been shipped'),
-        ('returned', 'Order was returned and has been received. Refunds will be issued upon approval'),
+        ('returned', 'Order was returned and has been received. Refunds will be issued upon approval'), 
         ('refunded', 'Return was accepted and appropriate refunds have been applied'),
-    )
+    ) 
     saleID = models.AutoField(primary_key=True)
     saleStringID = models.CharField(max_length=120, blank=True)# change: add sensor to generate this
     saleDate = models.DateTimeField('sale date', auto_now_add=True)

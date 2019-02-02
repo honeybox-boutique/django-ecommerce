@@ -6,6 +6,10 @@ from products.models import Product, Category
 
 ONE_HUNDRED_D = decimal.Decimal('100.00')
 # Create your models here.
+DISCOUNT_TYPE_CHOICES = (
+    ('Percent', 'Percent'),
+    ('Amount', 'Amount'),
+) 
 
 class Pricing(models.Model):
     pricingID = models.AutoField(primary_key=True)
@@ -42,7 +46,7 @@ class PDiscount(models.Model):
     pDiscountID = models.AutoField(primary_key=True)
     pDiscountName = models.CharField(max_length=40)
     pDiscountDescription = models.TextField(max_length=200)
-    pDiscountType = models.CharField(max_length=30)# change: add choices for percent and decimal
+    pDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)# change: add choices for percent and decimal
     pDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)
     pDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
     pDiscountDateValidFrom = models.DateTimeField('valid from')
@@ -93,7 +97,7 @@ class CDiscount(models.Model):
     cDiscountID = models.AutoField(primary_key=True)
     cDiscountName = models.CharField(max_length=40)
     cDiscountDescription = models.TextField(max_length=200)
-    cDiscountType = models.CharField(max_length=30)
+    cDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)
     cDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)
     cDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
     cDiscountDateValidFrom = models.DateTimeField('valid from')

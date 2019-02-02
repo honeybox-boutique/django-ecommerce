@@ -25,16 +25,12 @@ class ShopCartManager(models.Manager):
                 #use user cart
             #else
         if qs.count() == 1:# Check if session cart exists
-            print('has session cart')
             new_obj = False
             cart_obj = qs.first()
             if request.user.is_authenticated and cart_obj.user is None:# If authed and shoppincart user not set
-                print('authenticated and session cart user is null')
                 # filter for user cart
                 user_cart = self.get_queryset().filter(user=request.user)
-                print(user_cart.count())
                 if user_cart.count() >= 1:
-                    print('has user cart')
                     user_cart_obj = user_cart.first()# user cart
                     items_to_add = cart_obj.shopCartItems.all()
 
@@ -45,40 +41,30 @@ class ShopCartManager(models.Manager):
 
                     # add filtered items to user cart
                     for item in items_to_add:
-                        print('added item to user cart')
                         user_cart_obj.shopCartItems.add(item)
 
                     # set cart_obj to modified usercartobj
-                    print('merging carts')
                     cart_obj = user_cart_obj
-                    print('deleting session cart key')
                     del request.session['cart_id']
 
                 # if user cart doesn't exist just save session cart to user
                 else:
-                    print('no user cart, adding session cart as user cart')
                     cart_obj.user = request.user
                     cart_obj.save()
-                    print('flushing session cart')
                     del request.session['cart_id']
 
         else:# if session cart doesn't exist
-            print('session cart not exist')
             if not request.user.is_authenticated:           # and user is not authenticated
-                print('not authed, adding new session')
                 new_obj = True
                 cart_obj = ShopCart.objects.new(user=request.user)
                 request.session['cart_id'] = cart_obj.id
             else:
-                print('authed')
                 # return user cart
                 user_cart = self.get_queryset().filter(user=request.user)
                 if user_cart.count() == 1:
-                    print('user cart exists, getting user cart')
                     new_obj = False
                     cart_obj = user_cart.first()
                 else:
-                    print('user cart not exist, making new')
                     new_obj = True
                     cart_obj = ShopCart.objects.new(user=request.user)
 
