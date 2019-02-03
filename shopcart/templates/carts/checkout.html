@@ -1,8 +1,41 @@
 {% extends 'layout.html' %}
+
 {% block content %}
+
+{% if not billing_profile %}
+<div class="row text-center">
+    <div class="col-12 col-md-6">
+        <p class="lead">Login</p>
+        {% include 'users/snippets/form.html' with form=login_form next=request.build_absolute_uri %}
+    </div>
+    <div class="col-12 col-md-6">
+        <p class="lead">Continue as Guest</p>
+    </div>
+</div>
+{% else %}
+
 <h1>Checkout {{ shopcart }}</h1>
 <table>
     <tbody>
+        {% for item in shopcart.shopCartItems.all %}
+        <tr>
+            <th scope="row">-</th>
+            <td>{{ item.productID }}</td>
+            <td>{{ item.piColor }}</td>
+            <td>{{ item.piSize }}</td>
+            <td>{{ item.productID.productBasePrice }}</td>
+            <td>{{ item.productID.productDiscountAmount }}</td>
+            <td>{{ item.productID.productSalePrice }}</td>
+        </tr>
+        {% endfor %}
+
+        <tr>
+            <td colspan="6">-</td>
+            <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
+        </tr>
     </tbody>
 </table>
+
+{% endif %}
+
 {% endblock %}

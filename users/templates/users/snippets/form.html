@@ -1,0 +1,7 @@
+<form action="{% url 'users:login' %}" method="POST"> {% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}"
+    {% endif %}
+    {{ form.as_p }}
+    <input type="submit" value="Login" class="btn-primary">
+</form>

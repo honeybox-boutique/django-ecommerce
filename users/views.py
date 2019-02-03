@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views.generic import FormView, CreateView
-from .forms import SignUpForm
+from .forms import SignUpForm, GuestForm
 from django.contrib.auth import authenticate, login, logout
 from django.utils.http import is_safe_url
+
+from .models import Guest
 # Create your views here.
 
 def dashboard(request):
@@ -31,3 +33,19 @@ class SignUpView(CreateView):
         if new_user is not None:
             login(self.request, new_user)
         return valid
+
+def guest_register_view(request):
+    form = GuestForm(request.POST or None)
+    context = {
+        "form": form,
+    }
+    next_post = request.POST['next']
+    if form.is_valid():
+        email = form.cleaned_data.get("email")
+        new_guest_email = Guest.objects.create(guestEmail=email)
+        request.session['guest_email_id'] = new_guest_email.id
+        if is_safe_url(next_post, request.get_host()):
+            return redirect(next_post)
+        else:
+            redirect('users/signup')
+    return redirect('users/signup')
