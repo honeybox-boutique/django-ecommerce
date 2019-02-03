@@ -6,6 +6,7 @@ from billing.models import BillingProfile
 from .models import ShopCart, PurchaseItems
 from users.models import Guest
 from sales.models import Sale, SaleItems
+from addresses.models import Address
 
 def cart_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
@@ -56,15 +57,28 @@ def checkout_home(request):
     guest_form = GuestForm()
     address_form = AddressForm()
     sale_obj = None
+    billing_address_id = request.session.get('billing_address_id', None)
+    shipping_address_id = request.session.get('shipping_address_id', None)
+    print(shipping_address_id)
+    print(billing_address_id)
     
-    # get billing profile
-    billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
 
     if cart_created or cart_items.count() == 0:# if cart was just created redirect to cart home
         return redirect('shopcart:home')
 
+    # get billing profile
+    billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
     if billing_profile is not None:
         sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_items)
+        if shipping_address_id:
+            sale_obj.saleShippingAddress = Address.objects.get(id=shipping_address_id)
+            del request.session['shipping_address_id']
+        if billing_address_id:
+            sale_obj.saleBillingAddress = Address.objects.get(id=billing_address_id)
+            del request.session['billing_address_id']
+        if billing_address_id or shipping_address_id:
+            sale_obj.save()
+        
 
         # set cart status to submitted
         cart_obj.shopCartStatus = 'Submitted'

@@ -7,4 +7,9 @@ class AddressForm(forms.ModelForm):
         model = Address
         fields = (
             'addressLine1',
+            'addressLine2',
+            'addressCity',
+            'addressCountry',
+            'addressState',
+            'addressPostalCode',
         )

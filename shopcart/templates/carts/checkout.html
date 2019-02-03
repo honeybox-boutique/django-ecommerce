@@ -3,41 +3,63 @@
 {% block content %}
 
 {% if not billing_profile %}
-<div class="row text-center">
-    <div class="col-12 col-md-6">
-        <p class="lead">Login</p>
-        {% include 'users/snippets/form.html' with form=login_form next=request.build_absolute_uri %}
+
+    <div class="row text-center">
+        <div class="col-12 col-md-6">
+            <p class="lead">Login</p>
+            {% include 'users/snippets/form.html' with form=login_form next=request.build_absolute_uri %}
+        </div>
+        <div class="col-12 col-md-6">
+            <p class="lead">Continue as Guest</p>
+            {% url 'users:guest_register' as guest_register_url %}
+            {% include 'users/snippets/form.html' with form=guest_form next=request.build_absolute_uri action_url=guest_register_url %}
+        </div>
     </div>
-    <div class="col-12 col-md-6">
-        <p class="lead">Continue as Guest</p>
-        {% url 'users:guest_register' as guest_register_url %}
-        {% include 'users/snippets/form.html' with form=guest_form next=request.build_absolute_uri action_url=guest_register_url %}
-    </div>
-</div>
+
 {% else %}
 
-{{ sale_obj }}
-<h1>Checkout {{ shopcart }}</h1>
-<table>
-    <tbody>
-        {% for item in shopcart.shopCartItems.all %}
-        <tr>
-            <th scope="row">-</th>
-            <td>{{ item.productID }}</td>
-            <td>{{ item.piColor }}</td>
-            <td>{{ item.piSize }}</td>
-            <td>{{ item.productID.productBasePrice }}</td>
-            <td>{{ item.productID.productDiscountAmount }}</td>
-            <td>{{ item.productID.productSalePrice }}</td>
-        </tr>
-        {% endfor %}
+    {% if not sale_obj.saleShippingAddress %}
+        <div class="row">
+            <div class="col-md-6 mx-auto col-10">
+            <p class="lead">Shipping Address</p>
+            <hr/>
+            {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
+            {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
+            </div>
+        </div>
+    {% elif not sale_obj.saleBillingAddress %}
+        <div class="row">
+            <div class="col-md-6 mx-auto col-10">
+            <p class="lead">Billing Address</p>
+            <hr/>
+            {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
+            {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='billing' %}
+            </div>
+        </div>
+    {% else %}
+        {{ sale_obj }}
+        <h1>Finalize Checkout {{ shopcart }}</h1>
+        <table>
+            <tbody>
+                {% for item in shopcart.shopCartItems.all %}
+                <tr>
+                    <th scope="row">-</th>
+                    <td>{{ item.productID }}</td>
+                    <td>{{ item.piColor }}</td>
+                    <td>{{ item.piSize }}</td>
+                    <td>{{ item.productID.productBasePrice }}</td>
+                    <td>{{ item.productID.productDiscountAmount }}</td>
+                    <td>{{ item.productID.productSalePrice }}</td>
+                </tr>
+                {% endfor %}
 
-        <tr>
-            <td colspan="6">-</td>
-            <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
-        </tr>
-    </tbody>
-</table>
+                <tr>
+                    <td colspan="6">-</td>
+                    <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
 
 {% endif %}
 

@@ -28,6 +28,7 @@ urlpatterns = [
     path('pricing/', include('pricing.urls')),
     path('billing/', include('billing.urls')),
     path('sales/', include('sales.urls')),
+    path('address/', include('addresses.urls')),
     path('', TemplateView.as_view(template_name="index.html"), name='home'),
     path('returns/', TemplateView.as_view(template_name="returns.html"), name='returns'),
     path('data-privacy/', TemplateView.as_view(template_name="data-privacy.html"), name='dataprivacy'),

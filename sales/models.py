@@ -5,6 +5,7 @@ from speedtest.utils import unique_sale_id_generator
 from purchases.models import PurchaseItems
 from shopcart.models import ShopCart
 from billing.models import BillingProfile
+from addresses.models import Address
 
 class SaleManager(models.Manager):
     def new_or_get(self, billing_profile, cart_items):
@@ -72,8 +73,8 @@ class Sale(models.Model):
     saleStringID = models.CharField(max_length=120, blank=True)
     saleDate = models.DateTimeField('sale date', auto_now_add=True)
     saleNote = models.CharField(max_length=120, default='Sale')
-    # shippingAddress = ?
-    # billingAddress = ?
+    saleShippingAddress = models.ForeignKey(Address, related_name='saleShippingAddress', null=True, blank=True, on_delete=models.PROTECT)
+    saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
     # saleDiscountAmount = ? 
