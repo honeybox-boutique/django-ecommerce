@@ -96,6 +96,16 @@ class ShopCart(models.Model):
     class Meta:
         db_table = 'shopcart'
 
+    def empty_shopcart(self):
+        is_empty = False
+        for item in self.shopCartItems:
+            item.delete()
+
+        if self.shopCartItems.count() == 0:
+            is_empty = True
+        return is_empty
+
+
 def m2m_changed_shopcart_receiver(sender, instance, action, *args, **kwargs):
     if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
         shopcart_items = instance.shopCartItems.all().select_related('productID')# may need optimizing

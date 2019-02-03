@@ -59,9 +59,6 @@ def checkout_home(request):
     sale_obj = None
     billing_address_id = request.session.get('billing_address_id', None)
     shipping_address_id = request.session.get('shipping_address_id', None)
-    print(shipping_address_id)
-    print(billing_address_id)
-    
 
     if cart_created or cart_items.count() == 0:# if cart was just created redirect to cart home
         return redirect('shopcart:home')
@@ -83,6 +80,22 @@ def checkout_home(request):
         # set cart status to submitted
         cart_obj.shopCartStatus = 'Submitted'
         cart_obj.save()
+    
+    if request.method == 'POST':
+        '''check if sale is done'''
+        is_done = sale_obj.check_done()
+        if is_done:
+            sale_obj.mark_paid()
+            request.session['cart_count'] = 0
+            # clear items from user cart if authenticated
+            if request.user.is_authenticated:
+                # remove items from cart
+                is_empty = cart_obj.empty_shopcart()
+                print(is_empty)
+
+            return redirect('checkout/success/')
+        else:
+            print('something is not done')
 
     context = {
         "sale_obj": sale_obj,

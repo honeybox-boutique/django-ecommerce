@@ -41,7 +41,7 @@
         <h1>Finalize Checkout {{ shopcart }}</h1>
         <table>
             <tbody>
-                {% for item in shopcart.shopCartItems.all %}
+                {% for item in sale_obj.saleItems.all %}
                 <tr>
                     <th scope="row">-</th>
                     <td>{{ item.productID }}</td>
@@ -55,10 +55,17 @@
 
                 <tr>
                     <td colspan="6">-</td>
-                    <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
+                    <td><b>Subtotal:</b> {{ sale_obj.saleSubTotal }}</td>
+                    <td><b>Shipping:</b> {{ sale_obj.saleShipCostAmountCharged }}</td>
+                    <!-- change: add sales tax here-->
+                    <!-- change: add sale discount amount here-->
+                    <td><b>Total:</b> {{ sale_obj.saleTotal }}</td>
                 </tr>
             </tbody>
         </table>
+        <form class="form" method="POST" action="">{% csrf_token %}
+            <button type="submit">Complete Checkout</button>
+        </form>
     {% endif %}
 
 {% endif %}

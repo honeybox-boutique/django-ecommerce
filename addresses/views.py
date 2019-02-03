@@ -12,13 +12,11 @@ def checkout_address_create_view(request):
     }
     next_post = request.POST['next']
     if form.is_valid():
-        print(request.POST)
         instance = form.save(commit=False)
 
         billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
         if billing_profile is not None:
             address_type = request.POST.get('addressType')
-            print(address_type)
             instance.addressBillingProfile = billing_profile
             instance.addressType = address_type
             instance.save()

@@ -93,6 +93,22 @@ class Sale(models.Model):
     def __str__(self):
         return self.saleStringID
     
+    def check_done(self):
+        billing_profile = self.saleBillingProfile
+        shipping_address = self.saleShippingAddress
+        billing_address = self.saleBillingAddress
+        sub_total = self.saleSubTotal
+        total = self.saleTotal
+
+        if billing_profile and shipping_address and billing_address and sub_total > 0 and total > 0:
+            return True
+        return False
+
+    def mark_done(self):
+        if self.check_done():
+            self.saleStatus = 'payed'
+            self.save()
+        return self.saleStatus
     # Should probably be in model manager?
     # Computes final order total
     # def get_final_total(self, request):
