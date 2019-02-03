@@ -4,6 +4,7 @@ from django.db.models.signals import pre_save, post_save
 from speedtest.utils import unique_sale_id_generator
 from purchases.models import PurchaseItems
 from shopcart.models import ShopCart
+from billing.models import BillingProfile
 
 
 class Sale(models.Model):
@@ -18,7 +19,6 @@ class Sale(models.Model):
     saleStringID = models.CharField(max_length=120, blank=True)# change: add sensor to generate this
     saleDate = models.DateTimeField('sale date', auto_now_add=True)
     saleNote = models.CharField(max_length=120, default='Sale')
-    # billingProfile = ?
     # shippingAddress = ?
     # billingAddress = ?
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
@@ -29,6 +29,7 @@ class Sale(models.Model):
     saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
 
     saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
+    saleBillingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'sale'
@@ -62,10 +63,10 @@ class SaleItems(models.Model):
     saleItemID = models.AutoField(primary_key=True)
     siBasePrice = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     siDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-    # siSalePrice = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: add sensor to calculate this
+    siSalePrice = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: add sensor to calculate this
     siNote = models.CharField(default='SaleItem', max_length=120, blank=True)# change: add sensor to populate this
 
-    saleID = models.ForeignKey(Sale, on_delete=models.PROTECT)
+    saleID = models.ForeignKey(Sale, on_delete=models.CASCADE)
     prodStockID = models.ForeignKey(PurchaseItems, on_delete=models.PROTECT)
 
     class Meta:

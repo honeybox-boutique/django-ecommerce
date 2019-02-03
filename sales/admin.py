@@ -1,5 +1,13 @@
 from django.contrib import admin
 
-from .models import Sale
+from .models import Sale, SaleItems
 
-admin.site.register(Sale)
+class SaleItemsInline(admin.StackedInline):
+    model = SaleItems
+
+class SaleAdmin(admin.ModelAdmin):
+    model = Sale
+    inlines = [
+        SaleItemsInline
+    ]
+admin.site.register(Sale, SaleAdmin)

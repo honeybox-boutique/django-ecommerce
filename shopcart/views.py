@@ -1,14 +1,10 @@
 from django.shortcuts import render, redirect
 
 from users.forms import LoginForm, GuestForm
-from .models import ShopCart, PurchaseItems
 from billing.models import BillingProfile
+from .models import ShopCart, PurchaseItems
 from users.models import Guest
-# from django.contrib.messages.views import SuccessMessageMixin
-# 
-# class ShopCartUpdateView(SuccessMessageMixin, UpdateView):
-#     ...
-#     success_message = 'List successfully saved!!!!'
+from sales.models import Sale, SaleItems
 
 def cart_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
@@ -42,40 +38,69 @@ def cart_update(request):
 
 def checkout_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)# get cart
+    cart_items = cart_obj.shopCartItems.all()
     user = request.user
     order_obj = None
     billing_profile = None
+    new_sale_obj = None
     login_form = LoginForm()
     guest_form = GuestForm()
     guest_email_id = request.session.get('guest_email_id')
 
-    if new_obj or cart_obj.shopCartItems.count() == 0:# if cart was just created redirect to cart home
+    if new_obj or cart_items.count() == 0:# if cart was just created redirect to cart home
        redirect('shopcart:home')
     else:# cart is not new, begin checkout
         pass
     
     if user.is_authenticated:
-        billing_profile = BillingProfile.objects.get_or_create(user=user, billingEmail=user.email)
+        print('authenticated, getting profile')
+        billing_profile, billing_profile_created = BillingProfile.objects.get_or_create(user=user, billingEmail=user.email)
+        print(billing_profile.id)
     elif guest_email_id is not None:
         guest_obj = Guest.objects.get(id=guest_email_id)
-        billing_profile = BillingProfile.objects.get_or_create(billingEmail=guest_obj.guestEmail)
+        billing_profile, billing_profile_created = BillingProfile.objects.get_or_create(billingEmail=guest_obj.guestEmail)
+        print(billing_profile.id)
     else:
         # change: do we need error raise here?
         pass
-    
+    # add sale query that checks if this order was created
+    # maybe filter on shopCartID? maybe on shopcartitems
+    if billing_profile is not None:
+        new_sale_obj = Sale(
+                    saleBillingProfile=billing_profile,
+                    saleStatus='created',
+                    saleNote='default sale note',
+                    saleSubTotal=cart_obj.shopCartSubTotal,
+                    # saleDiscountAmount = ?
+                    # saleSalesTaxAmount = ?
+                    # saleShipCostAmountCharged = ?# change: default is 7.00 on models, change to calculation
+                    # saleTotal=cart_obj.shopCartSubTotal# change: 
+        )
+        new_sale_obj.save()
+        print(new_sale_obj.saleBillingProfile)
+        for item in cart_items:
+            # change: maybe add checking logic to make sure pricing is active, prodStockItems don't haven't been sold, etc.
+            new_sale_item = SaleItems(
+                            saleID=new_sale_obj,
+                            prodStockID=item,
+                            siBasePrice=item.productID.productBasePrice,
+                            siDiscountAmount=item.productID.productDiscountAmount,
+                            siSalePrice=item.productID.productSalePrice,
+                            siNote=item.productID.productName
+                        )
+            new_sale_item.save()
+    else:
+        print('no billing email on profile')
+
+
     context = {
+        "new_sale_obj": new_sale_obj,
         "shopcart": cart_obj,
         "billing_profile": billing_profile,
         "login_form": login_form,
         "guest_form": guest_form,
     }
 
-    # saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
-    # saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
-    # saleDiscountAmount = ? # change: determine if value appropriate: only sale-level discount amount, doesn't include p or c discount
-    # saleSalesTaxAmount = ? # change: add logic for sales tax calculation
-    # saleShipCostAmountCharged = models.DecimalField(default=7.00, max_digits=12, decimal_places=2)# change: integrate shipping API
-    # saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
         # new_sale_obj = Sale(saleStatus='created', 
         # shop_cart_items = cart_obj.shopCartItems.all()
         # for item in shop_cart_items:
