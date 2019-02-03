@@ -17,17 +17,6 @@ class Vendor(models.Model):
     def __str__(self):
         return self.vendorName
 
-# class TransactionType(models.Model):
-    # transactionTypeID = models.AutoField(primary_key=True)
-    # transactionTypeName = models.CharField(max_length=40)
-    # transactionTypeDescription = models.TextField(max_length=200)
-
-    # class Meta:
-        # db_table = 'transaction_type'
-
-    # def __str__(self):
-        # return self.transactionTypeName
-
 class Purchase(models.Model):
     purchaseID = models.AutoField(primary_key=True)
     purchaseDate = models.DateTimeField('date purchased')

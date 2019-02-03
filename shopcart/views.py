@@ -16,16 +16,28 @@ def cart_update(request):
         purchitem with matching slug, color, and size exists,
         AND does NOT have a sale transaction associated with it
     """
-    print(request.POST)
+    # change: maybe? clean these parameters using form method
     # get POST parameters
     product_slug = request.POST.get('productSlug')
     color = request.POST.get('color-selection')
     size = request.POST.get('size-selection')
     quantity = request.POST.get('quantity')
-    cart_obj, new_obj = ShopCart.objects.get_or_new(request)# get cart
-    purchase_item_query = PurchaseItems.objects.filter(productID__productSlug=product_slug, piColor__colorName=color).filter(piSize=size)
-    for cart_item in cart_obj.shopCartItems.all():# exclude all pitems already in cart
+
+    # get cart
+    cart_obj, new_obj = ShopCart.objects.get_or_new(request)
+
+    # query for purchaseitems available
+    purchase_item_query = PurchaseItems.objects.filter(
+                                productID__productSlug=product_slug, 
+                                piColor__colorName=color,
+                                piSize=size
+                                # piIsAvailable=True# change: change once you are done
+                            )
+    # exclude all pitems already in cart
+    for cart_item in cart_obj.shopCartItems.all():
         purchase_item_query = purchase_item_query.exclude(pk=cart_item.pk)
+
+    # change: add quantity logic here
     # if quantity + quantity in cart > purchase_item_query.count() return "not enough in stock to add these to cart"
     if not purchase_item_query:
         print('Not Enough')
@@ -37,25 +49,28 @@ def cart_update(request):
     return redirect('shopcart:home')
 
 def checkout_home(request):
-    cart_obj, new_obj = ShopCart.objects.get_or_new(request)# get cart
-    cart_items = cart_obj.shopCartItems.all()
-    user = request.user
     sale_obj = None
     billing_profile = None
+    cart_obj, new_cart = ShopCart.objects.get_or_new(request)# get cart
+    cart_items = cart_obj.shopCartItems.all()
+    user = request.user
     login_form = LoginForm()
     guest_form = GuestForm()
     guest_email_id = request.session.get('guest_email_id')
 
-    if new_obj or cart_items.count() == 0:# if cart was just created redirect to cart home
+    if new_cart or cart_items.count() == 0:# if cart was just created redirect to cart home
         return redirect('shopcart:home')
     else:# cart is not new, begin checkout
         pass
     
     if user.is_authenticated:
-        print('authenticated, getting profile')
+        # user checkout
+        print('user checkout')
         billing_profile, billing_profile_created = BillingProfile.objects.get_or_create(user=user, billingEmail=user.email)
         print(billing_profile.id)
     elif guest_email_id is not None:
+        # guest checkout
+        print('guest checkout')
         guest_obj = Guest.objects.get(id=guest_email_id)
         billing_profile, billing_profile_created = BillingProfile.objects.get_or_create(billingEmail=guest_obj.guestEmail)
         print(billing_profile.id)
