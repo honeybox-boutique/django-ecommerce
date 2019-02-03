@@ -47,7 +47,7 @@ def checkout_home(request):
     billing_profile = None
     login_form = LoginForm()
     guest_form = GuestForm()
-    guest_email_id = request.session.get['guest_email_id']
+    guest_email_id = request.session.get('guest_email_id')
 
     if new_obj or cart_obj.shopCartItems.count() == 0:# if cart was just created redirect to cart home
        redirect('shopcart:home')
@@ -67,6 +67,7 @@ def checkout_home(request):
         "shopcart": cart_obj,
         "billing_profile": billing_profile,
         "login_form": login_form,
+        "guest_form": guest_form,
     }
 
     # saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
