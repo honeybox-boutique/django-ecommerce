@@ -1,4 +1,4 @@
-<form action="{% url 'users:login' %}" method="POST"> {% csrf_token %}
+<form method="POST" action="{% if action_url %}{{action_url}}{% else %}{% url 'users:login' %}{% endif %}"> {% csrf_token %}
     {% if next %}
     <input type="hidden" name="next" value="{{ next }}"
     {% endif %}
