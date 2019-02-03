@@ -40,15 +40,14 @@ def checkout_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)# get cart
     cart_items = cart_obj.shopCartItems.all()
     user = request.user
-    order_obj = None
+    sale_obj = None
     billing_profile = None
-    new_sale_obj = None
     login_form = LoginForm()
     guest_form = GuestForm()
     guest_email_id = request.session.get('guest_email_id')
 
     if new_obj or cart_items.count() == 0:# if cart was just created redirect to cart home
-       redirect('shopcart:home')
+        return redirect('shopcart:home')
     else:# cart is not new, begin checkout
         pass
     
@@ -63,46 +62,23 @@ def checkout_home(request):
     else:
         # change: do we need error raise here?
         pass
-    # add sale query that checks if this order was created
-    # maybe filter on shopCartID? maybe on shopcartitems
+
     if billing_profile is not None:
-        new_sale_obj = Sale(
-                    saleBillingProfile=billing_profile,
-                    saleStatus='created',
-                    saleNote='default sale note',
-                    saleSubTotal=cart_obj.shopCartSubTotal,
-                    # saleDiscountAmount = ?
-                    # saleSalesTaxAmount = ?
-                    # saleShipCostAmountCharged = ?# change: default is 7.00 on models, change to calculation
-                    # saleTotal=cart_obj.shopCartSubTotal# change: 
-        )
-        new_sale_obj.save()
-        print(new_sale_obj.saleBillingProfile)
-        for item in cart_items:
-            # change: maybe add checking logic to make sure pricing is active, prodStockItems don't haven't been sold, etc.
-            new_sale_item = SaleItems(
-                            saleID=new_sale_obj,
-                            prodStockID=item,
-                            siBasePrice=item.productID.productBasePrice,
-                            siDiscountAmount=item.productID.productDiscountAmount,
-                            siSalePrice=item.productID.productSalePrice,
-                            siNote=item.productID.productName
-                        )
-            new_sale_item.save()
+        sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_items)
+
+        # set cart status to submitted
+        cart_obj.shopCartStatus = 'Submitted'
+        cart_obj.save()
     else:
         print('no billing email on profile')
 
 
     context = {
-        "new_sale_obj": new_sale_obj,
+        "sale_obj": sale_obj,
         "shopcart": cart_obj,
         "billing_profile": billing_profile,
         "login_form": login_form,
         "guest_form": guest_form,
     }
 
-        # new_sale_obj = Sale(saleStatus='created', 
-        # shop_cart_items = cart_obj.shopCartItems.all()
-        # for item in shop_cart_items:
-             # new_sale_obj.objects.add(saleItems=)
     return render(request, 'carts/checkout.html', context)

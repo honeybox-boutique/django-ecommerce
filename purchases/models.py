@@ -56,5 +56,8 @@ class PurchaseItems(models.Model):
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
     vendorID = models.ForeignKey(Vendor, on_delete=models.CASCADE)
 
+    # field to determine if item is available for sale
+    piIsAvailable = models.BooleanField(default=True)
+
     class Meta:
         db_table = 'purchase_items'

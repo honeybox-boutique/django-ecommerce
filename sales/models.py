@@ -6,6 +6,58 @@ from purchases.models import PurchaseItems
 from shopcart.models import ShopCart
 from billing.models import BillingProfile
 
+class SaleManager(models.Manager):
+    def new_or_get(self, billing_profile, cart_items):
+        created = False
+        qs = None
+        for item in cart_items:
+            if not item.piIsAvailable:
+                # its not new, query for it and return it   
+                qs = self.get_queryset().filter(
+                                saleBillingProfile=billing_profile,
+                                saleStatus='created',
+                                saleItems__prodStockID=item.prodStockID
+                )
+                print('query count')
+                print(qs.count())
+                if qs.count() == 1:
+                    obj = qs.first()
+                    print('queried for')
+                    print(obj)
+                    return obj, created 
+                
+        #cart already used, checkout not finished
+        else: # its a new order so make it and return it
+            obj = Sale(
+                        saleBillingProfile=billing_profile,
+                        saleStatus='created',
+                        saleNote='default sale note',
+                        # saleSubTotal=cart_obj.shopCartSubTotal,# change: this will be calc in post_save
+                        # saleDiscountAmount = ?
+                        # saleSalesTaxAmount = ?
+                        # saleShipCostAmountCharged = ?# change: default is 7.00 on models, change to calculation
+                        # saleTotal=cart_obj.shopCartSubTotal# change: 
+            )
+            obj.save()
+            # add cart_items to sale
+            for item in cart_items:
+                # change: maybe add checking logic to make sure pricing is active, prodStockItems don't haven't been sold, etc.
+                new_sale_item = SaleItems(
+                                saleID=obj,
+                                prodStockID=item,
+                                siBasePrice=item.productID.productBasePrice,
+                                siDiscountAmount=item.productID.productDiscountAmount,
+                                siSalePrice=item.productID.productSalePrice,
+                                siNote=item.productID.productName
+                            )
+                new_sale_item.save()
+                # set piIsAvailable to False
+                item.piIsAvailable = False
+                item.save()
+            created = True
+            print('created: ')
+            print(obj)
+        return obj, created
 
 class Sale(models.Model):
     SALE_STATUS_CHOICES = (
@@ -16,20 +68,22 @@ class Sale(models.Model):
         ('refunded', 'Return was accepted and appropriate refunds have been applied'),
     ) 
     saleID = models.AutoField(primary_key=True)
-    saleStringID = models.CharField(max_length=120, blank=True)# change: add sensor to generate this
+    saleStringID = models.CharField(max_length=120, blank=True)
     saleDate = models.DateTimeField('sale date', auto_now_add=True)
     saleNote = models.CharField(max_length=120, default='Sale')
     # shippingAddress = ?
     # billingAddress = ?
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
-    # saleDiscountAmount = ? # change: determine if value appropriate: only sale-level discount amount, doesn't include p or c discount
+    # saleDiscountAmount = ? 
     # saleSalesTaxAmount = ? # change: add logic for sales tax calculation
     saleShipCostAmountCharged = models.DecimalField(default=7.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
 
     saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
     saleBillingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
+
+    objects = SaleManager()
 
     class Meta:
         db_table = 'sale'
@@ -39,10 +93,9 @@ class Sale(models.Model):
     
     # Should probably be in model manager?
     # Computes final order total
-    def get_final_total(self, request):
-        cart_obj, new_obj = ShopCart.objects.get_or_new(request)
+    # def get_final_total(self, request):
         # if new_obj? return you have nothing in cart?
-        cart_sub_total = cart_obj.shopCartSubTotal
+        # cart_sub_total = cart_obj.shopCartSubTotal
         # sale_discount_amount = ?
         # sale_tax_amount = ?
         # shipping_charged = ?
@@ -50,14 +103,8 @@ class Sale(models.Model):
         # self.saleTotal = new_sale_total
         # self.save()
         # return new_sale_total
-        return cart_sub_total
+        # return cart_sub_total
 
-# Example add many to many relationship
-
-# m1 = Membership(person=ringo, group=beatles,
-# ...     date_joined=date(1962, 8, 16),
-# ...     invite_reason="Needed a new drummer.")
-# >>> m1.save()
 
 class SaleItems(models.Model):
     saleItemID = models.AutoField(primary_key=True)
