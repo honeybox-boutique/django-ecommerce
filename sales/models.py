@@ -12,6 +12,7 @@ class SaleManager(models.Manager):
         qs = None
         for item in cart_items:
             if not item.piIsAvailable:
+                # change: logic error here or where the cart is
                 # its not new, query for it and return it   
                 qs = self.get_queryset().filter(
                                 saleBillingProfile=billing_profile,

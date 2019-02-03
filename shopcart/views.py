@@ -49,34 +49,17 @@ def cart_update(request):
     return redirect('shopcart:home')
 
 def checkout_home(request):
-    sale_obj = None
-    billing_profile = None
-    cart_obj, new_cart = ShopCart.objects.get_or_new(request)# get cart
+    cart_obj, cart_created = ShopCart.objects.get_or_new(request)# get cart
     cart_items = cart_obj.shopCartItems.all()
-    user = request.user
     login_form = LoginForm()
     guest_form = GuestForm()
-    guest_email_id = request.session.get('guest_email_id')
-
-    if new_cart or cart_items.count() == 0:# if cart was just created redirect to cart home
-        return redirect('shopcart:home')
-    else:# cart is not new, begin checkout
-        pass
+    sale_obj = None
     
-    if user.is_authenticated:
-        # user checkout
-        print('user checkout')
-        billing_profile, billing_profile_created = BillingProfile.objects.get_or_create(user=user, billingEmail=user.email)
-        print(billing_profile.id)
-    elif guest_email_id is not None:
-        # guest checkout
-        print('guest checkout')
-        guest_obj = Guest.objects.get(id=guest_email_id)
-        billing_profile, billing_profile_created = BillingProfile.objects.get_or_create(billingEmail=guest_obj.guestEmail)
-        print(billing_profile.id)
-    else:
-        # change: do we need error raise here?
-        pass
+    # get billing profile
+    billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
+
+    if cart_created or cart_items.count() == 0:# if cart was just created redirect to cart home
+        return redirect('shopcart:home')
 
     if billing_profile is not None:
         sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_items)
@@ -84,9 +67,6 @@ def checkout_home(request):
         # set cart status to submitted
         cart_obj.shopCartStatus = 'Submitted'
         cart_obj.save()
-    else:
-        print('no billing email on profile')
-
 
     context = {
         "sale_obj": sale_obj,
@@ -95,5 +75,4 @@ def checkout_home(request):
         "login_form": login_form,
         "guest_form": guest_form,
     }
-
     return render(request, 'carts/checkout.html', context)
