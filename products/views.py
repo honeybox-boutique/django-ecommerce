@@ -6,16 +6,8 @@ from pricing.models import Product, Pricing, PDiscount
 from purchases.models import PurchaseItems
 from products.models import ProductImage
 from shopcart.models import ShopCart
-# import django_filters
-# Create your views here.
 
-# class ProductFilter(django_filters.FilterSet):
-    # class Meta:
-        # model = Product
-        # fields = {
-            # 'product__pricing__pricingStartDate': ['exact', 'contains'],
-            # 'last_login': ['exact', 'year__gt'],
-        # }
+
 class ProductList(generic.ListView):
     model = Product
     template_name = 'products/list.html'
@@ -48,11 +40,20 @@ class ProductDetail(generic.DetailView):
         """
         # Call the base implementation first to get the context
         context = super(ProductDetail, self).get_context_data(*args, **kwargs)
+
+        # change: change these disaster queries and remove template logics
         # Get colorset for product
-        product_color_query = Product.objects.filter(productSlug__exact=self.kwargs['productSlug'], productcolor__productimage__isnull=False)
+        product_color_query = Product.objects.filter(productSlug__exact=self.kwargs['productSlug'],
+                                        productcolor__productimage__isnull=False
+                                    )
+
+        # check if pitems associated with product id available == 0
+        # if 0 add out_of_stock message
+
         # get or add cart
         cart_obj, new_obj = ShopCart.objects.get_or_new(self.request)
-        # Create any data and add it to the context
+
+        # add to context
         context['shopcart'] = cart_obj
         context['product1'] = product_color_query
         # context['product'] = productQuerySet
@@ -60,10 +61,16 @@ class ProductDetail(generic.DetailView):
 
 def load_sizes(request):
     """ This method will populate the available purchaseitem sizes based on color selection """
-    productColorID = request.GET.get('productColorID')
-    productSlug = request.GET.get('productSlug')
-    sizes = PurchaseItems.objects.filter(piColor__colorName__exact=productColorID, productID__productSlug__iexact=productSlug).distinct('piSize').values('piSize')
-    # data = [{'piSize': size.piSize} for size in size_list]
-    images = ProductImage.objects.filter(productColorID__colorID__colorName__iexact=productColorID, productColorID__productID__productSlug__iexact=productSlug)# .values('productImagePath')
-    # return render(request, 'products/size_dropdown_list_options.html', {'sizes': sizes, 'images': images})
+    product_color = request.GET.get('productColorID')
+    product_slug = request.GET.get('productSlug')
+
+    # change: fix these queries
+    sizes = PurchaseItems.objects.filter(piColor__colorName__exact=product_color,
+                                    productID__productSlug__iexact=product_slug,
+                                ).distinct('piSize').values('piSize')
+
+    images = ProductImage.objects.filter(productColorID__colorID__colorName__iexact=product_color,
+                                productColorID__productID__productSlug__iexact=product_slug
+                            )# .values('productImagePath')
+
     return render(request, 'products/size_dropdown_list_options.html', {'sizes': sizes, 'images': images})
