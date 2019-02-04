@@ -56,7 +56,9 @@ def checkout_home(request):
     login_form = LoginForm()
     guest_form = GuestForm()
     address_form = AddressForm()
+    #initializers
     sale_obj = None
+    address_qs = None
     billing_address_id = request.session.get('billing_address_id', None)
     shipping_address_id = request.session.get('shipping_address_id', None)
 
@@ -66,7 +68,11 @@ def checkout_home(request):
     # get billing profile
     billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
     if billing_profile is not None:
-        sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_items)
+        if request.user.is_authenticated:
+            address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
+            print('address count: ', address_qs.count())
+        # create sale
+        sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_obj)
         if shipping_address_id:
             sale_obj.saleShippingAddress = Address.objects.get(id=shipping_address_id)
             del request.session['shipping_address_id']
@@ -104,5 +110,6 @@ def checkout_home(request):
         "login_form": login_form,
         "guest_form": guest_form,
         "address_form": address_form,
+        "address_qs": address_qs,
     }
     return render(request, 'carts/checkout.html', context)

@@ -8,9 +8,10 @@ from billing.models import BillingProfile
 from addresses.models import Address
 
 class SaleManager(models.Manager):
-    def new_or_get(self, billing_profile, cart_items):
+    def new_or_get(self, billing_profile, cart_obj):
         created = False
         qs = None
+        cart_items = cart_obj.shopCartItems.all()
         for item in cart_items:
             if not item.piIsAvailable:
                 # change: logic error here or where the cart is
@@ -34,11 +35,11 @@ class SaleManager(models.Manager):
                         saleBillingProfile=billing_profile,
                         saleStatus='created',
                         saleNote='default sale note',
-                        # saleSubTotal=cart_obj.shopCartSubTotal,# change: this will be calc in post_save
-                        # saleDiscountAmount = ?
-                        # saleSalesTaxAmount = ?
-                        # saleShipCostAmountCharged = ?# change: default is 7.00 on models, change to calculation
-                        # saleTotal=cart_obj.shopCartSubTotal# change: 
+                        # saleSubTotal= # calc in post_save
+                        # saleDiscountAmount = # in post_save
+                        # saleSalesTaxAmount = # in post_save
+                        # saleShipCostAmountCharged = # calc in post_save
+                        # saleTotal= # calc in post_save 
             )
             obj.save()
             # add cart_items to sale
@@ -77,9 +78,10 @@ class Sale(models.Model):
     saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
-    # saleDiscountAmount = ? 
+    # saleDiscount = many to many
+    # saleDiscountAmount = ? actual calculated discount amount
     # saleSalesTaxAmount = ? # change: add logic for sales tax calculation
-    saleShipCostAmountCharged = models.DecimalField(default=7.00, max_digits=12, decimal_places=2)# change: integrate shipping API
+    saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
 
     saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
@@ -104,25 +106,51 @@ class Sale(models.Model):
             return True
         return False
 
-    def mark_done(self):
+    def mark_payed(self):
         if self.check_done():
             self.saleStatus = 'payed'
             self.save()
         return self.saleStatus
-    # Should probably be in model manager?
-    # Computes final order total
-    # def get_final_total(self, request):
-        # if new_obj? return you have nothing in cart?
-        # cart_sub_total = cart_obj.shopCartSubTotal
-        # sale_discount_amount = ?
-        # sale_tax_amount = ?
-        # shipping_charged = ?
-        # new_sale_total = cart_sub_total - sale_discount_amount + sale_tax_amount + sale_shipping_charged
-        # self.saleTotal = new_sale_total
-        # self.save()
-        # return new_sale_total
-        # return cart_sub_total
 
+    # calculates total based on present values. if ANY null return error?
+    def update_total(self):
+        total = 0
+        sub_total = self.saleSubTotal
+        if sub_total != 0 and sub_total is not None:# add more checks as you add more stuff
+            # add saleDiscount calculation
+            total = self.saleSubTotal# - sale_discount_amount + sale_shipping_charged + sale_tax_amount
+            self.save()
+            return total
+
+    def update_sub_total(self):
+        items = self.saleItems.all()
+        sub_total = 0
+        # calculates sub_total 
+        # if saleitem count is more than 0
+        if items.count() > 0:
+            for item in items:
+                subtotal += item.productID.productSalePrice
+            self.shopCartSubTotal = sub_total
+            # add saleDiscount calculation
+            self.save()
+            return sub_total
+
+    # def get_discount_amount(self):
+        # # get discount obj
+        # # s_discount_obj = self.saleDiscount
+        # # check that sale meets conditions
+            # #if met, get saleDiscountAmount
+
+        # sub_total = 0
+        # # calculates sub_total 
+        # # if saleitem count is more than 0
+        # if items.count() > 0:
+            # for item in items:
+                # subtotal += item.productID.productSalePrice
+            # self.shopCartSubTotal = sub_total
+            # # add saleDiscount calculation
+            # self.save()
+            # return sub_total
 
 class SaleItems(models.Model):
     saleItemID = models.AutoField(primary_key=True)
@@ -146,8 +174,22 @@ def pre_save_create_sale_id(sender, instance, *args, **kwargs):
 pre_save.connect(pre_save_create_sale_id, sender=Sale)
 
 # Might be used to call instance.get_final_total and retrieve all the calculated fields
-# def post_save_sale(sender, instance, created, *args, **kwargs):
-    # if created:# if order just created
-        # # do stuff
-        # pass
-# post_save.connect(post_save_sale, sender=Sale)
+def post_save_sale(sender, instance, created, *args, **kwargs):
+    if created:#initial creation, update sub_total and discount
+        instance.update_sub_total()# this saves
+        # add instnace.update_sale_discount()
+        if instance.saleStatus == 'payed':# already payed, probably do nothing, maybe do some ashley stuff
+            pass
+        if instance.saleStatus == 'created':# already creatd once, get shipping cost
+            pass
+            # calc shipping if billing, shipping, and shipmethod are null
+            #if instance.saleShippingAddress and instance.saleBillingAddress and instance.saleShipMethod:
+                # call calcShipping
+            # calc tax if shipcharged is already there
+            # if both addresses, shipMethod, and ship charged are not null: calc tax
+                # sale_tax_amount = ?
+            # calc total if everything is there
+            # if everything is ready, calculate total
+    # if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+        # add saleDiscount calculation
+post_save.connect(post_save_sale, sender=Sale)

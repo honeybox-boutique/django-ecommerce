@@ -20,14 +20,31 @@
 
     {% if not sale_obj.saleShippingAddress %}
         <div class="row">
-            <div class="col-md-6 mx-auto col-10">
-            <p class="lead">Shipping Address</p>
-            <hr/>
-            {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
-            {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
+            <div class="col-12">
+                <p class="lead">Shipping Address</p>
+                <hr/>
             </div>
-        </div>
+            <div class="col-6">
+                    {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
+                    {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
+            </div>
+
+            {% if address_qs.exists %}
+
+            <div class="col-6">
+                {% for address in address_qs %}
+                    <label for="address-{{ address.id }}">
+                        <input type="radio" name="shipping_address" value="{{ address.id }}"
+                    {{ address.addressLine1 }}
+                    </label>
+                {% endfor %}
+            </div>
+
+            {% endif %}
+            
+        </div><!-- End of Row -->
     {% elif not sale_obj.saleBillingAddress %}
+
         <div class="row">
             <div class="col-md-6 mx-auto col-10">
             <p class="lead">Billing Address</p>
@@ -36,11 +53,14 @@
             {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='billing' %}
             </div>
         </div>
+
     {% else %}
+
         {{ sale_obj }}
         <h1>Finalize Checkout {{ shopcart }}</h1>
         <table>
             <tbody>
+
                 {% for item in sale_obj.saleItems.all %}
                 <tr>
                     <th scope="row">-</th>

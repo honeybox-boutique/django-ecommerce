@@ -20,10 +20,6 @@ class ShopCartManager(models.Manager):
     def get_or_new(self, request):
         cart_id = request.session.get('cart_id', None)
         qs = self.get_queryset().filter(id=cart_id)
-        # if authenticated
-            # if user cart exists
-                #use user cart
-            #else
         if qs.count() == 1:# Check if session cart exists
             new_obj = False
             cart_obj = qs.first()
@@ -84,7 +80,6 @@ class ShopCart(models.Model):
 
     shopCartStatus = models.CharField(max_length=40, default=OPEN, choices=STATUS_CHOICES)
 
-    shopCartDiscount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     shopCartSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
 
     shopCartItems = models.ManyToManyField(PurchaseItems, blank=True)

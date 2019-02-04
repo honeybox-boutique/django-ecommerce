@@ -147,26 +147,26 @@ def pre_save_cdiscount_active(sender, instance, *args, **kwargs):
         instance.cDiscountIsActive = False
 pre_save.connect(pre_save_cdiscount_active, sender=CDiscount)
 
-# class TDiscount(models.Model):
-    # tDiscountID = models.AutoField(primary_key=True)
-    # tDiscountName = models.CharField(max_length=40)
-    # tDiscountDescription = models.TextField(max_length=200)
-    # tDiscountType = models.CharField(max_length=30)
-    # tDiscountAmount = models.DecimalField(max_digits=8, decimal_places=3)
-    # tDiscountDateCreated = models.DateTimeField('date created')
-    # tDiscountDateValidFrom = models.DateTimeField('date created')
-    # tDiscountDateValidUntil = models.DateTimeField('date created')
-    # tDiscountCouponCode = models.CharField(max_length=20)
-    # tDiscountMaxDiscount = models.DecimalField(max_digits=8, decimal_places=3)
-    # tDiscountMinOrderValue = models.DecimalField(max_digits=8, decimal_places=3)
+# class SDiscount(models.Model):
+    # sDiscountID = models.AutoField(primary_key=True)
+    # sDiscountName = models.CharField(max_length=40)
+    # sDiscountDescription = models.TextField(max_length=200)
+    # sDiscountType = models.CharField(max_length=30)
+    # sDiscountAmount = models.DecimalField(max_digits=8, decimal_places=3)
+    # sDiscountDateCreated = models.DateTimeField('date created')
+    # sDiscountDateValidFrom = models.DateTimeField('date created')
+    # sDiscountDateValidUntil = models.DateTimeField('date created')
+    # sDiscountCouponCode = models.CharField(max_length=20)
+    # sDiscountMaxDiscount = models.DecimalField(max_digits=8, decimal_places=3)
+    # sDiscountMinOrderValue = models.DecimalField(max_digits=8, decimal_places=3)
 
-    # transactionID = models.ForeignKey(Category, on_delete=models.CASCADE)
+    # saleID = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     # class Meta:
-        # db_table = 'cdiscount'
+        # db_table = 'sdiscount'
 
     # def __str__(self):
-        # return self.cDiscountName
+        # return self.sDiscountName
 
 # Pricing post_save
 def post_save_pricing(sender, instance, created, *args, **kwargs):
@@ -200,3 +200,35 @@ def post_save_c_discount(sender, instance, created, *args, **kwargs):
     for product in category_products.all():
         product.update_pricing()
 post_save.connect(post_save_c_discount, sender=CDiscount)
+
+# make app, view, and template for accepting discount codes
+
+# on view
+# on discount code send do sDiscount.object.new_or_get
+# get success_message, created, discountValue, is_multplier
+# if created show success_message
+# if nil then 
+# generate string
+
+
+# add model method on sales thats attempt_apply_or_get()
+# takes discount code and returns
+# will be called in view that takes discount codes
+
+# sale discount condition check should go in sDiscount model manager and should take in sdiscountcode, sale
+# returns created (bool, will be true if discount relation was created)
+# returns discount_message (self.sDiscountMessage)
+# returns discount_value (self.sDiscountValue)
+# returns is_multiplier (if self.sDiscountType == 'Percent')
+# if cart_items > 0:
+    #if sale.saleStatus == 'created':
+        # if sDiscountIsActive:
+            # if sale_items meet sDiscount reqs
+                # set message = 'Successfully applied discount!'
+                # set discount_message = self.sDiscountMessage
+                # apply discount to 
+            # elif cart_items NOT meet sDiscount reqs
+                # set message = 'you do not meet reqs'
+
+        
+        
