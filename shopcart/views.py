@@ -18,6 +18,8 @@ def cart_update(request):
         purchitem with matching slug, color, and size exists,
         AND does NOT have a sale transaction associated with it
     """
+    # get cart
+    cart_obj, new_obj = ShopCart.objects.get_or_new(request)
     # change: maybe? clean these parameters using form method
     # get POST parameters
     product_slug = request.POST.get('productSlug')
@@ -25,15 +27,13 @@ def cart_update(request):
     size = request.POST.get('size-selection')
     quantity = request.POST.get('quantity')
 
-    # get cart
-    cart_obj, new_obj = ShopCart.objects.get_or_new(request)
 
     # query for purchaseitems available
     purchase_item_query = PurchaseItems.objects.filter(
-                                productID__productSlug=product_slug, 
+                                productID__productSlug=product_slug,
                                 piColor__colorName=color,
-                                piSize=size
-                                # piIsAvailable=True# change: change once you are done
+                                piSize=size,
+                                piIsAvailable=True# change: change once you are done
                             )
     # exclude all pitems already in cart
     for cart_item in cart_obj.shopCartItems.all():

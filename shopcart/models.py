@@ -28,7 +28,7 @@ class ShopCartManager(models.Manager):
                 user_cart = self.get_queryset().filter(user=request.user)
                 if user_cart.count() >= 1:
                     user_cart_obj = user_cart.first()# user cart
-                    items_to_add = cart_obj.shopCartItems.all()
+                    items_to_add = cart_obj.shopCartItems.filter(piIsAvailable=True).all()# added available filter here
 
                     # filter out items already present in user cart
                     for cart_item in user_cart_obj.shopCartItems.all():
