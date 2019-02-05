@@ -70,7 +70,6 @@ def checkout_home(request):
     if billing_profile is not None:
         if request.user.is_authenticated:
             address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
-            print('address count: ', address_qs.count())
         # create sale
         sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_obj)
         if shipping_address_id:
@@ -83,14 +82,17 @@ def checkout_home(request):
             sale_obj.save()
         
 
-        # set cart status to submitted
-        cart_obj.shopCartStatus = 'Submitted'
-        cart_obj.save()
     
     if request.method == 'POST':
         '''check if sale is done'''
         is_done = sale_obj.check_done()
-        if is_done:
+        if not is_done:
+            print('something is not done')
+        elif is_done:
+            print('clearing stuff becuase isdone')
+            # set cart status to submitted
+            cart_obj.shopCartStatus = 'Submitted'
+            cart_obj.save()
             sale_obj.mark_paid()
             request.session['cart_count'] = 0
             # clear items from user cart if authenticated
@@ -100,10 +102,9 @@ def checkout_home(request):
                 print(is_empty)
 
             return redirect('checkout/success/')
-        else:
-            print('something is not done')
 
     context = {
+        "cart_obj": cart_obj,
         "sale_obj": sale_obj,
         "shopcart": cart_obj,
         "billing_profile": billing_profile,

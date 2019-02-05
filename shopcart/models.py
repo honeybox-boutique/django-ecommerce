@@ -92,12 +92,12 @@ class ShopCart(models.Model):
         db_table = 'shopcart'
 
     def empty_shopcart(self):
+        print('emptying')
         is_empty = False
-        for item in self.shopCartItems:
-            item.delete()
-
+        self.shopCartItems.clear()
         if self.shopCartItems.count() == 0:
             is_empty = True
+        print(is_empty)
         return is_empty
 
 

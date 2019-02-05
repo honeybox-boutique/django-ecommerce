@@ -19,6 +19,7 @@
 {% else %}
 
     {% if not sale_obj.saleShippingAddress %}
+        <p>{{ cart_obj }}</p>
         <div class="row">
             <div class="col-12">
                 <p class="lead">Shipping Address</p>
@@ -45,6 +46,7 @@
         </div><!-- End of Row -->
     {% elif not sale_obj.saleBillingAddress %}
 
+        {{ cart_obj }}
         <div class="row">
             <div class="col-md-6 mx-auto col-10">
             <p class="lead">Billing Address</p>
@@ -57,7 +59,7 @@
     {% else %}
 
         {{ sale_obj }}
-        <h1>Finalize Checkout {{ shopcart }}</h1>
+        <h1>Finalize Checkout {{ cart_obj }}</h1>
         <table>
             <tbody>
 
@@ -83,7 +85,7 @@
                 </tr>
             </tbody>
         </table>
-        <form class="form" method="POST" action="">{% csrf_token %}
+        <form class="form" method="POST" action="{% url 'shopcart:checkout' %}">{% csrf_token %}
             <button type="submit">Complete Checkout</button>
         </form>
     {% endif %}

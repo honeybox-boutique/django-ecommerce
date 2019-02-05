@@ -18,7 +18,7 @@ class BillingProfileManager(models.Manager):
             # user checkout
             print('user checkout')
             obj, created = self.model.objects.get_or_create(user=user, billingEmail=user.email)
-            print(obj)
+            print('billing profile: ', obj.id)
         elif guest_email_id is not None:
             # guest checkout
             print('guest checkout')

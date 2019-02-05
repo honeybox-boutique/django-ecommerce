@@ -1,3 +1,4 @@
+import decimal
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 
@@ -9,28 +10,38 @@ from addresses.models import Address
 
 class SaleManager(models.Manager):
     def new_or_get(self, billing_profile, cart_obj):
+        print('sale new or get')
         created = False
         qs = None
         cart_items = cart_obj.shopCartItems.all()
+        available = True
+        # if cart has 
         for item in cart_items:
-            if not item.piIsAvailable:
+            if item.piIsAvailable == False:# wrong, need to check if there is sale
+                print('not available')
                 # change: logic error here or where the cart is
                 # its not new, query for it and return it   
-                qs = self.get_queryset().filter(
-                                saleBillingProfile=billing_profile,
-                                saleStatus='created',
-                                saleItems__prodStockID=item.prodStockID
-                )
-                print('query count')
-                print(qs.count())
-                if qs.count() == 1:
-                    obj = qs.first()
-                    print('queried for')
-                    print(obj)
-                    return obj, created 
+                available = False
+        if not available:
+            qs = self.get_queryset().filter(
+                            saleBillingProfile=billing_profile,
+                            saleItems__prodStockID=cart_items.first().prodStockID
+            )
+            print('query count')
+            print(qs.count())
+            if qs.count() == 1:
+                obj = qs.first()
+                print('queried for')
+                print(obj)
+                print(obj.saleSubTotal)
+                return obj, created
+            if qs.count() == 0:
+                print('no sale,')
                 
         #cart already used, checkout not finished
         else: # its a new order so make it and return it
+            print('model manager creating new sale')
+            created = True
             obj = Sale(
                         saleBillingProfile=billing_profile,
                         saleStatus='created',
@@ -41,7 +52,7 @@ class SaleManager(models.Manager):
                         # saleShipCostAmountCharged = # calc in post_save
                         # saleTotal= # calc in post_save 
             )
-            obj.save()
+            obj.save(created)
             # add cart_items to sale
             for item in cart_items:
                 # change: maybe add checking logic to make sure pricing is active, prodStockItems don't haven't been sold, etc.
@@ -57,10 +68,9 @@ class SaleManager(models.Manager):
                 # set piIsAvailable to False
                 item.piIsAvailable = False
                 item.save()
-            created = True
             print('created: ')
             print(obj)
-        return obj, created
+            return obj, created
 
 class Sale(models.Model):
     SALE_STATUS_CHOICES = (
@@ -95,6 +105,13 @@ class Sale(models.Model):
     def __str__(self):
         return self.saleStringID
     
+    def save(self, *args, **kwargs):
+        if self.saleID is not None:
+            # call calculated field methods here
+            self.saleSubTotal = self.get_sub_total()
+            self.saleTotal = self.get_total()
+        super(Sale, self).save(*args, **kwargs)
+    
     def check_done(self):
         billing_profile = self.saleBillingProfile
         shipping_address = self.saleShippingAddress
@@ -106,34 +123,34 @@ class Sale(models.Model):
             return True
         return False
 
-    def mark_payed(self):
+    def mark_paid(self):
         if self.check_done():
             self.saleStatus = 'payed'
             self.save()
         return self.saleStatus
 
     # calculates total based on present values. if ANY null return error?
-    def update_total(self):
-        total = 0
+    def get_total(self):
+        print('getting total')
+        total = decimal.Decimal("0.00")
         sub_total = self.saleSubTotal
-        if sub_total != 0 and sub_total is not None:# add more checks as you add more stuff
-            # add saleDiscount calculation
-            total = self.saleSubTotal# - sale_discount_amount + sale_shipping_charged + sale_tax_amount
-            self.save()
-            return total
+        # add saleDiscount calculation
+        total = sub_total# - sale_discount_amount + sale_shipping_charged + sale_tax_amount
+        print(total)
+        return total
 
-    def update_sub_total(self):
+    def get_sub_total(self):
+        print('updating subtotal')
         items = self.saleItems.all()
-        sub_total = 0
+        sub_total = decimal.Decimal("0.00")
         # calculates sub_total 
         # if saleitem count is more than 0
-        if items.count() > 0:
-            for item in items:
-                subtotal += item.productID.productSalePrice
-            self.shopCartSubTotal = sub_total
-            # add saleDiscount calculation
-            self.save()
-            return sub_total
+        for item in items:
+            sub_total += item.productID.productSalePrice
+        self.shopCartSubTotal = sub_total
+        # add saleDiscount calculation
+        print('saving subtotal: ', sub_total)
+        return sub_total
 
     # def get_discount_amount(self):
         # # get discount obj
@@ -173,23 +190,24 @@ def pre_save_create_sale_id(sender, instance, *args, **kwargs):
         instance.saleStringID = unique_sale_id_generator(instance)
 pre_save.connect(pre_save_create_sale_id, sender=Sale)
 
+# Change: maybe remove this as can't use signals to get calc field values for same model
 # Might be used to call instance.get_final_total and retrieve all the calculated fields
-def post_save_sale(sender, instance, created, *args, **kwargs):
-    if created:#initial creation, update sub_total and discount
-        instance.update_sub_total()# this saves
-        # add instnace.update_sale_discount()
-        if instance.saleStatus == 'payed':# already payed, probably do nothing, maybe do some ashley stuff
-            pass
-        if instance.saleStatus == 'created':# already creatd once, get shipping cost
-            pass
-            # calc shipping if billing, shipping, and shipmethod are null
-            #if instance.saleShippingAddress and instance.saleBillingAddress and instance.saleShipMethod:
-                # call calcShipping
-            # calc tax if shipcharged is already there
-            # if both addresses, shipMethod, and ship charged are not null: calc tax
-                # sale_tax_amount = ?
-            # calc total if everything is there
-            # if everything is ready, calculate total
-    # if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
-        # add saleDiscount calculation
-post_save.connect(post_save_sale, sender=Sale)
+# def post_save_sale(sender, instance, created, *args, **kwargs):
+    # if instance.saleStatus == 'created':# already creatd once, get shipping cost
+        # print('post save worked')
+        # instance.saleSubTotal = instance.get_sub_total()
+        # instance.saleTotal = instance.get_total()
+        # # add instnace.update_sale_discount()
+        # # if instance.saleStatus == 'payed':# already payed, probably do nothing, maybe do some ashley stuff
+            # # pass
+            # # calc shipping if billing, shipping, and shipmethod are null
+            # #if instance.saleShippingAddress and instance.saleBillingAddress and instance.saleShipMethod:
+                # # call calcShipping
+            # # calc tax if shipcharged is already there
+            # # if both addresses, shipMethod, and ship charged are not null: calc tax
+                # # sale_tax_amount = ?
+            # # calc total if everything is there
+            # # if everything is ready, calculate total
+    # # if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+        # # add saleDiscount calculation
+# post_save.connect(post_save_sale, sender=Sale)
