@@ -157,11 +157,12 @@ class SDiscount(models.Model):
     sDiscountDateCreated = models.DateTimeField('date created')
     sDiscountDateValidFrom = models.DateTimeField('valid from')
     sDiscountDateValidUntil = models.DateTimeField('valid until')
-    sDiscountCouponCode = models.CharField(max_length=20)
+    sDiscountCouponCode = models.CharField('coupon code', max_length=20)
     sDiscountMaxAmount = models.DecimalField(max_digits=8, decimal_places=3)
     sDiscountMinSaleValue = models.DecimalField(max_digits=8, decimal_places=3)
     sDiscountAutomatic = models.BooleanField(default=False)
     sDiscountIsShippingDiscount = models.BooleanField(default=False)
+    sDiscountIsActive = models.BooleanField(default=False)
 
 
     class Meta:
@@ -169,6 +170,18 @@ class SDiscount(models.Model):
 
     def __str__(self):
         return self.sDiscountName
+
+def pre_save_sdiscount_active(sender, instance, *args, **kwargs):
+    current_time = timezone.now()
+    # check if timezone.now is between start and endate of instance
+    if instance.sDiscountDateValidFrom < current_time < instance.sDiscountDateValidUntil: 
+        # change: check if product has other active discounts
+        # if has other active pricings then don't save and return error "already active pricing"
+        instance.sDiscountIsActive = True
+    else:
+        # set not active
+        instance.sDiscountIsActive = False
+pre_save.connect(pre_save_sdiscount_active, sender=SDiscount)
 
 class SDiscountCondition(models.Model):
     CONDITION_TYPE_CHOICES = (
@@ -239,14 +252,14 @@ post_save.connect(post_save_c_discount, sender=CDiscount)
 # make app, view, and template for accepting discount codes
 
 # on view
-# on discount code send do sDiscount.object.new_or_get
+# on discount code send do sDiscount.object.check_conditions()
 # get success_message, created, discountValue, is_multplier
 # if created show success_message
 # if nil then 
 # generate string
 
 
-# add model method on sales thats attempt_apply_or_get()
+# add model method on sales thats check_conditions()
 # takes discount code and returns
 # will be called in view that takes discount codes
 

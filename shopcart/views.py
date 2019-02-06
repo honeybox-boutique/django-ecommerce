@@ -2,16 +2,18 @@ from django.shortcuts import render, redirect
 
 from users.forms import LoginForm, GuestForm
 from addresses.forms import AddressForm
+from coupons.forms import SDiscountForm
 from billing.models import BillingProfile
 from .models import ShopCart, PurchaseItems
 from users.models import Guest
 from sales.models import Sale, SaleItems
 from addresses.models import Address
+from pricing.models import SDiscount
 
 def cart_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
     request.session['cart_count'] = cart_obj.shopCartItems.count()
-    return render(request, 'shopcart:home', {"shopcart": cart_obj})
+    return render(request, 'shopcart/home.html', {"shopcart": cart_obj})
 
 def cart_update(request):
     """ should use product-slug, color, and size as parameters to check if:
@@ -59,6 +61,7 @@ def checkout_home(request):
     #initializers
     sale_obj = None
     address_qs = None
+    discount_qs = None
     billing_address_id = request.session.get('billing_address_id', None)
     shipping_address_id = request.session.get('shipping_address_id', None)
 
@@ -72,6 +75,10 @@ def checkout_home(request):
             address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
         # create sale
         sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_obj)
+        # initialize coupon form with sale object
+        coupon_form = SDiscountForm(initial={'sobj': sale_obj.saleStringID})
+        # get discount qs
+        discount_qs = SDiscount.objects.filter(sale=sale_obj)
         if shipping_address_id:
             sale_obj.saleShippingAddress = Address.objects.get(id=shipping_address_id)
             del request.session['shipping_address_id']
@@ -111,7 +118,9 @@ def checkout_home(request):
         "login_form": login_form,
         "guest_form": guest_form,
         "address_form": address_form,
+        "coupon_form": coupon_form,
         "address_qs": address_qs,
+        "discount_qs": discount_qs,
     }
     return render(request, 'shopcart/checkout.html', context)
 

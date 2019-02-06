@@ -28,12 +28,17 @@
             <div class="col-6">
                 {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
                 {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
-            </div>
-
-            <div class="col-6">
                 {% url 'addresses:checkout_address_reuse' as checkout_address_reuse %}
                 {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='shipping' %}
             </div>
+
+            <div class="col-6">
+                {% url 'coupons:apply_discount' as apply_discount %}
+                {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
+            </div>
+        <!-- in checkout have if manytomany discount-sale exists 
+        then show applied discounts and then form for code input
+        else if none exist just show form-->
 
         </div><!-- End of Row -->
     {% elif not sale_obj.saleBillingAddress %}
