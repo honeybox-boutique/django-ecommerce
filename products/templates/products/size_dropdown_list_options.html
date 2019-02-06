@@ -2,5 +2,7 @@
     <input type="radio" name="size-selection" value="{{ size.piSize }}"> {{ size.piSize }}
 {% endfor %}
 {% for image in images %}
+<div class="row">
     <img src="{{ image.productImagePath.url }}" alt="" class="img-fluid">
+</div>
 {% endfor %}

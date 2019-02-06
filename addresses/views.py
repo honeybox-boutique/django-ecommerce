@@ -4,6 +4,7 @@ from django.utils.http import is_safe_url
 # Create your views here.
 from .forms import AddressForm
 from billing.models import BillingProfile
+from addresses.models import Address
 
 def checkout_address_create_view(request):
     form = AddressForm(request.POST or None)
@@ -34,4 +35,22 @@ def checkout_address_create_view(request):
             return redirect(next_post)
         else:
             redirect('shopcart:checkout')
+    return redirect('shopcart:checkout')
+
+def checkout_address_reuse_view(request):
+    if request.user.is_authenticated:
+        form = AddressForm(request.POST or None)
+        context = {}
+        next_post = request.POST['next']
+        if request.method == 'POST':
+            print(request.POST)
+            address = request.POST.get('address', None)
+            address_type = request.POST.get('addressType')
+            billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
+            if address is not None:
+                qs = Address.objects.filter(id=address, addressBillingProfile=billing_profile)
+                if qs.exists():
+                    request.session[address_type + "_address_id"] = address
+                if is_safe_url(next_post, request.get_host()):
+                    return redirect(next_post)
     return redirect('shopcart:checkout')

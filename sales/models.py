@@ -10,7 +10,6 @@ from addresses.models import Address
 
 class SaleManager(models.Manager):
     def new_or_get(self, billing_profile, cart_obj):
-        print('sale new or get')
         created = False
         qs = None
         cart_items = cart_obj.shopCartItems.all()
@@ -18,7 +17,7 @@ class SaleManager(models.Manager):
         # if cart has 
         for item in cart_items:
             if item.piIsAvailable == False:# wrong, need to check if there is sale
-                print('not available')
+                print('getting new sale')
                 # change: logic error here or where the cart is
                 # its not new, query for it and return it   
                 available = False
@@ -27,8 +26,6 @@ class SaleManager(models.Manager):
                             saleBillingProfile=billing_profile,
                             saleItems__prodStockID=cart_items.first().prodStockID
             )
-            print('query count')
-            print(qs.count())
             if qs.count() == 1:
                 obj = qs.first()
                 print('queried for')

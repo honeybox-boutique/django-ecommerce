@@ -26,33 +26,31 @@
                 <hr/>
             </div>
             <div class="col-6">
-                    {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
-                    {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
+                {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
+                {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
             </div>
-
-            {% if address_qs.exists %}
 
             <div class="col-6">
-                {% for address in address_qs %}
-                    <label for="address-{{ address.id }}">
-                        <input type="radio" name="shipping_address" value="{{ address.id }}"
-                    {{ address.addressLine1 }}
-                    </label>
-                {% endfor %}
+                {% url 'addresses:checkout_address_reuse' as checkout_address_reuse %}
+                {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='shipping' %}
             </div>
 
-            {% endif %}
-            
         </div><!-- End of Row -->
     {% elif not sale_obj.saleBillingAddress %}
 
         {{ cart_obj }}
         <div class="row">
-            <div class="col-md-6 mx-auto col-10">
-            <p class="lead">Billing Address</p>
-            <hr/>
-            {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
-            {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='billing' %}
+            <div class="col-12">
+                <p class="lead">Billing Address</p>
+                <hr/>
+            </div>
+            <div class="col-6">
+                {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
+                {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='billing' %}
+            </div>
+            <div class="col-6">
+                {% url 'addresses:checkout_address_reuse' as checkout_address_reuse %}
+                {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='billing' %}
             </div>
         </div>
 
