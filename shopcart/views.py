@@ -11,7 +11,7 @@ from addresses.models import Address
 def cart_home(request):
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
     request.session['cart_count'] = cart_obj.shopCartItems.count()
-    return render(request, 'carts/home.html', {"shopcart": cart_obj})
+    return render(request, 'shopcart:home', {"shopcart": cart_obj})
 
 def cart_update(request):
     """ should use product-slug, color, and size as parameters to check if:
@@ -101,7 +101,7 @@ def checkout_home(request):
                 is_empty = cart_obj.empty_shopcart()
                 print(is_empty)
 
-            return redirect('checkout/success/')
+            return redirect('shopcart:success')
 
     context = {
         "cart_obj": cart_obj,
@@ -113,4 +113,8 @@ def checkout_home(request):
         "address_form": address_form,
         "address_qs": address_qs,
     }
-    return render(request, 'carts/checkout.html', context)
+    return render(request, 'shopcart/checkout.html', context)
+
+def checkout_done_view(request):
+    """ final checkout complete page, thank you for your order! """
+    return render(request, 'shopcart/checkout-done.html', {})

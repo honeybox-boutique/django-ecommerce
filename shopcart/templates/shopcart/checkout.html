@@ -56,36 +56,38 @@
 
     {% else %}
 
-        {{ sale_obj }}
-        <h1>Finalize Checkout {{ cart_obj }}</h1>
-        <table>
-            <tbody>
+        <div class="row">
+        <div class="col-12">
+            <h1>Finalize Checkout {{ sale_obj }}</h1>
+            <hr/>
+        </div>
+        <div class="col-6">
+            <h4>Shipping Address</h4>
+            <p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
+            <p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
+            <h4>Billing Address</h4>
+            <p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
+            <p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
+        </div>
+        <div class="col 6">
+            <h4>Your Items</h4>
+            {% for item in sale_obj.saleItems.all %}
 
-                {% for item in sale_obj.saleItems.all %}
-                <tr>
-                    <th scope="row">-</th>
-                    <td>{{ item.productID }}</td>
-                    <td>{{ item.piColor }}</td>
-                    <td>{{ item.piSize }}</td>
-                    <td>{{ item.productID.productBasePrice }}</td>
-                    <td>{{ item.productID.productDiscountAmount }}</td>
-                    <td>{{ item.productID.productSalePrice }}</td>
-                </tr>
-                {% endfor %}
+                <p>{{ item.productID }}, {{ item.piColor }}, {{ item.piSize }}</p>
 
-                <tr>
-                    <td colspan="6">-</td>
-                    <td><b>Subtotal:</b> {{ sale_obj.saleSubTotal }}</td>
-                    <td><b>Shipping:</b> {{ sale_obj.saleShipCostAmountCharged }}</td>
-                    <!-- change: add sales tax here-->
-                    <!-- change: add sale discount amount here-->
-                    <td><b>Total:</b> {{ sale_obj.saleTotal }}</td>
-                </tr>
-            </tbody>
-        </table>
-        <form class="form" method="POST" action="{% url 'shopcart:checkout' %}">{% csrf_token %}
-            <button type="submit">Complete Checkout</button>
-        </form>
+            {% endfor %}
+            <p>Subtotal: ${{ sale_obj.saleSubTotal }}</p>
+            <!--<p>sale_obj.saleDiscount</p>-->
+            <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
+            <!-- change: add tax -->
+            <p>Sales Tax: $</p>
+            <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
+
+            <form class="form" method="POST" action="{% url 'shopcart:checkout' %}">{% csrf_token %}
+                <button type="submit">Complete Checkout</button>
+            </form>
+        </div>
+        </div>
     {% endif %}
 
 {% endif %}
