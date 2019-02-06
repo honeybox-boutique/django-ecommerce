@@ -147,26 +147,61 @@ def pre_save_cdiscount_active(sender, instance, *args, **kwargs):
         instance.cDiscountIsActive = False
 pre_save.connect(pre_save_cdiscount_active, sender=CDiscount)
 
-# class SDiscount(models.Model):
-    # sDiscountID = models.AutoField(primary_key=True)
-    # sDiscountName = models.CharField(max_length=40)
-    # sDiscountDescription = models.TextField(max_length=200)
-    # sDiscountType = models.CharField(max_length=30)
-    # sDiscountAmount = models.DecimalField(max_digits=8, decimal_places=3)
-    # sDiscountDateCreated = models.DateTimeField('date created')
-    # sDiscountDateValidFrom = models.DateTimeField('date created')
-    # sDiscountDateValidUntil = models.DateTimeField('date created')
-    # sDiscountCouponCode = models.CharField(max_length=20)
-    # sDiscountMaxDiscount = models.DecimalField(max_digits=8, decimal_places=3)
-    # sDiscountMinOrderValue = models.DecimalField(max_digits=8, decimal_places=3)
+class SDiscount(models.Model):
+    sDiscountID = models.AutoField(primary_key=True)
+    sDiscountName = models.CharField(max_length=40)
+    sDiscountDescription = models.TextField(max_length=200)
+    sDiscountMessage = models.CharField(max_length=150)
+    sDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)
+    sDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)
+    sDiscountDateCreated = models.DateTimeField('date created')
+    sDiscountDateValidFrom = models.DateTimeField('valid from')
+    sDiscountDateValidUntil = models.DateTimeField('valid until')
+    sDiscountCouponCode = models.CharField(max_length=20)
+    sDiscountMaxAmount = models.DecimalField(max_digits=8, decimal_places=3)
+    sDiscountMinSaleValue = models.DecimalField(max_digits=8, decimal_places=3)
+    sDiscountAutomatic = models.BooleanField(default=False)
+    sDiscountIsShippingDiscount = models.BooleanField(default=False)
 
-    # saleID = models.ForeignKey(Category, on_delete=models.CASCADE)
 
-    # class Meta:
-        # db_table = 'sdiscount'
+    class Meta:
+        db_table = 'sdiscount'
 
-    # def __str__(self):
-        # return self.sDiscountName
+    def __str__(self):
+        return self.sDiscountName
+
+class SDiscountCondition(models.Model):
+    CONDITION_TYPE_CHOICES = (
+        ('Sale', 'Sale'),
+        ('Item', 'Item'),
+        ('User', 'User'),
+    ) 
+    FIELD_NAME_CHOICES = (
+        ('saleSubTotal', 'Sale Sub-Total'),
+        ('productCategories', 'Product Category'),
+        ('productName', 'Product Name'),
+    ) 
+    COMPARE_OPERATOR_CHOICES = (
+        ('equal_to', 'Is equal to'),
+        ('greater_than', 'Is greater than'),
+        ('less_than', 'Is less than'),
+    ) 
+    sDCID = models.AutoField(primary_key=True)
+    sDCName = models.CharField(max_length=50)
+    sDCDescription = models.TextField(max_length=200)
+    sDCType = models.CharField(max_length=50, choices=CONDITION_TYPE_CHOICES)
+    sDCFieldName = models.CharField(max_length=50, choices=FIELD_NAME_CHOICES)
+    sDCCompareOperator = models.CharField(max_length=50, choices=COMPARE_OPERATOR_CHOICES)
+    sDCValue = models.CharField(max_length=70)
+    sDCNumRequired = models.IntegerField(default=1)
+
+    sDiscountID = models.ForeignKey(SDiscount, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'sdiscount_condition'
+
+    def __str__(self):
+        return self.sDCName
 
 # Pricing post_save
 def post_save_pricing(sender, instance, created, *args, **kwargs):

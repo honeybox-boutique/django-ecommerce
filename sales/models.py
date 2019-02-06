@@ -7,6 +7,8 @@ from purchases.models import PurchaseItems
 from shopcart.models import ShopCart
 from billing.models import BillingProfile
 from addresses.models import Address
+from pricing.models import SDiscount
+
 
 class SaleManager(models.Manager):
     def new_or_get(self, billing_profile, cart_obj):
@@ -85,12 +87,12 @@ class Sale(models.Model):
     saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
-    # saleDiscount = many to many
-    # saleDiscountAmount = ? actual calculated discount amount
+    saleDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     # saleSalesTaxAmount = ? # change: add logic for sales tax calculation
     saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
 
+    saleDiscounts = models.ManyToManyField(SDiscount)
     saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
     saleBillingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
 
