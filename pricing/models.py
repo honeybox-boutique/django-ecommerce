@@ -209,20 +209,20 @@ class SDiscountCondition(models.Model):
         ('Sale', 'Sale'),
         ('Item', 'Item'),
         ('User', 'User'),
-    ) 
+    )
     FIELD_NAME_CHOICES = (
         ('saleSubTotal', 'Sale Sub-Total'),
         ('productCategories', 'Product Category'),
         ('productName', 'Product Name'),
-    ) 
+    )
     COMPARE_OPERATOR_CHOICES = (
         ('equal_to', 'Is equal to'),
         ('greater_than', 'Is greater than'),
         ('less_than', 'Is less than'),
-    ) 
+    )
     sDCID = models.AutoField(primary_key=True)
     sDCName = models.CharField(max_length=50)
-    sDCDescription = models.TextField(max_length=200)
+    sDCFailMessage = models.TextField(max_length=200)
     sDCType = models.CharField(max_length=50, choices=CONDITION_TYPE_CHOICES)
     sDCFieldName = models.CharField(max_length=50, choices=FIELD_NAME_CHOICES)
     sDCCompareOperator = models.CharField(max_length=50, choices=COMPARE_OPERATOR_CHOICES)
@@ -269,35 +269,3 @@ def post_save_c_discount(sender, instance, created, *args, **kwargs):
     for product in category_products.all():
         product.update_pricing()
 post_save.connect(post_save_c_discount, sender=CDiscount)
-
-# make app, view, and template for accepting discount codes
-
-# on view
-# on discount code send do sDiscount.object.check_conditions()
-# get success_message, created, discountValue, is_multplier
-# if created show success_message
-# if nil then 
-# generate string
-
-
-# add model method on sales thats check_conditions()
-# takes discount code and returns
-# will be called in view that takes discount codes
-
-# sale discount condition check should go in sDiscount model manager and should take in sdiscountcode, sale
-# returns created (bool, will be true if discount relation was created)
-# returns discount_message (self.sDiscountMessage)
-# returns discount_value (self.sDiscountValue)
-# returns is_multiplier (if self.sDiscountType == 'Percent')
-# if cart_items > 0:
-    #if sale.saleStatus == 'created':
-        # if sDiscountIsActive:
-            # if sale_items meet sDiscount reqs
-                # set message = 'Successfully applied discount!'
-                # set discount_message = self.sDiscountMessage
-                # apply discount to 
-            # elif cart_items NOT meet sDiscount reqs
-                # set message = 'you do not meet reqs'
-
-        
-        

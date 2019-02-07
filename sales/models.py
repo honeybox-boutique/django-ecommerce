@@ -18,10 +18,7 @@ class SaleManager(models.Manager):
         available = True
         # if cart has 
         for item in cart_items:
-            if item.piIsAvailable == False:# wrong, need to check if there is sale
-                print('getting new sale')
-                # change: logic error here or where the cart is
-                # its not new, query for it and return it   
+            if item.piIsAvailable == False:
                 available = False
         if not available:
             qs = self.get_queryset().filter(
@@ -30,7 +27,6 @@ class SaleManager(models.Manager):
             )
             if qs.count() == 1:
                 obj = qs.first()
-                print('queried for')
                 print(obj)
                 return obj, created
             if qs.count() == 0:
@@ -38,7 +34,6 @@ class SaleManager(models.Manager):
                 
         #cart already used, checkout not finished
         else: # its a new order so make it and return it
-            print('model manager creating new sale')
             created = True
             obj = Sale(
                         saleBillingProfile=billing_profile,
@@ -68,10 +63,11 @@ class SaleManager(models.Manager):
                 item.piIsAvailable = False
                 item.save()
             obj.save()
-            print('created: ')
-            print(obj)
-            print('Sale Subtotal on creation', obj.saleSubTotal)
+            print('num items in sale', obj.saleItems.count())
             return obj, created
+
+    # sale discount condition check should go in sDiscount model manager and should take in sdiscountcode, sale
+
 
 class Sale(models.Model):
     SALE_STATUS_CHOICES = (
@@ -108,14 +104,14 @@ class Sale(models.Model):
         return self.saleStringID
     
     def save(self, *args, **kwargs):
-        if self.saleID is not None:
+        if self.saleID is not None and self.saleStatus == 'created':
             # call calculated field methods here
             self.saleSubTotal = self.get_sub_total()
             self.saleDiscountAmount = self.get_discount_amount()
             self.saleShipCostAmountCharged = self.get_shipping_ammount()
             self.saleTotal = self.get_total()
         super(Sale, self).save(*args, **kwargs)
-    
+
     def check_done(self):
         billing_profile = self.saleBillingProfile
         shipping_address = self.saleShippingAddress
@@ -128,6 +124,7 @@ class Sale(models.Model):
         return False
 
     def mark_paid(self):
+        print('marking paid')
         if self.check_done():
             self.saleStatus = 'payed'
             self.save()
@@ -212,6 +209,88 @@ class Sale(models.Model):
         print('saving shipamount: ', ship_amount)
         return ship_amount
 
+    def check_discount_conditions(self, discount):
+        print('checking discount conditions')
+        # get discount_obj
+        discount_obj = discount
+        # get sale_obj
+        # get sale_items
+        sale_items = self.saleItems.all()
+        print('num saleitems: ', sale_items.count())
+        # get discount_conditions
+        discount_conditions = discount_obj.sdiscountcondition_set.all()
+        num_discount_conditions = discount_conditions.count()
+        is_met = False
+        reason = ''
+        is_met_super_counter = 0
+
+        # for each condition
+        for condition in discount_conditions:
+            # type
+            condition_type = condition.sDCType
+            # field_name
+            field_name = condition.sDCFieldName
+            # compare_operator
+            compare_operator = condition.sDCCompareOperator
+            # value
+            condition_value = condition.sDCValue
+            print('Condition Value: ', condition_value)
+            # num_required
+            num_required = condition.sDCNumRequired
+            print('Number items required to meet condition: ', num_required)
+            reason = condition.sDCFailMessage
+            if condition_type == 'Sale':
+                if field_name == 'saleSubTotal':
+                    # convert value to decimal
+                    value_decimal = decimal.Decimal(condition_value.strip(' "'))
+                    if compare_operator == 'equal_to':
+                        if self.saleSubTotal == value_decimal:
+                            is_met_super_counter += 1
+                            reason = ''
+                    if compare_operator == 'greater_than':
+                        if self.saleSubTotal >= value_decimal:
+                            is_met_super_counter += 1
+                            reason = ''
+                    if compare_operator == 'less_than':
+                        if self.saleSubTotal <= value_decimal:
+                            is_met_super_counter += 1
+                            reason = ''
+            if condition_type == 'Item':
+                if field_name == 'productCategories':
+                    if compare_operator == 'equal_to':
+                        is_met_counter = 0
+                        for item in sale_items:
+                            # get categories
+                            item_categories = item.productID.productCategories.all()
+                            for category in item_categories:
+                                print(category.categoryName)
+                                if category.categoryName == condition_value:
+                                    is_met_counter += 1
+                                    print('met condition')
+                        print('items that met condition: ', is_met_counter)
+                        if is_met_counter >= num_required:
+                            is_met_super_counter += 1
+                            reason = ''
+
+                if field_name == 'productName':
+                    if compare_operator == 'equal_to':
+                        is_met_counter = 0
+                        for item in sale_items:
+                            # get categories
+                            if item.productID == condition_value:
+                                is_met_counter += 1
+                                print('met condition')
+                        print('items that met condition: ', is_met_counter)
+                        if is_met_counter >= num_required:
+                            is_met_super_counter += 1
+                            reason = ''
+            # if type == 'User'
+                # do stuff
+        print('conditions met | total conditions')
+        print(is_met_super_counter, num_discount_conditions)
+        if is_met_super_counter == num_discount_conditions:
+            is_met = True
+        return is_met, reason
 
 class SaleItems(models.Model):
     saleItemID = models.AutoField(primary_key=True)

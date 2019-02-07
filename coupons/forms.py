@@ -9,3 +9,4 @@ class SDiscountForm(forms.ModelForm):
         fields = (
             'sDiscountCouponCode',
         )
+# attrs={'autocomplete'='off'}

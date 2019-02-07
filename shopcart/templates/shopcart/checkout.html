@@ -32,10 +32,25 @@
                 {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='shipping' %}
             </div>
 
+            {% if discount_qs.exists %}
+
+            <div class="col-6">
+                <p>Discounts Applied</p>
+                {% for discount in discount_qs %}
+                <p>{{ discount.sDiscountName }}</p>
+                {% endfor %}
+                {% url 'coupons:apply_discount' as apply_discount %}
+                {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
+            </div>
+            
+            {% else %}
+
             <div class="col-6">
                 {% url 'coupons:apply_discount' as apply_discount %}
                 {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
             </div>
+
+            {% endif %}
         <!-- in checkout have if manytomany discount-sale exists 
         then show applied discounts and then form for code input
         else if none exist just show form-->

@@ -79,7 +79,7 @@ def checkout_home(request):
         coupon_form = SDiscountForm(initial={'sobj': sale_obj.saleStringID})
         # get discount qs
         discount_qs = SDiscount.objects.filter(sale=sale_obj)
-        print('Discount query Count')
+        print('Applied Discounts')
         print(discount_qs.count())
         if shipping_address_id:
             sale_obj.saleShippingAddress = Address.objects.get(id=shipping_address_id)

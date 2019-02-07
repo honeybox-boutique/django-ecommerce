@@ -22,15 +22,20 @@ def apply_discount_view(request):
         discount_qs = SDiscount.objects.filter(sDiscountCouponCode=discount_code,
                                     sDiscountIsActive=True,
                                 )
+        print('Discount Query Count')
+        print(discount_qs.count())
         if sale_qs.count() == 1:
             sale_obj = sale_qs.first()
             if discount_qs.count() == 1:
                 discount_obj = discount_qs.first()
-                #  do sDiscount.object.check_conditions()
+                # check of sale meets discount conditions
+                discount_conditions_met, reason, = sale_obj.check_discount_conditions(discount_obj)
                 # if conditions met then apply discount (create many to many)
-                sale_obj.saleDiscounts.add(discount_obj)
-                # maybe call save on sale object to recalc totals
-                print('added')
+                if discount_conditions_met:
+                    sale_obj.saleDiscounts.add(discount_obj)
+                    print('added')
+                else:
+                    print(reason)
             else:
                 print('no discount found')
         else:
