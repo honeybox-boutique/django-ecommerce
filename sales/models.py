@@ -1,6 +1,6 @@
 import decimal
 from django.db import models
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, m2m_changed
 
 from speedtest.utils import unique_sale_id_generator
 from purchases.models import PurchaseItems
@@ -32,7 +32,6 @@ class SaleManager(models.Manager):
                 obj = qs.first()
                 print('queried for')
                 print(obj)
-                print(obj.saleSubTotal)
                 return obj, created
             if qs.count() == 0:
                 print('no sale,')
@@ -51,11 +50,12 @@ class SaleManager(models.Manager):
                         # saleShipCostAmountCharged = # calc in post_save
                         # saleTotal= # calc in post_save 
             )
-            obj.save(created)
+            obj.save()
+
             # add cart_items to sale
             for item in cart_items:
                 # change: maybe add checking logic to make sure pricing is active, prodStockItems don't haven't been sold, etc.
-                new_sale_item = SaleItems(
+                new_sale_item = SaleItems.objects.create(
                                 saleID=obj,
                                 prodStockID=item,
                                 siBasePrice=item.productID.productBasePrice,
@@ -63,12 +63,14 @@ class SaleManager(models.Manager):
                                 siSalePrice=item.productID.productSalePrice,
                                 siNote=item.productID.productName
                             )
-                new_sale_item.save()
+                # obj.saleItems = new_sale_item
                 # set piIsAvailable to False
                 item.piIsAvailable = False
                 item.save()
+            obj.save()
             print('created: ')
             print(obj)
+            print('Sale Subtotal on creation', obj.saleSubTotal)
             return obj, created
 
 class Sale(models.Model):
@@ -88,6 +90,7 @@ class Sale(models.Model):
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
     saleDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+    # saleShipDiscountAmount = ? # change: should this be a thing? currently no way to tell free shipping as it isn't included in discountamount
     # saleSalesTaxAmount = ? # change: add logic for sales tax calculation
     saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
@@ -108,6 +111,8 @@ class Sale(models.Model):
         if self.saleID is not None:
             # call calculated field methods here
             self.saleSubTotal = self.get_sub_total()
+            self.saleDiscountAmount = self.get_discount_amount()
+            self.saleShipCostAmountCharged = self.get_shipping_ammount()
             self.saleTotal = self.get_total()
         super(Sale, self).save(*args, **kwargs)
     
@@ -133,8 +138,9 @@ class Sale(models.Model):
         print('getting total')
         total = decimal.Decimal("0.00")
         sub_total = self.saleSubTotal
+        sale_discount_amount = self.saleDiscountAmount
         # add saleDiscount calculation
-        total = sub_total# - sale_discount_amount + sale_shipping_charged + sale_tax_amount
+        total = sub_total - sale_discount_amount# + sale_shipping_charged + sale_tax_amount
         print(total)
         return total
 
@@ -146,27 +152,66 @@ class Sale(models.Model):
         # if saleitem count is more than 0
         for item in items:
             sub_total += item.productID.productSalePrice
-        self.shopCartSubTotal = sub_total
+        self.saleSubTotal = sub_total
         # add saleDiscount calculation
         print('saving subtotal: ', sub_total)
         return sub_total
 
-    # def get_discount_amount(self):
-        # # get discount obj
-        # # s_discount_obj = self.saleDiscount
-        # # check that sale meets conditions
-            # #if met, get saleDiscountAmount
+    def get_discount_amount(self):
+        # get discount obj
+        print('updating discount')
+        amount = decimal.Decimal("0.00")
+        s_discounts = self.saleDiscounts.filter(sDiscountIsShippingDiscount=False,
+                                                sDiscountIsActive=True,
+                                            ).all()
 
-        # sub_total = 0
-        # # calculates sub_total 
-        # # if saleitem count is more than 0
-        # if items.count() > 0:
-            # for item in items:
-                # subtotal += item.productID.productSalePrice
-            # self.shopCartSubTotal = sub_total
-            # # add saleDiscount calculation
-            # self.save()
-            # return sub_total
+        # if saleitem count is more than 0
+        for discount in s_discounts:
+            # get discount value or multiplier
+            discount_value, is_multiplier = discount.get_active_sdiscount_amount_or_multiplier()
+            print('discount value: ', discount_value)
+
+            # if percentage discount
+            if is_multiplier:
+                # add subTotal * discount_multiplier
+                amount += self.saleSubTotal * discount_value
+            # if decimal discount 
+            else:
+                amount += discount_value
+        print('saving discount: ', amount)
+        return amount
+
+    def get_shipping_ammount(self):
+        # get discount obj
+        print('updating shipping')
+        ship_amount = decimal.Decimal("0.00")
+        ship_discount_amount = decimal.Decimal("0.00")
+        # get ship_amount
+            # EASPOST HERE change: 
+        ship_amount = decimal.Decimal("7.00")
+
+        # get shipping discounts
+        ship_discounts = self.saleDiscounts.filter(sDiscountIsShippingDiscount=True,
+                                                sDiscountIsActive=True,
+                                            ).all()
+        for discount in ship_discounts:
+            # get discount value or multiplier
+            discount_value, is_multiplier = discount.get_active_sdiscount_amount_or_multiplier()
+            print('shipping discount value: ', discount_value)
+
+            # if percentage discount
+            if is_multiplier:
+                # add subTotal * discount_multiplier
+                ship_discount_amount += ship_amount * discount_value
+            # if decimal discount 
+            else:
+                ship_discount_amount += discount_value
+
+        # add discount
+        ship_amount = ship_amount - ship_discount_amount
+        print('saving shipamount: ', ship_amount)
+        return ship_amount
+
 
 class SaleItems(models.Model):
     saleItemID = models.AutoField(primary_key=True)
@@ -188,6 +233,16 @@ def pre_save_create_sale_id(sender, instance, *args, **kwargs):
     if not instance.saleStringID:
         instance.saleStringID = unique_sale_id_generator(instance)
 pre_save.connect(pre_save_create_sale_id, sender=Sale)
+
+def m2m_changed_sale_receiver(sender, instance, action, *args, **kwargs):
+    if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+        instance.save()# save sale to trigger calc field calcs
+m2m_changed.connect(m2m_changed_sale_receiver, sender=Sale.saleItems.through)
+
+def m2m_changed_discount_receiver(sender, instance, action, *args, **kwargs):
+    if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+        instance.save()# save sale to trigger calc field calcs
+m2m_changed.connect(m2m_changed_sale_receiver, sender=Sale.saleDiscounts.through)
 
 # Change: maybe remove this as can't use signals to get calc field values for same model
 # Might be used to call instance.get_final_total and retrieve all the calculated fields

@@ -71,7 +71,7 @@ class PDiscount(models.Model):
             discount_returned = decimal.Decimal("0.00")
             is_multiplier = False
             #if decimal
-            if discount_type == 'Decimal':
+            if discount_type == 'Amount':
                 # return discount_value
                 discount_returned = discount_value
             #if percent
@@ -123,7 +123,7 @@ class CDiscount(models.Model):
             is_multiplier = False
             discount_returned = decimal.Decimal("0.00")# amount or multiplier to return
             #if decimal
-            if discount_type == 'Decimal':
+            if discount_type == 'Amount':
                 # return discount_value
                 discount_returned = discount_value
             #if percent
@@ -170,6 +170,27 @@ class SDiscount(models.Model):
 
     def __str__(self):
         return self.sDiscountName
+
+    def get_active_sdiscount_amount_or_multiplier(self):
+        """ Returns discount_returned, the discount amount or multiplier """
+        if self.sDiscountIsActive:
+            discount_type = self.sDiscountType
+            discount_value = decimal.Decimal(self.sDiscountValue)
+            is_multiplier = False
+            discount_returned = decimal.Decimal("0.00")# amount or multiplier to return
+            #if decimal
+            if discount_type == 'Amount':
+                # return discount_value
+                discount_returned = discount_value
+            #if percent
+            elif discount_type == 'Percent':
+                is_multiplier = True
+                # change: add logic to get category value
+                discount_returned = discount_value / ONE_HUNDRED_D
+            return discount_returned, is_multiplier
+        else:
+            print('not active')
+
 
 def pre_save_sdiscount_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()

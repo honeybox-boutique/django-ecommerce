@@ -50,3 +50,6 @@ class PurchaseItems(models.Model):
 
     class Meta:
         db_table = 'purchase_items'
+
+    def __str__(self):
+        return str(self.productID)

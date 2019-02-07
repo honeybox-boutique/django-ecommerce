@@ -1,7 +1,9 @@
 from django.contrib import admin
+
 from .forms import PurchaseItemsForm, PurchaseItemsFormSet, PurchaseForm
 from .models import Vendor, Purchase, PurchaseItems
-# Register your models here.
+
+admin.site.register(PurchaseItems)
 
 class VendorAdmin(admin.ModelAdmin):
     inlines = [

@@ -1,6 +1,4 @@
-<form method="POST" action="{{ action_url }}">
-{% csrf_token %}
-    
+<form method="POST" action="{{ action_url }}">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Apply Discount" class="btn-primary"/>
 </form>

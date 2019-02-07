@@ -6,13 +6,10 @@ from sales.models import Sale
 
 def apply_discount_view(request):
     form = SDiscountForm(request.POST or None)# change: check if you're using this
-    print('starting')
     if form.is_valid():
-        print('form is valid')
         #get discount code from form
         discount_code = form.cleaned_data.get('sDiscountCouponCode')
         sale_id = form.cleaned_data.get('sobj')
-        print('posted stuff: ', discount_code, form.cleaned_data.get('sobj'))
         # billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
         # get sale from form hidden input
         sale_qs = Sale.objects.filter(saleStringID=sale_id,
@@ -25,8 +22,6 @@ def apply_discount_view(request):
         discount_qs = SDiscount.objects.filter(sDiscountCouponCode=discount_code,
                                     sDiscountIsActive=True,
                                 )
-        print('Discount query Count')
-        print(discount_qs.count())
         if sale_qs.count() == 1:
             sale_obj = sale_qs.first()
             if discount_qs.count() == 1:
