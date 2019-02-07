@@ -18,55 +18,76 @@ class SaleManager(models.Manager):
         available = True
         # if cart has 
         for item in cart_items:
-            if item.piIsAvailable == False:
+            if not item.piIsAvailable:
                 available = False
         if not available:
             qs = self.get_queryset().filter(
-                            saleBillingProfile=billing_profile,
-                            saleItems__prodStockID=cart_items.first().prodStockID
+                saleStatus='created',
+                saleBillingProfile=billing_profile,
+                saleItems__prodStockID=cart_items.first().prodStockID
             )
             if qs.count() == 1:
                 obj = qs.first()
+                # change:  maybe add if cart not submitted
+                if cart_items.count() != obj.saleItems.count():
+                    print('clearing items from sale')
+                    print('clearing discounts')
+                    # clear sale items
+                    obj.saleDiscounts.clear()
+                    obj.saleItems.clear()# change: this causes saletotals to be recalced. Maybe rethink to improve performance
+                    # re add items from cart
+                    for item in cart_items:
+                        SaleItems.objects.create(
+                            saleID=obj,
+                            prodStockID=item,
+                            siBasePrice=item.productID.productBasePrice,
+                            siDiscountAmount=item.productID.productDiscountAmount,
+                            siSalePrice=item.productID.productSalePrice,
+                            siNote=item.productID.productName
+                            )
+                        item.piIsAvailable = False
+                        item.save()
+                    #save to recalc
+                    obj.save()
+                    print('added them back from cart')
+
+                print('unchanged')
                 print(obj)
                 return obj, created
-            if qs.count() == 0:
+
+            elif qs.count() == 0:
                 print('no sale,')
-                
+
         #cart already used, checkout not finished
         else: # its a new order so make it and return it
             created = True
             obj = Sale(
-                        saleBillingProfile=billing_profile,
-                        saleStatus='created',
-                        saleNote='default sale note',
-                        # saleSubTotal= # calc in post_save
-                        # saleDiscountAmount = # in post_save
-                        # saleSalesTaxAmount = # in post_save
-                        # saleShipCostAmountCharged = # calc in post_save
-                        # saleTotal= # calc in post_save 
+                saleBillingProfile=billing_profile,
+                saleStatus='created',
+                saleNote='default sale note',
+                # saleSubTotal= # calc in post_save
+                # saleDiscountAmount = # in post_save
+                # saleSalesTaxAmount = # in post_save
+                # saleShipCostAmountCharged = # calc in post_save
+                # saleTotal= # calc in post_save 
             )
             obj.save()
 
             # add cart_items to sale
             for item in cart_items:
-                # change: maybe add checking logic to make sure pricing is active, prodStockItems don't haven't been sold, etc.
-                new_sale_item = SaleItems.objects.create(
-                                saleID=obj,
-                                prodStockID=item,
-                                siBasePrice=item.productID.productBasePrice,
-                                siDiscountAmount=item.productID.productDiscountAmount,
-                                siSalePrice=item.productID.productSalePrice,
-                                siNote=item.productID.productName
-                            )
-                # obj.saleItems = new_sale_item
-                # set piIsAvailable to False
+                SaleItems.objects.create(
+                    saleID=obj,
+                    prodStockID=item,
+                    siBasePrice=item.productID.productBasePrice,
+                    siDiscountAmount=item.productID.productDiscountAmount,
+                    siSalePrice=item.productID.productSalePrice,
+                    siNote=item.productID.productName
+                    )
                 item.piIsAvailable = False
                 item.save()
             obj.save()
             print('num items in sale', obj.saleItems.count())
             return obj, created
-
-    # sale discount condition check should go in sDiscount model manager and should take in sdiscountcode, sale
 
 
 class Sale(models.Model):
@@ -81,8 +102,6 @@ class Sale(models.Model):
     saleStringID = models.CharField(max_length=120, blank=True)
     saleDate = models.DateTimeField('sale date', auto_now_add=True)
     saleNote = models.CharField(max_length=120, default='Sale')
-    saleShippingAddress = models.ForeignKey(Address, related_name='saleShippingAddress', null=True, blank=True, on_delete=models.PROTECT)
-    saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
     saleDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
@@ -91,6 +110,8 @@ class Sale(models.Model):
     saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
 
+    saleShippingAddress = models.ForeignKey(Address, related_name='saleShippingAddress', null=True, blank=True, on_delete=models.PROTECT)
+    saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
     saleDiscounts = models.ManyToManyField(SDiscount)
     saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
     saleBillingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
@@ -102,7 +123,7 @@ class Sale(models.Model):
 
     def __str__(self):
         return self.saleStringID
-    
+
     def save(self, *args, **kwargs):
         if self.saleID is not None and self.saleStatus == 'created':
             # call calculated field methods here
@@ -113,6 +134,7 @@ class Sale(models.Model):
         super(Sale, self).save(*args, **kwargs)
 
     def check_done(self):
+        """ checks if sale has all info necessary """
         billing_profile = self.saleBillingProfile
         shipping_address = self.saleShippingAddress
         billing_address = self.saleBillingAddress
@@ -124,6 +146,7 @@ class Sale(models.Model):
         return False
 
     def mark_paid(self):
+        """ marks the sale paid """
         print('marking paid')
         if self.check_done():
             self.saleStatus = 'payed'
@@ -314,12 +337,12 @@ def pre_save_create_sale_id(sender, instance, *args, **kwargs):
 pre_save.connect(pre_save_create_sale_id, sender=Sale)
 
 def m2m_changed_sale_receiver(sender, instance, action, *args, **kwargs):
-    if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+    if action == 'post_add' or action == 'post_remove':
         instance.save()# save sale to trigger calc field calcs
 m2m_changed.connect(m2m_changed_sale_receiver, sender=Sale.saleItems.through)
 
 def m2m_changed_discount_receiver(sender, instance, action, *args, **kwargs):
-    if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+    if action == 'post_add' or action == 'post_remove':
         instance.save()# save sale to trigger calc field calcs
 m2m_changed.connect(m2m_changed_sale_receiver, sender=Sale.saleDiscounts.through)
 
