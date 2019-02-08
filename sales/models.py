@@ -15,57 +15,39 @@ class SaleManager(models.Manager):
         created = False
         qs = None
         cart_items = cart_obj.shopCartItems.all()
-        available = True
-        # if cart has 
-        for item in cart_items:
-            if not item.piIsAvailable:
-                available = False
-        if not available:
-            qs = self.get_queryset().filter(
-                saleStatus='created',
-                saleBillingProfile=billing_profile,
-                saleItems__prodStockID=cart_items.first().prodStockID
-            )
-            if qs.count() == 1:
-                obj = qs.first()
-                # change:  maybe add if cart not submitted
-                if cart_items.count() != obj.saleItems.count():
-                    print('clearing items from sale')
-                    print('clearing discounts')
-                    # clear sale items
-                    obj.saleDiscounts.clear()
-                    obj.saleItems.clear()# change: this causes saletotals to be recalced. Maybe rethink to improve performance
-                    # re add items from cart
-                    for item in cart_items:
-                        SaleItems.objects.create(
-                            saleID=obj,
-                            prodStockID=item,
-                            siBasePrice=item.productID.productBasePrice,
-                            siDiscountAmount=item.productID.productDiscountAmount,
-                            siSalePrice=item.productID.productSalePrice,
-                            siNote=item.productID.productName
-                            )
-                        item.piIsAvailable = False
-                        item.save()
-                    #save to recalc
-                    obj.save()
-                # check for automatic discounts
-                auto_sdiscounts_qs = SDiscount.objects.filter(
-                    sDiscountAutomatic=True,
-                    sDiscountIsActive=True,
-                )
-                if auto_sdiscounts_qs.exists():
-                    for sdiscount in auto_sdiscounts_qs:
-                        discount_conditions_met, reason = obj.check_discount_conditions(sdiscount)
-                        # if conditions met then apply discount (create many to many)
-                        if discount_conditions_met:
-                            obj.saleDiscounts.add(sdiscount)
-                            print('auto-added a discount')
-                print(obj)
-                return obj, created
+        qs = self.get_queryset().filter(
+            saleStatus='created',
+            saleBillingProfile=billing_profile,
+            # saleItems__prodStockID=cart_items.first().prodStockID
+        )
+        print('salecount: ', qs.count())
+        if qs.count() == 1:
+            obj = qs.first()
+            sale_items = obj.saleItems.all()
 
-            elif qs.count() == 0:
-                print('no sale,')
+            # check if cart_items and saleitems are still avail
+            for item in sale_items:
+                #check
+                if item.piIsAvailable == False:
+                    print('this item has become unavailable: ', item)
+                    sale_item_qs = SaleItems.objects.filter(
+                        prodStockID=item.prodStockID,
+                        saleID=obj.saleID
+                    )
+                    print(sale_item_qs)
+                    if sale_item_qs.count() == 1:
+                        sale_item_qs.delete()
+                        print('deleted')
+
+            # if cart has changed
+            if cart_items.count() != obj.saleItems.count():# bug: will not detect if item is different but quantity is the same
+                # update sale from 
+                obj.update_sale_from_cart(cart_items)
+            print(obj)
+            return obj, created
+        elif qs.count() > 1:
+            print('multiple sales in created')
+
 
         #cart already used, checkout not finished
         else: # its a new order so make it and return it
@@ -74,27 +56,10 @@ class SaleManager(models.Manager):
                 saleBillingProfile=billing_profile,
                 saleStatus='created',
                 saleNote='default sale note',
-                # saleSubTotal= # calc in post_save
-                # saleDiscountAmount = # in post_save
-                # saleSalesTaxAmount = # in post_save
-                # saleShipCostAmountCharged = # calc in post_save
-                # saleTotal= # calc in post_save 
             )
             obj.save()
 
-            # add cart_items to sale
-            for item in cart_items:
-                SaleItems.objects.create(
-                    saleID=obj,
-                    prodStockID=item,
-                    siBasePrice=item.productID.productBasePrice,
-                    siDiscountAmount=item.productID.productDiscountAmount,
-                    siSalePrice=item.productID.productSalePrice,
-                    siNote=item.productID.productName
-                    )
-                item.piIsAvailable = False
-                item.save()
-            obj.save()
+            obj.update_sale_from_cart(cart_items)
             print('num items in sale', obj.saleItems.count())
             return obj, created
 
@@ -160,6 +125,11 @@ class Sale(models.Model):
         if self.check_done():
             self.saleStatus = 'payed'
             self.save()
+            # set saleItems to unavailable
+            sale_items = self.saleItems.all()
+            for item in sale_items:
+                item.piIsAvailable = False
+                item.save()
         return self.saleStatus
 
     # calculates total based on present values. if ANY null return error?
@@ -243,6 +213,43 @@ class Sale(models.Model):
         ship_amount = ship_amount - ship_discount_amount
         print('saving shipamount: ', ship_amount)
         return ship_amount
+
+    def update_sale_from_cart(self, cart_items):
+        # clear sale items
+        print('clearing items from sale')
+        print('clearing discounts')
+        self.saleDiscounts.clear()
+        self.saleItems.clear()
+        # re add items from cart
+        for item in cart_items:
+            SaleItems.objects.create(
+                saleID=self,
+                prodStockID=item,
+                siBasePrice=item.productID.productBasePrice,
+                siDiscountAmount=item.productID.productDiscountAmount,
+                siSalePrice=item.productID.productSalePrice,
+                siNote=item.productID.productName
+                )
+        #save to recalc
+        self.save()
+        # update auto discounts
+        self.apply_auto_discounts()
+        return True
+
+    def apply_auto_discounts(self):
+        # check for automatic discounts
+        auto_sdiscounts_qs = SDiscount.objects.filter(
+            sDiscountAutomatic=True,
+            sDiscountIsActive=True,
+        )
+        if auto_sdiscounts_qs.exists():
+            for sdiscount in auto_sdiscounts_qs:
+                discount_conditions_met, reason = self.check_discount_conditions(sdiscount)
+                # if conditions met then apply discount (create many to many)
+                if discount_conditions_met:
+                    self.saleDiscounts.add(sdiscount)
+                    print('auto-added a discount')
+        return True
 
     def check_discount_conditions(self, discount):
         print('checking discount conditions')

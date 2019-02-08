@@ -1,0 +1,4 @@
+<form method="POST" action="{% url 'shopcart:remove' %}">{% csrf_token %}
+    <input type="hidden" name="prod" value={{ item.prodStockID }} />
+    <input type="submit" value="Remove" class="btn-primary"/>
+</form>

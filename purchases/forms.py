@@ -11,6 +11,7 @@ PurchaseItemsFormSet = forms.inlineformset_factory(Purchase,
                                                    fields=('productID', 'vendorID', 'piPrice',
                                                            'piColor', 'piCondition', 'piNotes'))
 
+
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase

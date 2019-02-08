@@ -13,9 +13,15 @@
             <td>{{ item.productID.productBasePrice }}</td>
             <td>{{ item.productID.productDiscountAmount }}</td>
             <td>{{ item.productID.productSalePrice }}</td>
+            <td>{% include 'shopcart/form.html' with prod=item %}</td>
         </tr>
         {% endfor %}
-
+<!--
+            <form method="post" action="{% url 'shopcart:remove' %}">{% csrf_token %}
+            <input type="hidden" value="{{ item.prodStockID }}">
+            <td><input type="submit" class="btn btn-info" value="Remove"></td>
+            </form>
+-->
         <tr>
             <td colspan="6">-</td>
             <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>

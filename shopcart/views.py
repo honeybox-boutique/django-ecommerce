@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 
+from .forms import CartRemoveItemForm
 from users.forms import LoginForm, GuestForm
 from addresses.forms import AddressForm
 from coupons.forms import SDiscountForm
@@ -11,9 +12,31 @@ from addresses.models import Address
 from pricing.models import SDiscount
 
 def cart_home(request):
+    """ Displays cart contents """
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
     request.session['cart_count'] = cart_obj.shopCartItems.count()
-    return render(request, 'shopcart/home.html', {"shopcart": cart_obj})
+
+    context = {
+        "shopcart": cart_obj,
+    }
+    return render(request, 'shopcart/home.html', context)
+
+def cart_remove_item(request):
+    """ removes prodStockItem from cart """
+    cart_obj, new_obj = ShopCart.objects.get_or_new(request)
+    form = CartRemoveItemForm(request.POST)
+
+    if form.is_valid():
+        print('form valid')
+        prod_stock_id = form.cleaned_data.get('prod')
+        prod_stock_obj = PurchaseItems.objects.get(prodStockID=prod_stock_id)
+        cart_obj.shopCartItems.remove(prod_stock_obj)
+        print('should be removed')
+        print(cart_obj.shopCartItems.count())
+
+
+    request.session['cart_count'] = cart_obj.shopCartItems.count()
+    return redirect('shopcart:home')
 
 def cart_update(request):
     """ should use product-slug, color, and size as parameters to check if:
@@ -32,11 +55,11 @@ def cart_update(request):
 
     # query for purchaseitems available
     purchase_item_query = PurchaseItems.objects.filter(
-                                productID__productSlug=product_slug,
-                                piColor__colorName=color,
-                                piSize=size,
-                                piIsAvailable=True# change: change once you are done
-                            )
+        productID__productSlug=product_slug,
+        piColor__colorName=color,
+        piSize=size,
+        piIsAvailable=True
+    )
     # exclude all pitems already in cart
     for cart_item in cart_obj.shopCartItems.all():
         purchase_item_query = purchase_item_query.exclude(pk=cart_item.pk)
@@ -62,11 +85,31 @@ def checkout_home(request):
     sale_obj = None
     address_qs = None
     discount_qs = None
+    coupon_form = None
     billing_address_id = request.session.get('billing_address_id', None)
     shipping_address_id = request.session.get('shipping_address_id', None)
 
     if cart_created or cart_items.count() == 0:# if cart was just created redirect to cart home
         return redirect('shopcart:home')
+
+    # first check if cart_items are available
+    for item in cart_items:
+        if item.piIsAvailable == False:
+            print('this item has become unavailable: ', item)
+            print('removing ', item)
+            cart_obj.shopCartItems.remove(item)
+            # if sale was already created remove the item from the sale as well
+            billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
+            if billing_profile is not None:
+                # remove item from sale
+                sale_item = SaleItems.objects.filter(
+                    prodStockID=item.prodStockID,
+                    saleID__saleStatus='created',
+                    saleID__saleBillingProfile=billing_profile
+                )
+                print(sale_item.count())
+                sale_item.delete()
+                return redirect('shopcart:home')
 
     # get billing profile
     billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)

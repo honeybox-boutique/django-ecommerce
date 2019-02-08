@@ -9,3 +9,7 @@ class ProductSizeColorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['piSize'].queryset = PurchaseItems.objects.none()
+
+
+class CartRemoveItemForm(forms.Form):
+    prod = forms.CharField(widget=forms.HiddenInput(), required=True)
