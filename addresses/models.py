@@ -17,5 +17,6 @@ class Address(models.Model):
     addressState = models.CharField(max_length=120)
     addressPostalCode = models.CharField(max_length=120)
 
+
     def __str__(self):
         return str(self.addressBillingProfile)
