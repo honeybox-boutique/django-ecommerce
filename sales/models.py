@@ -49,9 +49,18 @@ class SaleManager(models.Manager):
                         item.save()
                     #save to recalc
                     obj.save()
-                    print('added them back from cart')
-
-                print('unchanged')
+                # check for automatic discounts
+                auto_sdiscounts_qs = SDiscount.objects.filter(
+                    sDiscountAutomatic=True,
+                    sDiscountIsActive=True,
+                )
+                if auto_sdiscounts_qs.exists():
+                    for sdiscount in auto_sdiscounts_qs:
+                        discount_conditions_met, reason = obj.check_discount_conditions(sdiscount)
+                        # if conditions met then apply discount (create many to many)
+                        if discount_conditions_met:
+                            obj.saleDiscounts.add(sdiscount)
+                            print('auto-added a discount')
                 print(obj)
                 return obj, created
 
@@ -206,14 +215,17 @@ class Sale(models.Model):
         print('updating shipping')
         ship_amount = decimal.Decimal("0.00")
         ship_discount_amount = decimal.Decimal("0.00")
+        
         # get ship_amount
             # EASPOST HERE change: 
         ship_amount = decimal.Decimal("7.00")
 
         # get shipping discounts
-        ship_discounts = self.saleDiscounts.filter(sDiscountIsShippingDiscount=True,
-                                                sDiscountIsActive=True,
-                                            ).all()
+        ship_discounts = self.saleDiscounts.filter(
+            sDiscountIsShippingDiscount=True,
+            sDiscountIsActive=True,
+            ).all()
+
         for discount in ship_discounts:
             # get discount value or multiplier
             discount_value, is_multiplier = discount.get_active_sdiscount_amount_or_multiplier()
@@ -236,7 +248,6 @@ class Sale(models.Model):
         print('checking discount conditions')
         # get discount_obj
         discount_obj = discount
-        # get sale_obj
         # get sale_items
         sale_items = self.saleItems.all()
         print('num saleitems: ', sale_items.count())

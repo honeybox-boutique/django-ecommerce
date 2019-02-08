@@ -38,7 +38,7 @@ class PurchaseItems(models.Model):
     piSize = models.CharField(max_length=20)
     piCondition = models.CharField(max_length=50)
     piNotes = models.TextField(max_length=200)
-    piBarcode = models.ImageField(upload_to='barcodes')
+    piBarcode = models.ImageField(upload_to='barcodes', blank=True, null=True)
 
     piColor = models.ForeignKey(Color, on_delete=models.CASCADE)
     purchaseID = models.ForeignKey(Purchase, on_delete=models.CASCADE)
