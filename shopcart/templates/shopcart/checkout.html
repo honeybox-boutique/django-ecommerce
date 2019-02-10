@@ -51,8 +51,8 @@
                 {% url 'coupons:apply_discount' as apply_discount %}
                 {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
                 <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
+                <p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
                 <!-- change: add tax -->
-                <p>Sales Tax: $</p>
                 <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
             </div>
 
@@ -95,8 +95,7 @@
                 {% url 'coupons:apply_discount' as apply_discount %}
                 {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
                 <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
-                <!-- change: add tax -->
-                <p>Sales Tax: $</p>
+                <p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
                 <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
             </div>
         </div>
@@ -132,8 +131,7 @@
             {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount: ${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
             {% endif %}
             <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
-            <!-- change: add tax -->
-            <p>Sales Tax: $</p>
+            <p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
             <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
 
             <form class="form" method="POST" action="{% url 'shopcart:checkout' %}">{% csrf_token %}

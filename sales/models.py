@@ -8,6 +8,7 @@ from shopcart.models import ShopCart
 from billing.models import BillingProfile
 from addresses.models import Address
 from pricing.models import SDiscount
+from tax.models import Jurisdiction
 
 
 class SaleManager(models.Manager):
@@ -79,14 +80,13 @@ class Sale(models.Model):
     saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
     saleDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-    # saleShipDiscountAmount = ? # change: should this be a thing? currently no way to tell free shipping as it isn't included in discountamount
-    # saleSalesTaxAmount = ? # change: add logic for sales tax calculation
+    saleTaxAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
 
     saleShippingAddress = models.ForeignKey(Address, related_name='saleShippingAddress', null=True, blank=True, on_delete=models.PROTECT)
     saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
-    saleDiscounts = models.ManyToManyField(SDiscount)
+    saleDiscounts = models.ManyToManyField(SDiscount, blank=True)
     saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
     saleBillingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
 
@@ -104,6 +104,7 @@ class Sale(models.Model):
             self.saleSubTotal = self.get_sub_total()
             self.saleDiscountAmount = self.get_discount_amount()
             self.saleShipCostAmountCharged = self.get_shipping_ammount()
+            self.saleTaxAmount = self.get_tax_amount()
             self.saleTotal = self.get_total()
         super(Sale, self).save(*args, **kwargs)
 
@@ -138,8 +139,10 @@ class Sale(models.Model):
         total = decimal.Decimal("0.00")
         sub_total = self.saleSubTotal
         sale_discount_amount = self.saleDiscountAmount
+        sale_shipping_charged = self.saleShipCostAmountCharged
+        sale_tax_amount = self.saleTaxAmount
         # add saleDiscount calculation
-        total = sub_total - sale_discount_amount# + sale_shipping_charged + sale_tax_amount
+        total = sub_total - sale_discount_amount + sale_shipping_charged + sale_tax_amount
         print(total)
         return total
 
@@ -160,9 +163,11 @@ class Sale(models.Model):
         # get discount obj
         print('updating discount')
         amount = decimal.Decimal("0.00")
-        s_discounts = self.saleDiscounts.filter(sDiscountIsShippingDiscount=False,
-                                                sDiscountIsActive=True,
-                                            ).all()
+
+        s_discounts = self.saleDiscounts.filter(
+            sDiscountIsShippingDiscount=False,
+            sDiscountIsActive=True,
+        ).all()
 
         # if saleitem count is more than 0
         for discount in s_discounts:
@@ -213,6 +218,73 @@ class Sale(models.Model):
         ship_amount = ship_amount - ship_discount_amount
         print('saving shipamount: ', ship_amount)
         return ship_amount
+
+
+    # get tax amount
+    def get_tax_amount(self):
+        print('getting tax amount')
+        tax_amount = decimal.Decimal("0.00")
+        # get jurisdiction
+        jurisdiction_obj, jurisdiction_exists = self.get_jurisdiction()
+        if jurisdiction_exists:
+            print('jurisdiction exists')
+            print(jurisdiction_obj)
+            # call calc_tax
+            tax_multiplier, tax_rate_exists = jurisdiction_obj.calc_tax()
+            if tax_rate_exists:
+                print('tax rate exists for jurisdiction')
+                tax_amount = (self.saleSubTotal - self.saleDiscountAmount) * tax_multiplier
+        print(tax_amount)
+        # call get_tax on jurisdiction
+        return tax_amount
+
+    # get jurisdiction of sale
+    def get_jurisdiction(self):
+        # initialize vars
+        jurisdiction_obj = None
+        jurisdiction_exists = False
+        # get address stuff
+        shipping_address_obj = self.saleShippingAddress
+        # pull out city, state, zip
+        shipping_city = shipping_address_obj.addressCity
+        shipping_state = shipping_address_obj.addressState
+        shipping_zip = shipping_address_obj.addressPostalCode
+        # Find jurisdiction
+        jurisdiction_qs = Jurisdiction.objects.filter(
+            jurisdictionState=shipping_state,
+            jurisdictionCity=shipping_city,
+            jurisdictionZip=shipping_zip,
+            taxrate__taxRateIsActive=True,
+        )
+
+        # if no jurisdiction
+        if jurisdiction_qs.count() == 0:
+            # query only using state city
+            jurisdiction_qs = Jurisdiction.objects.filter(
+                jurisdictionState=shipping_state,
+                jurisdictionCity=shipping_city,
+                taxrate__taxRateIsActive=True,
+            )
+            if jurisdiction_qs.count() == 0:
+                # query using only state
+                jurisdiction_qs = Jurisdiction.objects.filter(
+                    jurisdictionState=shipping_state,
+                    taxrate__taxRateIsActive=True,
+                )
+                if jurisdiction_qs.count() == 0:
+                    print('no jurisdiction')
+                    return jurisdiction_obj, jurisdiction_exists
+        # if jurisdiction in db
+        if jurisdiction_qs.count() == 1:
+            # return 
+            jurisdiction_obj = jurisdiction_qs.first()
+            # collecting = True
+            jurisdiction_exists = True
+            return jurisdiction_obj, jurisdiction_exists
+        # if no tax rates for the jurisdiction
+        if jurisdiction_qs.count() > 1:
+            print('error, multiple matching jurisdictions')
+            pass
 
     def update_sale_from_cart(self, cart_items):
         # clear sale items
