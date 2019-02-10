@@ -1,5 +1,14 @@
 {% extends 'layout.html' %}
 
+<!-- Breadcrumbs -->
+{% block breadcrumbs %}
+    <a href="#">Checkout</a>
+    >
+    <a href="#">Shipping Address</a>
+    >
+    <a href="#">Billing</a>
+{% endblock %}
+<!-- Breadcrumbs -->
 {% block content %}
 
 {% if not billing_profile %}

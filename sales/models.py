@@ -81,8 +81,14 @@ class Sale(models.Model):
     saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
     saleDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     saleTaxAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+
+    # customer shipping and total
     saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
-    saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: generate total from other fields
+    # saleCustomerTotal - not inclusive of shipping cost that we are paying
+
+    # actual total
+    saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+    # saleTotalShippingCost - total shipping cost including portion we are paying
 
     saleShippingAddress = models.ForeignKey(Address, related_name='saleShippingAddress', null=True, blank=True, on_delete=models.PROTECT)
     saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
@@ -142,7 +148,7 @@ class Sale(models.Model):
         sale_shipping_charged = self.saleShipCostAmountCharged
         sale_tax_amount = self.saleTaxAmount
         # add saleDiscount calculation
-        total = sub_total - sale_discount_amount + sale_shipping_charged + sale_tax_amount
+        total = sub_total - sale_discount_amount + sale_shipping_charged + sale_tax_amount # + remaining shipping cost
         print(total)
         return total
 
@@ -457,3 +463,66 @@ m2m_changed.connect(m2m_changed_sale_receiver, sender=Sale.saleDiscounts.through
     # # if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
         # # add saleDiscount calculation
 # post_save.connect(post_save_sale, sender=Sale)
+
+
+
+# on sale pre_save
+# check if saleStatus is payed
+    # add from address
+    # fromAddress = easypost.Address.create(
+        # company='Honeybox Boutique',
+        # street1='130 Valley St.',
+        # street2='',
+        # city='Pasadena',
+        # state='CA',
+        # zip='91105',
+        # phone='801-602-3439'
+    # )
+    # get address obj
+    # shipping_address_obj = instance.saleShippingAddress
+    # create  to address
+    # toAddress = easypost.Address.create(
+        # street1=shipping_address_obj.addressLine1,
+        # street2=shipping_address_obj.addressLine2,
+        # city=shipping_address_obj.addressCity,
+        # state=shipping_address_obj.addressState,
+        # zip=shipping_address_obj.addressPostalCode,
+    # )
+
+    # add parcel
+    # parcel = easypost.Parcel.create(
+        # predefined_package='FlatRateEnvelope',
+        # weight=10,
+    # )
+    
+    # create shipment
+    # shipment = easypost.Shipment.create(
+        # to_address=toAddress,
+        # from_address=fromAddress,
+        # parcel=parcel,
+    # )
+
+    # show rates
+    # for rate in shipment.rates:
+        # print rate.carrier 
+        # print rate.service 
+        # print rate.rate 
+        # print rate.id
+
+    # buy label
+    # shipment.buy(
+        # rate=shipment.lowest_rate(
+            # carriers=['USPS'], 
+            # services=['First'],
+        # )
+    # ) 
+
+    # or 
+
+    # shipment.buy(rate={'id': '{RATE_ID}’})
+
+    # show label
+        ## Print PNG link 
+        # print shipment.postage_label.label_url 
+        # ## Print Tracking Code 
+        # print shipment.tracking_code
