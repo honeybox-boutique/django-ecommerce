@@ -10,6 +10,13 @@ class ShipmentAdmin(admin.ModelAdmin):
     inlines = [
         ParcelInLine,
     ]
+    readonly_fields = (
+        'saleID',
+        'shipmentEasyPostID',
+        'shipmentCost',
+        'shipmentTrackingNumber',
+        'shipmentLabelURL',
+    )
 admin.site.register(Shipment, ShipmentAdmin)
 
 admin.site.register(Warehouse)
