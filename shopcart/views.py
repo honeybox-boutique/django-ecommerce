@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from .forms import CartRemoveItemForm, EditSaleForm
+from .forms import CartRemoveItemForm, EditSaleForm, CustomerShipMethodForm
 from users.forms import LoginForm, GuestForm
 from addresses.forms import AddressForm
 from coupons.forms import SDiscountForm
@@ -106,6 +106,22 @@ def edit_billing(request):
             sale_obj.save()
     return redirect('shopcart:checkout')
 
+def ship_method(request):
+    """ removes prodStockItem from cart """
+    form = CustomerShipMethodForm(request.POST)
+
+    if form.is_valid():
+        print('form valid')
+        ship_method_id = form.cleaned_data.get('customerShipMethodID')
+        sale_id = form.cleaned_data.get('sale')
+        # get sale obj
+        sale_obj = Sale.objects.get(saleStringID=sale_id)
+        sale_obj.customerShipMethodID = ship_method_id
+        sale_obj.save()
+        print(sale_obj.customerShipMethodID)
+        print('saved ship method')
+    return redirect('shopcart:checkout')
+
 def checkout_home(request):
     cart_obj, cart_created = ShopCart.objects.get_or_new(request)# get cart
     cart_items = cart_obj.shopCartItems.all()
@@ -118,6 +134,7 @@ def checkout_home(request):
     address_qs = None
     discount_qs = None
     coupon_form = None
+    ship_method_form = None
     billing_address_id = request.session.get('billing_address_id', None)
     shipping_address_id = request.session.get('shipping_address_id', None)
 
@@ -152,6 +169,7 @@ def checkout_home(request):
         sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_obj)
         # initialize coupon form with sale object
         coupon_form = SDiscountForm(initial={'sobj': sale_obj.saleStringID})
+        ship_method_form = CustomerShipMethodForm(initial={'sale': sale_obj.saleStringID})
         # get discount qs
         discount_qs = SDiscount.objects.filter(sale=sale_obj)
         print('Applied Discounts')
@@ -197,6 +215,7 @@ def checkout_home(request):
         "address_form": address_form,
         "coupon_form": coupon_form,
         "edit_form": edit_form,
+        "ship_method_form": ship_method_form,
         "address_qs": address_qs,
         "discount_qs": discount_qs,
     }

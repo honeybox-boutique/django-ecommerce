@@ -1,15 +1,12 @@
 from django import forms
-from purchases.models import PurchaseItems
+from sales.models import Sale
 
-class ProductSizeColorForm(forms.ModelForm):
+class CustomerShipMethodForm(forms.ModelForm):
+    sale = forms.CharField(widget=forms.HiddenInput(), required=True)
     class Meta:
-        model = PurchaseItems
-        fields = ('piColor', 'piSize')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['piSize'].queryset = PurchaseItems.objects.none()
-
+        model = Sale
+        fields = ('customerShipMethodID',)
+        # change: widget to radio button
 
 class CartRemoveItemForm(forms.Form):
     prod = forms.CharField(widget=forms.HiddenInput(), required=True)

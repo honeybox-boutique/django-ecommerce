@@ -6,14 +6,23 @@
     {% if not sale_obj.saleShippingAddress %}
     >
     Shipping Address
+    {% elif not sale_obj.customerShipMethodID %}
+    >
+    Shipping Address
+    >
+    Shipping Method
     {% elif not sale_obj.saleBillingAddress %}
     >
     Shipping Address
+    >
+    Shipping Method
     >
     Billing
     {% else %}
     >
     Shipping Address
+    >
+    Shipping Method
     >
     Billing
     >
@@ -73,15 +82,27 @@
                 {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
                 <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
                 <p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
-                <!-- change: add tax -->
                 <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
             </div>
 
-        <!-- in checkout have if manytomany discount-sale exists 
-        then show applied discounts and then form for code input
-        else if none exist just show form-->
-
         </div><!-- End of Row -->
+
+    {% elif not sale_obj.customerShipMethodID %}
+
+        <div class="row">
+            <div class="col-12">
+                <p class="lead">Shipping Method</p>
+                <hr/>
+            </div>
+            <div class="col-6">
+                <h5>Shipping Address</h5>
+                <p>{{ sale_obj.saleShippingAddress.addressLine1 }}, {{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
+                {% include 'shopcart/edit-shipping-form.html' with form=edit_form %}
+                <br>
+                {% include 'shopcart/ship-method-form.html' with form=ship_method_form %}
+            </div>
+        </div>
+
     {% elif not sale_obj.saleBillingAddress %}
 
         {{ cart_obj }}
@@ -122,6 +143,7 @@
         </div>
 
     {% else %}
+
         <div class="row">
         <div class="col-12">
             <h1>Finalize Checkout {{ sale_obj }}</h1>
@@ -129,12 +151,12 @@
         </div>
         <div class="col-6">
             <h4>Shipping Address</h4>
-            <p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
-            <p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
+            <p>{{ sale_obj.saleShippingAddress.addressLine1 }}, {{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
             {% include 'shopcart/edit-shipping-form.html' with form=edit_form %}
+            <h5>Shipping Method</h5>
+            <p>{{ sale_obj.customerShipMethodID }}</p>
             <h4>Billing Address</h4>
-            <p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
-            <p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
+            <p>{{ sale_obj.saleBillingAddress.addressLine1 }}, {{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
             {% include 'shopcart/edit-billing-form.html' with form=edit_form %}
         </div>
         <div class="col 6">
