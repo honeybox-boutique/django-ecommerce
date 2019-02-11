@@ -17,6 +17,8 @@ class Address(models.Model):
     addressState = models.CharField(max_length=120)
     addressPostalCode = models.CharField(max_length=120)
 
+    addressEasyPostID = models.CharField(max_length=120, blank=True, null=True)
+
 
     def __str__(self):
-        return str(self.addressBillingProfile)
+        return str(self.addressBillingProfile) + ' ' + self.addressLine1

@@ -82,6 +82,7 @@ class Sale(models.Model):
     saleDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     saleTaxAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
 
+    # change: add saleShippingMethod
     # customer shipping and total
     saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     # saleCustomerTotal - not inclusive of shipping cost that we are paying
@@ -445,88 +446,3 @@ def m2m_changed_discount_receiver(sender, instance, action, *args, **kwargs):
     if action == 'post_add' or action == 'post_remove':
         instance.save()# save sale to trigger calc field calcs
 m2m_changed.connect(m2m_changed_sale_receiver, sender=Sale.saleDiscounts.through)
-
-# Change: maybe remove this as can't use signals to get calc field values for same model
-# Might be used to call instance.get_final_total and retrieve all the calculated fields
-# def post_save_sale(sender, instance, created, *args, **kwargs):
-    # if instance.saleStatus == 'created':# already creatd once, get shipping cost
-        # print('post save worked')
-        # instance.saleSubTotal = instance.get_sub_total()
-        # instance.saleTotal = instance.get_total()
-        # # add instnace.update_sale_discount()
-        # # if instance.saleStatus == 'payed':# already payed, probably do nothing, maybe do some ashley stuff
-            # # pass
-            # # calc shipping if billing, shipping, and shipmethod are null
-            # #if instance.saleShippingAddress and instance.saleBillingAddress and instance.saleShipMethod:
-                # # call calcShipping
-            # # calc tax if shipcharged is already there
-            # # if both addresses, shipMethod, and ship charged are not null: calc tax
-                # # sale_tax_amount = ?
-            # # calc total if everything is there
-            # # if everything is ready, calculate total
-    # # if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
-        # # add saleDiscount calculation
-# post_save.connect(post_save_sale, sender=Sale)
-
-
-
-# on sale pre_save
-# check if saleStatus is payed
-    # add from address
-    # fromAddress = easypost.Address.create(
-        # company='Honeybox Boutique',
-        # street1='130 Valley St.',
-        # street2='',
-        # city='Pasadena',
-        # state='CA',
-        # zip='91105',
-        # phone='801-602-3439'
-    # )
-    # get address obj
-    # shipping_address_obj = instance.saleShippingAddress
-    # create  to address
-    # toAddress = easypost.Address.create(
-        # street1=shipping_address_obj.addressLine1,
-        # street2=shipping_address_obj.addressLine2,
-        # city=shipping_address_obj.addressCity,
-        # state=shipping_address_obj.addressState,
-        # zip=shipping_address_obj.addressPostalCode,
-    # )
-
-    # add parcel
-    # parcel = easypost.Parcel.create(
-        # predefined_package='FlatRateEnvelope',
-        # weight=10,
-    # )
-    
-    # create shipment
-    # shipment = easypost.Shipment.create(
-        # to_address=toAddress,
-        # from_address=fromAddress,
-        # parcel=parcel,
-    # )
-
-    # show rates
-    # for rate in shipment.rates:
-        # print rate.carrier 
-        # print rate.service 
-        # print rate.rate 
-        # print rate.id
-
-    # buy label
-    # shipment.buy(
-        # rate=shipment.lowest_rate(
-            # carriers=['USPS'], 
-            # services=['First'],
-        # )
-    # ) 
-
-    # or 
-
-    # shipment.buy(rate={'id': '{RATE_ID}’})
-
-    # show label
-        ## Print PNG link 
-        # print shipment.postage_label.label_url 
-        # ## Print Tracking Code 
-        # print shipment.tracking_code
