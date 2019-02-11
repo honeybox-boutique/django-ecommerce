@@ -1,7 +1,15 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.utils import timezone
 
 from sales.models import Sale
 from addresses.models import Address
+
+
+# class Warehouse(models.Model):
+    # warehouseID = models.AutoField(primary_key=True)
+    # warehouseName = models.CharField(max_length=120)
+    # warehouseAddress = models.ForeignKey(Address, on_delete=models.PROTECT)
 
 class Shipment(models.Model):
     FROM_ADDRESS_CHOICES = (
@@ -17,7 +25,7 @@ class Shipment(models.Model):
     shipmentID = models.AutoField(primary_key=True)
     shipmentDateCreated = models.DateTimeField('shipment date created')
     shipmentNote = models.CharField(max_length=120, default='Default Shipment Note')
-    # shipmentFromAddress = models.CharField(max_length=120, choices=FROM_ADDRESS_CHOICES)# change: make choices and have ashleys be the only one
+    # warehouseID = models.ForeignKey(Warehouse, on_delete=models.PROTECT)
     shipmentFromAddress = models.ForeignKey(Address, related_name='shipmentFromAddress', null=True, blank=True, on_delete=models.PROTECT)
     shipmentToAddress = models.ForeignKey(Address, related_name='shipmentToAddress', null=True, blank=True, on_delete=models.PROTECT)
     # shipmentToAddress = models.ForeignKey(Address, on_delete=models.PROTECT)
@@ -73,6 +81,17 @@ class Parcel(models.Model):
 
 # Sale post_save receiver
 # creates shipment record in django db
+def post_save_create_shipment(sender, instance, *args, **kwargs):
+    if instance.saleStatus == 'payed':
+        # create shipment
+        print('creating shipment')
+        Shipment.objects.create(
+            shipmentDateCreated=timezone.now(),# change: add timezone import
+            shipmentToAddress=instance.saleShippingAddress,
+            saleID=instance,
+        )
+
+post_save.connect(post_save_create_shipment, sender=Sale)
 
 # shipment pre_save receiver
 # creates easypost stuff if things aren't null
