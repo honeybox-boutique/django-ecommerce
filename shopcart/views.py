@@ -196,6 +196,7 @@ def checkout_home(request):
         "guest_form": guest_form,
         "address_form": address_form,
         "coupon_form": coupon_form,
+        "edit_form": edit_form,
         "address_qs": address_qs,
         "discount_qs": discount_qs,
     }

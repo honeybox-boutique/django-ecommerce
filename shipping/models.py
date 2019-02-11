@@ -35,6 +35,7 @@ class Shipment(models.Model):
     )
     RATE_OPTIONS = (
         ('Priority', 'Priority'),
+        ('ParcelSelect', 'Parcel Select'),
         ('Express', 'Express'),
     )
     shipmentID = models.AutoField(primary_key=True)
@@ -49,7 +50,7 @@ class Shipment(models.Model):
     # maybe add shipmentStatus to clarify IsBought
     shipmentStatus = models.CharField(max_length=120, default='in progress', choices=SHIPMENT_STATUS_CHOICES)
     
-    saleID = models.ForeignKey(Sale, on_delete=models.PROTECT)
+    saleID = models.ForeignKey(Sale, on_delete=models.CASCADE)
 
     shipmentCarrier = models.CharField(max_length=120, choices=CARRIER_OPTIONS)
     shipmentRate = models.CharField(max_length=120, choices=RATE_OPTIONS)
@@ -73,7 +74,7 @@ class Shipment(models.Model):
             # do shipment email
 
         # if shipmentStatus is in progress
-        if self.shipmentFromAddress and self.shipmentToAddress and self.shipmentStatus == 'in progress':
+        if self.warehouseID and self.shipmentToAddress and self.shipmentStatus == 'in progress':
             # check parcel is good
             if self.parcel_set.count() > 0:
                 # now call create easy_post stuff
