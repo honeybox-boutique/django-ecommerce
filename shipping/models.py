@@ -9,6 +9,7 @@ from addresses.models import Address
 import easypost
 easypost.api_key = '***REMOVED***'
 
+
 class Warehouse(models.Model):
     warehouseID = models.AutoField(primary_key=True)
     warehouseName = models.CharField(max_length=120)
@@ -25,7 +26,7 @@ class Shipment(models.Model):
         ('home', 'House in Pasadena'),
     )
     SHIPMENT_STATUS_CHOICES = (
-        ('in progress', 'Being Prepared.'),
+        ('in progress', 'Being Prepared'),
         ('printed', 'Printed'),
         ('shipped', 'Shipped'),
     )

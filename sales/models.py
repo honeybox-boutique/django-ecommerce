@@ -10,6 +10,17 @@ from addresses.models import Address
 from pricing.models import SDiscount
 from tax.models import Jurisdiction
 
+class CustomerShipMethod(models.Model):
+    cSMID = models.AutoField(primary_key=True)
+    cSMName = models.CharField(max_length=120)
+    cSMDescription = models.TextField(max_length=200)
+    cSMChargeAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+
+    class Meta:
+        db_table = 'customer_ship_method'
+
+    def __str__(self):
+        return self.cSMName
 
 class SaleManager(models.Manager):
     def new_or_get(self, billing_profile, cart_obj):
@@ -83,6 +94,7 @@ class Sale(models.Model):
     saleTaxAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
 
     # change: add saleShippingMethod
+    customerShipMethodID = models.ForeignKey(CustomerShipMethod, on_delete=models.PROTECT, null=True, blank=True)
     # customer shipping and total
     saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
     # saleCustomerTotal - not inclusive of shipping cost that we are paying
@@ -200,7 +212,12 @@ class Sale(models.Model):
         
         # get ship_amount
             # EASPOST HERE change: 
-        ship_amount = decimal.Decimal("7.00")
+        if self.customerShipMethodID:
+            ship_amount = self.customerShipMethodID.cSMChargeAmount
+        else:
+            ship_amount = decimal.Decimal("7.00")
+
+        
 
         # get shipping discounts
         ship_discounts = self.saleDiscounts.filter(
