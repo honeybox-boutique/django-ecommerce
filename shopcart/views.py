@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from .forms import CartRemoveItemForm
+from .forms import CartRemoveItemForm, EditSaleForm
 from users.forms import LoginForm, GuestForm
 from addresses.forms import AddressForm
 from coupons.forms import SDiscountForm
@@ -75,12 +75,44 @@ def cart_update(request):
     request.session['cart_count'] = cart_obj.shopCartItems.count()
     return redirect('shopcart:home')
 
+# view that clears sale shipping or billing address on breadcrumb click
+def edit_shipping(request):
+    """ removes prodStockItem from cart """
+    form = EditSaleForm(request.POST)
+
+    if form.is_valid():
+        print('form valid')
+        sale_id = form.cleaned_data.get('sale')
+        sale_obj = Sale.objects.get(saleID=sale_id)
+        if sale_obj.saleStatus == 'created':
+            sale_obj.saleShippingAddress = None
+            print('set shipping to None')
+            print(sale_obj.saleShippingAddress)
+            sale_obj.save()
+    return redirect('shopcart:checkout')
+
+def edit_billing(request):
+    """ removes prodStockItem from cart """
+    form = EditSaleForm(request.POST)
+
+    if form.is_valid():
+        print('form valid')
+        sale_id = form.cleaned_data.get('sale')
+        sale_obj = Sale.objects.get(saleID=sale_id)
+        if sale_obj.saleStatus == 'created':
+            sale_obj.saleBillingAddress = None
+            print('set shipping to None')
+            print(sale_obj.saleShippingAddress)
+            sale_obj.save()
+    return redirect('shopcart:checkout')
+
 def checkout_home(request):
     cart_obj, cart_created = ShopCart.objects.get_or_new(request)# get cart
     cart_items = cart_obj.shopCartItems.all()
     login_form = LoginForm()
     guest_form = GuestForm()
     address_form = AddressForm()
+    edit_form = EditSaleForm()
     #initializers
     sale_obj = None
     address_qs = None

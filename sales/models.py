@@ -231,8 +231,11 @@ class Sale(models.Model):
         print('getting tax amount')
         tax_amount = decimal.Decimal("0.00")
         # get jurisdiction
-        jurisdiction_obj, jurisdiction_exists = self.get_jurisdiction()
-        if jurisdiction_exists:
+        # START HEREEEEEEEEEEEEEEEEEE
+        jurisdiction_obj = self.get_jurisdiction()
+        print(jurisdiction_obj)
+        # jurisdiction_obj, jurisdiction_exists = self.get_jurisdiction()
+        if jurisdiction_obj is not None:
             print('jurisdiction exists')
             print(jurisdiction_obj)
             # call calc_tax
@@ -248,49 +251,50 @@ class Sale(models.Model):
     def get_jurisdiction(self):
         # initialize vars
         jurisdiction_obj = None
-        jurisdiction_exists = False
+        # jurisdiction_exists = False
         # get address stuff
         shipping_address_obj = self.saleShippingAddress
         # pull out city, state, zip
-        shipping_city = shipping_address_obj.addressCity
-        shipping_state = shipping_address_obj.addressState
-        shipping_zip = shipping_address_obj.addressPostalCode
-        # Find jurisdiction
-        jurisdiction_qs = Jurisdiction.objects.filter(
-            jurisdictionState=shipping_state,
-            jurisdictionCity=shipping_city,
-            jurisdictionZip=shipping_zip,
-            taxrate__taxRateIsActive=True,
-        )
-
-        # if no jurisdiction
-        if jurisdiction_qs.count() == 0:
-            # query only using state city
+        if shipping_address_obj is not None:
+            shipping_city = shipping_address_obj.addressCity
+            shipping_state = shipping_address_obj.addressState
+            shipping_zip = shipping_address_obj.addressPostalCode
+            # Find jurisdiction
             jurisdiction_qs = Jurisdiction.objects.filter(
                 jurisdictionState=shipping_state,
                 jurisdictionCity=shipping_city,
+                jurisdictionZip=shipping_zip,
                 taxrate__taxRateIsActive=True,
             )
+
+            # if no jurisdiction
             if jurisdiction_qs.count() == 0:
-                # query using only state
+                # query only using state city
                 jurisdiction_qs = Jurisdiction.objects.filter(
                     jurisdictionState=shipping_state,
+                    jurisdictionCity=shipping_city,
                     taxrate__taxRateIsActive=True,
                 )
                 if jurisdiction_qs.count() == 0:
-                    print('no jurisdiction')
-                    return jurisdiction_obj, jurisdiction_exists
-        # if jurisdiction in db
-        if jurisdiction_qs.count() == 1:
-            # return 
-            jurisdiction_obj = jurisdiction_qs.first()
-            # collecting = True
-            jurisdiction_exists = True
-            return jurisdiction_obj, jurisdiction_exists
-        # if no tax rates for the jurisdiction
-        if jurisdiction_qs.count() > 1:
-            print('error, multiple matching jurisdictions')
-            pass
+                    # query using only state
+                    jurisdiction_qs = Jurisdiction.objects.filter(
+                        jurisdictionState=shipping_state,
+                        taxrate__taxRateIsActive=True,
+                    )
+                    if jurisdiction_qs.count() == 0:
+                        print('no jurisdiction')
+                        return jurisdiction_obj# , jurisdiction_exists
+            # # if jurisdiction in db
+            if jurisdiction_qs.count() == 1:
+                # return 
+                jurisdiction_obj = jurisdiction_qs.first()
+                # collecting = True
+                jurisdiction_exists = True
+                return jurisdiction_obj# , jurisdiction_exists
+            # if no tax rates for the jurisdiction
+            if jurisdiction_qs.count() > 1:
+                print('error, multiple matching jurisdictions')
+                pass
 
     def update_sale_from_cart(self, cart_items):
         # clear sale items

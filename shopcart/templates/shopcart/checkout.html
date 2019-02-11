@@ -2,11 +2,23 @@
 
 <!-- Breadcrumbs -->
 {% block breadcrumbs %}
-    <a href="#">Checkout</a>
+    Checkout
+    {% if not sale_obj.saleShippingAddress %}
     >
-    <a href="#">Shipping Address</a>
+    Shipping Address
+    {% elif not sale_obj.saleBillingAddress %}
     >
-    <a href="#">Billing</a>
+    Shipping Address
+    >
+    Billing
+    {% else %}
+    >
+    Shipping Address
+    >
+    Billing
+    >
+    Finalize Checkout
+    {% endif %}
 {% endblock %}
 <!-- Breadcrumbs -->
 {% block content %}
@@ -110,7 +122,6 @@
         </div>
 
     {% else %}
-
         <div class="row">
         <div class="col-12">
             <h1>Finalize Checkout {{ sale_obj }}</h1>
@@ -120,9 +131,11 @@
             <h4>Shipping Address</h4>
             <p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
             <p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
+            {% include 'shopcart/edit-shipping-form.html' with form=edit_form %}
             <h4>Billing Address</h4>
             <p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
             <p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
+            {% include 'shopcart/edit-billing-form.html' with form=edit_form %}
         </div>
         <div class="col 6">
             <h4>Your Items</h4>

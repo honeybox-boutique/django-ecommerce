@@ -13,3 +13,6 @@ class ProductSizeColorForm(forms.ModelForm):
 
 class CartRemoveItemForm(forms.Form):
     prod = forms.CharField(widget=forms.HiddenInput(), required=True)
+
+class EditSaleForm(forms.Form):
+    sale = forms.CharField(widget=forms.HiddenInput(), required=True)
