@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from emails.views import send_email_view, email_success_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,5 +35,6 @@ urlpatterns = [
     path('returns/', TemplateView.as_view(template_name="returns.html"), name='returns'),
     path('data-privacy/', TemplateView.as_view(template_name="data-privacy.html"), name='dataprivacy'),
     path('terms-of-service/', TemplateView.as_view(template_name="terms-of-service.html"), name='tos'),
-    path('contact-us/', TemplateView.as_view(template_name="contact-us.html"), name='contact'),
+    path('contact-us/', send_email_view, name='contact'),
+    path('contact-us/thanks/', email_success_view, name='contact_thanks'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
