@@ -60,11 +60,16 @@ class Shipment(models.Model):
     shipmentTrackingNumber = models.CharField(max_length=120, blank=True, null=True)
     shipmentLabelURL = models.URLField(blank=True, null=True)
 
+    shipmentReturnEasyPostID = models.CharField(max_length=120, blank=True, null=True)
+    shipmentReturnLabelCost = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+    shipmentReturnTrackingNumber = models.CharField(max_length=120, blank=True, null=True)
+    shipmentReturnLabelURL = models.CharField(max_length=120, blank=True, null=True)
+
     class Meta:
         db_table = 'shipment'
 
     def __str__(self):
-        return self.shipmentNote
+        return str(self.saleID)
 
     def save(self, *args, **kwargs):
         # if shipmentStatus is shipped
@@ -80,7 +85,7 @@ class Shipment(models.Model):
                 # now call create easy_post stuff
                 for parcel in self.parcel_set.all():
                     if parcel.parcelName and parcel.parcelWeight > 0:
-                        self.shipmentEasyPostID, self.shipmentCost, self.shipmentTrackingNumber, self.shipmentLabelURL = self.create_easypost()
+                        self.shipmentEasyPostID, self.shipmentCost, self.shipmentTrackingNumber, self.shipmentLabelURL, self.shipmentReturnEasyPostID, self.shipmentReturnLabelCost, self.shipmentReturnTrackingNumber, self.shipmentReturnLabelURL = self.create_easypost()
                         if self.shipmentTrackingNumber and self.shipmentLabelURL:
                             # if tracking num and label are gotten set status to printed
                             self.shipmentStatus = 'printed'
@@ -94,17 +99,25 @@ class Shipment(models.Model):
         shipment_cost = None
         shipment_track_num = None
         shipment_label_url = None
+        return_shipment_cost = None
+        return_shipment_track_num = None
+        return_shipment_label_url = None
 
         
-        # if not bought
-        if self.shipmentLabelIsBought:
+        # if marked bought
+        if self.shipmentLabelIsBought and self.shipmentEasyPostID:
             easy_shipment_id, shipment_cost, shipment_track_num, shipment_label_url = self.buy_shipment(from_address, to_address, parcel)
+            # get current EasypostID
+            return_shipment_id = self.shipmentEasyPostID
+            return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url = self.buy_return_shipment(return_shipment_id)
 
-        # if bought
+        # if not marked for buying
         else:
             easy_shipment_id, shipment_cost = self.create_shipment(from_address, to_address, parcel)
+            # get current EasypostID
+            return_easy_shipment_id, return_shipment_cost = self.create_return_shipment(easy_shipment_id)
 
-        return easy_shipment_id, shipment_cost, shipment_track_num, shipment_label_url
+        return easy_shipment_id, shipment_cost, shipment_track_num, shipment_label_url, return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url
         
             
     def buy_shipment(self, from_address, to_address, parcel):
@@ -154,8 +167,62 @@ class Shipment(models.Model):
                 shipment_cost = rate.rate
                 easy_shipment_id = shipment.id
                 print(shipment_cost)
+                # call create_return_shipment
         return easy_shipment_id, shipment_cost
 
+    def create_return_shipment(self, shipment):
+        print('creating return label')
+        # get passed shipmentid and get shipment
+        shipment = easypost.Shipment.retrieve(shipment)
+        return_shipment = easypost.Shipment.create(
+            to_address=shipment.from_address,
+            from_address=shipment.to_address,
+            parcel=shipment.parcel,
+            is_return=True,
+        )
+        print(return_shipment.id)
+        
+        # show rates
+        for rate in return_shipment.rates:
+            print(rate.carrier)
+            print(rate.service)
+            print(rate.rate)
+            print(rate.id)
+            if rate.carrier == self.shipmentCarrier and rate.service == self.shipmentRate:
+                print('found matching rate, saving cost and id')
+                return_shipment_cost = rate.rate
+                return_easy_shipment_id = return_shipment.id
+                print(return_shipment_cost)
+                # call create_return_shipment
+        return return_easy_shipment_id, return_shipment_cost
+
+
+    def buy_return_shipment(self, shipment):
+        print('creating return label')
+        # get passed shipmentid and get shipment
+        shipment = easypost.Shipment.retrieve(shipment)
+        return_shipment = easypost.Shipment.create(
+            to_address=shipment.from_address,
+            from_address=shipment.to_address,
+            parcel=shipment.parcel,
+            is_return=True,
+        )
+        print(return_shipment.id)
+        
+        # show rates
+        for rate in return_shipment.rates:
+            if rate.carrier == self.shipmentCarrier and rate.service == self.shipmentRate:
+                return_shipment_cost = rate.rate
+                return_easy_shipment_id = return_shipment.id
+
+                print('buying shipping label')
+                return_shipment.buy(rate={'id': rate.id})
+                print('setting Label URL and tracking number')
+                return_shipment_label_url = return_shipment.postage_label.label_url
+                ## Print Tracking Code
+                return_shipment_track_num = return_shipment.tracking_code
+                # call create_return_shipment
+        return return_easy_shipment_id, return_shipment_cost, return_shipment_label_url, return_shipment_track_num
 
     def get_from_address(self):
         print('creating from address')
