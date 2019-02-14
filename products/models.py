@@ -57,6 +57,10 @@ class Product(models.Model):
     def __str__(self):
         return self.productName
 
+    def get_absolute_url(self):
+        return "/products/%s/%s" % (self.productCategories.first(), self.productSlug)
+    
+
     def save(self, *args, **kwargs):
         if not self.productID:
             # Newly created object, so set slug

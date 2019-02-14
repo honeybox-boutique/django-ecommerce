@@ -38,7 +38,7 @@
         {% for product in product_list %}
             <div class="col-md-4">
                 <div class="thumbnail">
-                    <a class="text-center" href="{% url 'products:detail' view.kwargs.category product.productSlug %}">
+                    <a class="text-center" href="{{ product.get_absolute_url }}">
                         <img style="width:100%" src="{{ product.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
                     </a>
 

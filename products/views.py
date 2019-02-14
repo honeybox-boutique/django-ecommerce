@@ -11,20 +11,32 @@ from shopcart.models import ShopCart
 class ProductList(generic.ListView):
     model = Product
     template_name = 'products/list.html'
-    context_object_name = 'product_list'
 
-    def get_context_data(self, **kwargs):
+    def get_queryset(self, *args, **kwargs):
+        return Product.objects.filter(pricing__pricingIsActive=True)
+
+class CategoryList(generic.ListView):
+    model = Product
+    template_name = 'products/list.html'
+
+    def get_context_data(self, *args, **kwargs):
         """ queries database for products using the criteria below and adds it to context:
 
         product categoryName = key word argument 'category'
         at least one product pricing is active
         """
         # Call the base implementation first to get the context
-        context = super(ProductList, self).get_context_data(**kwargs)
-        # filter products based on category kwarg
-        product_list_query = Product.objects.filter(productCategories__categoryName=self.kwargs['category'])
+        context = super(CategoryList, self).get_context_data(**kwargs)
+
+        if 'category' in self.kwargs:
+            category_arg = self.kwargs['category']
+            context['category'] = category_arg
+
+        product_list_query = Product.objects.filter(
+            productCategories__categoryName=self.kwargs['category'],
+            pricing__pricingIsActive=True
+        )
         # filter products out with inactive pricings
-        product_list_query = product_list_query.filter(pricing__pricingIsActive=True)
         context['product_list'] = product_list_query
         return context
 
