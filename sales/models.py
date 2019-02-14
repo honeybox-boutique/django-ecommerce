@@ -150,6 +150,16 @@ class Sale(models.Model):
             for item in sale_items:
                 item.piIsAvailable = False
                 item.save()
+            # # send order confirmation email
+            # name = form.cleaned_data.get('name')
+            # from_email = settings.EMAIL_HOST_USER
+            # message = form.cleaned_data.get('message')
+            # phone_num = form.cleaned_data.get('phone_num')
+            # subject = 'Contact-Us Email - %s - %s - %s' % (name, from_email, phone_num)
+            # try:
+                # send_mail(subject, message, settings.EMAIL_HOST_USER, [settings.EMAIL_HOST_USER])
+            # except BadHeaderError:
+                # return HttpResponse('Invalid header found.')
         return self.saleStatus
 
     # calculates total based on present values. if ANY null return error?
