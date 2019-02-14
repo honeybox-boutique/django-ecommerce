@@ -9,7 +9,7 @@
     >
     <a href="{% url 'products:list' %}">Shop</a>
     >
-    <a href="{% url 'products:list' %}{{view.kwargs.category}}">{{view.kwargs.category}}</a>
+    <a href="{% url 'products:list' %}{{view.kwargs.category}}">{{ category }}</a>
 {% endblock %}
 <!-- Breadcrumbs -->
 
@@ -22,7 +22,11 @@
 {% load product_extras %}
 {% load humanize %}
         <!-- Category Name Header -->
-        <h1 class="text-center">{{view.kwargs.category}}</h1>
+        {% if category_image_obj.exists %}
+        <img src="{{ category_image_obj.url }}" alt="category image">
+        {% else %}
+        <h1 class="text-center">{{ category }}</h1>
+        {% endif %}
         <!-- Category Name Header -->
 
         <!-- Sorting drop down menu -->
@@ -47,14 +51,14 @@
                     {% if product.productDiscountAmount %}
 
                     <div class="text-center">
-                        <s>${{ product.productBasePrice }}</s>
-                        <h4>${{ product.productSalePrice }}</h4>
+                        <s class="text-danger">${{ product.productBasePrice }}</s>
+                        <p>${{ product.productSalePrice }}</p>
                     </div>
                     
                     {% else %}
 
                     <div class="text-center">
-                        <h4>${{ product.productSalePrice }}</h4>
+                        <p>${{ product.productSalePrice }}</p>
                     </div>
 
                     {% endif %}

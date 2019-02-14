@@ -20,7 +20,8 @@
             <input type="number" name="quantity" value="1"/>
         </label>
     </div>
-    <button type="submit">Add to Bag</button>
+
+    <input type="submit" value="Add to Bag" class="btn"/>
     <p>CartID: {{ shopcart }}</p>
     {% for item in shopcart.shopCartItems.all %}
         <p>{{ item.productID }}</p>

@@ -12,29 +12,53 @@
     <link href="https://fonts.googleapis.com/css?family=EB+Garamond|Montserrat" rel="stylesheet">
     <title>{% block title %}Ashley's Site{% endblock %}</title>
     <style>
-      h1, h2, h3, h4, h5, nav {
+      .breadcrumbs a, footer a {
+        font-family: 'EB Garamond', serif;
+        color: black;
+      }
+      h1, h2, h3, h4, h5 {
         font-family: 'Montserrat', sans-serif;
       }
-      breadcrumb {
+      .navbar-custom a {
         font-family: 'Montserrat', sans-serif;
+        color: black;
       }
-      p {
+      p, s, form, label {
         font-family: 'EB Garamond', serif;
       }
+
       /* Small devices (landscape phones, 576px and up) */
+      @media (max-width: 575.98px) { 
+        h2 {
+          font-size: 30px;
+        }
+      }
       @media (min-width: 576px) {  h1 {
           font-size: 30px;
-        }}
+        }
+        h2 {
+          font-size: 30px;
+        } 
+        }
+        
 
       /* Medium devices (tablets, 768px and up) */
       @media (min-width: 768px) { h1 {
           font-size: 30px;
-        }}
+        }
+        h2 {
+          font-size: 20px;
+        } 
+        }
 
       /* Large devices (desktops, 992px and up) */
       @media (min-width: 992px) { h1 {
           font-size: 40px;
-        }}
+        }
+        h2 {
+          font-size: 30px;
+        } 
+        }
 
       /* Extra large devices (large desktops, 1200px and up) */
       @media (min-width: 1200px) { 
@@ -49,7 +73,7 @@
 
     <!-- Nav Bar --> 
     {% load static %}
-    <nav class="navbar navbar-expand-md navbar-light">
+    <nav class="navbar navbar-custom navbar-expand-md">
     <div class="container">
       <ul class="nav navbar-nav mr-auto">
         <li class="nav-item">
@@ -75,7 +99,7 @@
       </div>
     </nav>
 
-    <nav class="navbar navbar-expand-md navbar-light">
+    <nav class="navbar navbar-custom navbar-expand-md">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
