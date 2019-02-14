@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from pricing.models import Product, Pricing, PDiscount
 from purchases.models import PurchaseItems
-from products.models import ProductImage
+from products.models import ProductImage, CategoryImage
 from shopcart.models import ShopCart
 
 
@@ -31,6 +31,9 @@ class CategoryList(generic.ListView):
         if 'category' in self.kwargs:
             category_arg = self.kwargs['category']
             context['category'] = category_arg
+            query = CategoryImage.objects.filter(categoryID__categoryName=self.kwargs['category'])
+            print(query.count())
+            context['category_image_obj'] = query.first()
 
         product_list_query = Product.objects.filter(
             productCategories__categoryName=self.kwargs['category'],
@@ -39,6 +42,11 @@ class CategoryList(generic.ListView):
         # filter products out with inactive pricings
         context['product_list'] = product_list_query
         return context
+
+    # def get_queryset(self, *args, **kwargs):
+        # context = super(CategoryList, self).get_context_data(**kwargs)
+        # context['category_image_obj'] = query.first()
+        # return query
 
 class ProductDetail(generic.DetailView):
     """ Product generic detailview """

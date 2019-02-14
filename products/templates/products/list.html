@@ -22,8 +22,8 @@
 {% load product_extras %}
 {% load humanize %}
         <!-- Category Name Header -->
-        {% if category_image_obj.exists %}
-        <img src="{{ category_image_obj.url }}" alt="category image">
+        {% if category_image_obj %}
+        <img src="{{ category_image_obj.categoryImagePath.url }}" alt="category image" style="width:100%">
         {% else %}
         <h1 class="text-center">{{ category }}</h1>
         {% endif %}
