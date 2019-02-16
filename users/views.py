@@ -9,7 +9,16 @@ from .models import Guest
 # Create your views here.
 
 def dashboard(request):
-    return render(request, 'users:dashboard')
+    return render(request, 'users/dashboard.html')
+
+def dashboard_addresses(request):
+    return render(request, 'users/dashboard_addresses.html')
+
+def dashboard_payment_methods(request):
+    return render(request, 'users/dashboard_payment_methods.html')
+
+def dashboard_orders(request):
+    return render(request, 'users/dashboard_orders.html')
 
 class PasswordResetView(auth_views.PasswordResetView):
 
@@ -20,11 +29,23 @@ class SignUpView(CreateView):
     form_class = SignUpForm
     template_name = 'users/signup.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(self.kwargs.get('next'))
+        next_arg = self.kwargs.get('next')
+        if is_safe_url(next_arg, self.request.get_host()):
+            context['next'] = next_arg
+        else:
+            context['next'] = '/'
+        return context
+
     def get_success_url(self):
+        next_get = self.kwargs.get('next')
         next_post = self.request.POST['next']
-        print(is_safe_url(next_post, self.request.get_host()))
         if is_safe_url(next_post, self.request.get_host()):
             success_url = next_post
+        elif is_safe_url(next_get, self.request.get_host()):
+            success_url = next_get
         else:
             success_url = '/'
         return success_url
@@ -34,7 +55,6 @@ class SignUpView(CreateView):
         valid = super(SignUpView, self).form_valid(form)
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password1')
-        # redirect_url = form.cleaned_data.get('next')
         new_user = authenticate(username=username, password=password)
         if new_user is not None:
             login(self.request, new_user)

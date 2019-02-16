@@ -13,7 +13,7 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password', 'password1', )
+        fields = ('username', 'first_name', 'last_name', 'email', 'password', )
 
 class GuestForm(forms.Form):
     email = forms.EmailField()
