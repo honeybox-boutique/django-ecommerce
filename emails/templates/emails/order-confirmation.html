@@ -3,50 +3,97 @@
 
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
-    <tr>
+    <tr width="50%">
         <td align="center">
             <p>Hello {{ sale_obj.saleBillingProfile }}, thank you for ordering from HoneyBox Boutique. 
             We will get your package sent to you as soon as we can. You will 
             receive another email with shipping details once your order has been shipped.</p>
         </td>
     </tr>
-    <tr>
+    <tr width="80%">
+    </tr>
+        <td align="center">
+            <h2>Address Information</h2>
+        </td>
+    <tr width="80%">
+        <td width="50%" align="center">
+            <h3>Shipping Address:</h3>
+            <p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
+            <p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressPostalCode }}</p>
+            <p>{{ sale_obj.saleShippingAddress.addressCountry }}</p>
+        </td>
+        <td width="50%" align="center">
+            <h3>Billing Address:</h3>
+            <p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
+            <p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressPostalCode }}</p>
+            <p>{{ sale_obj.saleBillingAddress.addressCountry }}</p>
+        </td>
+    </tr>
+    <tr width="80%">
+        <td align="center">
+            <h2>Order Items</h2>
+        </td>
+    </tr>
+    <tr width="80%">
+        <td width="45%">
+            <h3>Item</h3>
+        </td>
+        <td width="15%">
+            <h3>Qty</h3>
+        </td>
+        <td width="25%">
+            <h3>Price</h3>
+        </td>
+        <td width="15%">
+            <h3>Total Price</h3>
+        </td>
+    </tr>
+    {% for item in sale_obj.saleItems.all %}
+    <tr width="80%">
+        <td width="11%">
+            <h3>Image</h3>
+        </td>
+        <td width="34%">
+            <p>{{ item.productID }}-{{ item.piSize }}, {{ item.piColor }}</p>
+        </td>
+        <td width="15%">
+            <h3>1</h3>
+        </td>
+        <td width="25%">
+            <p>{{ item.siSalePrice }} </p>
+        </td>
+        <td width="15%">
+            <p>{{ item.siSalePrice }} </p>
+        </td>
+    </tr>
+    <tr width="80%">
+        <td width="11%">
+        </td>
+        <td width="34%">
+        </td>
+        <td width="15%">
+        </td>
+        <td width="25%">
+            <p>Subtotal:</p>
+            {% if discount_qs.exists %}
+            {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount:</p>{% endif %}
+            <p>Shipping and Handling:</p>
+            <p>Tax:</p>
+            <p>Order Total:</p>
+        </td>
+        <td width="15%">
+            <p>${{ item.siSalePrice }} </p>
+            {% if sale_obj.saleDiscountAmount != 0.00 %}<p>${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
+            <p>${{ sale_obj.saleShipCostAmountCharged }}</p>
+            <p>${{ sale_obj.saleTaxAmount }}</p>
+            <p>${{ sale_obj.saleTotal }}</p>
+        </td>
+    </tr>
+    {% endfor %}
+    <tr width="100%">
         <td>
+            <p>Questions? Feel free to contact us at HoneyboxDerek@gmail.com</p>
         </td>
     </tr>
 </table>
-
-<h2>Shipping Information:</h2>
-
-<h3>Shipping Address:</h3>
-<p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
-<p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressPostalCode }}</p>
-<p>{{ sale_obj.saleShippingAddress.addressCountry }}</p>
-
-
-<h2>Billing Information</h2>
-
-<h3>Billing Address:</h3>
-<p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
-<p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressPostalCode }}</p>
-<p>{{ sale_obj.saleBillingAddress.addressCountry }}</p>
-
-<h2>Order Summary</h2>
-{% for item in sale_obj.saleItems.all %}
-
-    <p>{{ item.productID }}, {{ item.piColor }}, {{ item.piSize }}      ${{ item.productID.productSalePrice }}</p>
-
-{% endfor %}
-<p>Subtotal: ${{ sale_obj.saleSubTotal }}</p>
-{% if discount_qs.exists %}
-<p>Discounts Applied:</p>
-{% for discount in discount_qs %}
-<p>{{ discount.sDiscountName }}</p>
-{% endfor %}
-{% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount: ${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
-{% endif %}
-<p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
-<p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
-<p>Sale Total: ${{ sale_obj.saleTotal }}</p>
 <br>
-<p>Questions? Feel free to contact us at HoneyboxDerek@gmail.com</p>

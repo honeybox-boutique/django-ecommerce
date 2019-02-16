@@ -21,7 +21,10 @@
         </a>
     </div>
     <div class="col-md-9">
-        <p>Lorem Ipsum</p>
+        <p>Addresses</p>
+        {% for obj in address_list %}
+        <p>{{ obj }}</p>
+        {% endfor %}
     </div>
 <div>
 </div>

@@ -1,0 +1,7 @@
+<form method="POST" action="{% url 'users:dashboard' %}"> {% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}"
+    {% endif %}
+    {{ form.as_p }}
+    <input type="submit" value="Save Changes" class="btn-primary">
+</form>

@@ -15,6 +15,16 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password', )
 
+class UserAccountInfoForm(forms.ModelForm):
+    
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email',)
+        help_texts = {
+            'username': None,
+            'email': None,
+        } 
+
 class GuestForm(forms.Form):
     email = forms.EmailField()
 

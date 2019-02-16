@@ -11,9 +11,9 @@
 </div>
 <div class="row">
     <div class="col-md-3">
-        <a class="btn btn-outline-secondary active" href="{% url 'users:dashboard' %}">Account Details
+        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard' %}">Account Details
         </a>
-        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard_addresses' %}">Addresses
+        <a class="btn btn-outline-secondary active" href="{% url 'users:dashboard_addresses' %}">Addresses
         </a>
         <a class="btn btn-outline-secondary" href="{% url 'users:dashboard_payment_methods' %}">Payment Methods
         </a>
@@ -21,8 +21,19 @@
         </a>
     </div>
     <div class="col-md-9">
-        <h3>My Account Information</h3>
-        {% include 'users/snippets/user_account_info_form.html' with form=form %}
+        <table class="table">
+            <thead>
+                <h3>Addresses</h3>
+            </thead>
+            {% for obj in address_list %}
+
+            <tr class="m-0">
+                <td class="w-75"><p>{{ obj.addressLine1 }}, {{ obj.addressCity }}, {{ obj.addressState }} {{ obj.addressCountry }}</p></td>
+                <td class="w-25"><a href="#" class="changelink">Change</a></td>
+            </tr>
+
+            {% endfor %}
+        </table>
     </div>
 <div>
 </div>

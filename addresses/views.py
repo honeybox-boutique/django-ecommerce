@@ -1,10 +1,24 @@
 from django.shortcuts import render, redirect
 from django.utils.http import is_safe_url
 
+from django.views.generic import UpdateView
 # Create your views here.
 from .forms import AddressForm
 from billing.models import BillingProfile
 from addresses.models import Address
+
+# class AddressUpdateView(UpdateView):
+    # model = Address
+    # template_name = 'users/dashboard_address.html'
+
+    # def get_context_data(self, **kwargs):
+        # context = super().get_context_data(**kwargs)
+        # user_obj = self.request.user
+        # billing_profile = user_obj.billingprofile
+        # address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
+        # context['address_list'] = address_qs
+        # return context
+
 
 def checkout_address_create_view(request):
     form = AddressForm(request.POST or None)# change: check if you're using this
