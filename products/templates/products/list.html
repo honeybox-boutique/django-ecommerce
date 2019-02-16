@@ -10,6 +10,11 @@
     <a href="{% url 'products:list' %}">Shop</a>
     >
     <a href="{% url 'products:list' %}{{view.kwargs.category}}">{{ category }}</a>
+        {% if category_image_obj %}
+        <img src="{{ category_image_obj.categoryImagePath.url }}" alt="category image" style="width:100%">
+        {% else %}
+        <h1 class="text-center">{{ category }}</h1>
+        {% endif %}
 {% endblock %}
 <!-- Breadcrumbs -->
 
@@ -22,11 +27,6 @@
 {% load product_extras %}
 {% load humanize %}
         <!-- Category Name Header -->
-        {% if category_image_obj %}
-        <img src="{{ category_image_obj.categoryImagePath.url }}" alt="category image" style="width:100%">
-        {% else %}
-        <h1 class="text-center">{{ category }}</h1>
-        {% endif %}
         <!-- Category Name Header -->
 
         <!-- Sorting drop down menu -->

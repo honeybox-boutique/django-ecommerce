@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
-
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
+from django.conf import settings
 from .forms import CartRemoveItemForm, EditSaleForm, CustomerShipMethodForm
 from users.forms import LoginForm, GuestForm
 from addresses.forms import AddressForm
@@ -196,12 +199,25 @@ def checkout_home(request):
             cart_obj.shopCartStatus = 'Submitted'
             cart_obj.save()
             sale_obj.mark_paid()
+
+
+            # # send order confirmation email
+            from_email = settings.EMAIL_HOST_USER
+            to_email = str(sale_obj.saleBillingProfile)
+            html_message = render_to_string('emails/order-confirmation.html', {
+                'sale_obj': sale_obj,
+                })
+            plain_message = strip_tags(html_message)
+            subject = 'HoneyBox Boutique - Order Confirmation %s' % (sale_obj.saleStringID)
+            send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+
+            # clear guest_email_id from session
+            del request.session['guest_email_id']
+            # clear carts session stuff
             request.session['cart_count'] = 0
             # clear items from user cart if authenticated
-            if request.user.is_authenticated:
-                # remove items from cart
-                is_empty = cart_obj.empty_shopcart()
-                print(is_empty)
+            is_empty = cart_obj.empty_shopcart()
+            print(is_empty)
 
             return redirect('shopcart:success')
 
