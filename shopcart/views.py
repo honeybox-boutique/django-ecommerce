@@ -212,7 +212,8 @@ def checkout_home(request):
             send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
 
             # clear guest_email_id from session
-            del request.session['guest_email_id']
+            if 'guest_email_id' in request.session:
+                del request.session['guest_email_id']
             # clear carts session stuff
             request.session['cart_count'] = 0
             # clear items from user cart if authenticated

@@ -2,7 +2,7 @@
 {% block content %}
 <h1>Cart {{ shopcart }}</h1>
 {% if shopcart.shopCartItems.exists %}
-<table>
+<table class="table table-border">
     <tbody>
         {% for item in shopcart.shopCartItems.all %}
         <tr>

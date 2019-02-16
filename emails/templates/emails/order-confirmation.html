@@ -1,55 +1,66 @@
 <p>Order Confirmation</p>
 <p>Order number: {{ sale_obj.saleStringID }}</p>
 
-
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-    <tr width="50%">
-        <td align="center">
+<table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr align="center">
+        <td>
             <p>Hello {{ sale_obj.saleBillingProfile }}, thank you for ordering from HoneyBox Boutique. 
             We will get your package sent to you as soon as we can. You will 
             receive another email with shipping details once your order has been shipped.</p>
         </td>
     </tr>
-    <tr width="80%">
+</table>
+<br>
+<table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr align="center">
+      <td>
+        <td><h2>Address Information</h2></td>
+      </td>
     </tr>
+ </table>
+ <table style="width:70%" align="center">
+ <tr align="center">
         <td align="center">
-            <h2>Address Information</h2>
-        </td>
-    <tr width="80%">
-        <td width="50%" align="center">
             <h3>Shipping Address:</h3>
             <p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
             <p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressPostalCode }}</p>
             <p>{{ sale_obj.saleShippingAddress.addressCountry }}</p>
         </td>
-        <td width="50%" align="center">
+        <td align="center">
             <h3>Billing Address:</h3>
             <p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
             <p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressPostalCode }}</p>
             <p>{{ sale_obj.saleBillingAddress.addressCountry }}</p>
         </td>
     </tr>
-    <tr width="80%">
-        <td align="center">
-            <h2>Order Items</h2>
-        </td>
+ </table>
+ <br> 
+ <table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr align="center">
+      <td>
+        <td><h2>Order Items</h2></td>
+      </td>
     </tr>
-    <tr width="80%">
-        <td width="45%">
-            <h3>Item</h3>
-        </td>
-        <td width="15%">
-            <h3>Qty</h3>
-        </td>
-        <td width="25%">
-            <h3>Price</h3>
-        </td>
-        <td width="15%">
-            <h3>Total Price</h3>
-        </td>
-    </tr>
-    {% for item in sale_obj.saleItems.all %}
-    <tr width="80%">
+ </table>
+ <table style="width:90%" align="center">
+   <tr align="center">
+          <td width="45%">
+              <h3>Item</h3>
+          </td>
+          <td width="15%">
+              <h3>Qty</h3>
+          </td>
+          <td width="20%">
+              <h3>Price</h3>
+          </td>
+          <td width="20%">
+              <h3>Total Price</h3>
+          </td>
+   </tr>
+</table>
+<table style="width:90%" align="center">
+{% for item in sale_obj.saleItems.all %}
+    <tr align="center">
         <td width="11%">
             <h3>Image</h3>
         </td>
@@ -66,7 +77,8 @@
             <p>{{ item.siSalePrice }} </p>
         </td>
     </tr>
-    <tr width="80%">
+{% endfor %}
+    <tr align="right">
         <td width="11%">
         </td>
         <td width="34%">
@@ -75,7 +87,6 @@
         </td>
         <td width="25%">
             <p>Subtotal:</p>
-            {% if discount_qs.exists %}
             {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount:</p>{% endif %}
             <p>Shipping and Handling:</p>
             <p>Tax:</p>
@@ -89,8 +100,9 @@
             <p>${{ sale_obj.saleTotal }}</p>
         </td>
     </tr>
-    {% endfor %}
-    <tr width="100%">
+ </table>
+ <table>
+    <tr align="center">
         <td>
             <p>Questions? Feel free to contact us at HoneyboxDerek@gmail.com</p>
         </td>
