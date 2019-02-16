@@ -1,14 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.views.generic import FormView, CreateView
 from .forms import SignUpForm, GuestForm
 from django.contrib.auth import authenticate, login, logout
 from django.utils.http import is_safe_url
+from django.contrib.auth import views as auth_views
 
 from .models import Guest
 # Create your views here.
 
 def dashboard(request):
-    return render(request, 'users/dashboard.html')
+    return render(request, 'users:dashboard')
+
+class PasswordResetView(auth_views.PasswordResetView):
+
+    def get_success_url(self):
+        return reverse('users:password_reset_done')
 
 class SignUpView(CreateView):
     form_class = SignUpForm
