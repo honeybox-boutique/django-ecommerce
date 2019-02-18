@@ -28,13 +28,13 @@
                 <img style="width:100%" src="{{ product1.first.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
             </div>
             <div class="col-md-4"><!-- details column -->
-                <h3 id="product" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h3>
+                <h3 id="product" class="mb-1" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h3>
 
 
                 {% if product.productDiscountAmount %}
 
                 <div>
-                    <s>${{ product.productBasePrice }}</s>
+                    <s class="text-danger">${{ product.productBasePrice }}</s>
                     <p>${{ product.productSalePrice }}</p>
                 </div>
                 
@@ -45,7 +45,7 @@
                 </div>
 
                 {% endif %}
-
+                <hr>
                 <!-- update_cart form -->
                 {% include 'products/update_cart.html' with productcolor=product1.first.productcolor_set.all shopcart=shopcart  %}
                 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -90,6 +90,8 @@
 
                     });
                 </script>
+                <hr>
+                <h4>Description</h4>
                 <p>{{ product1.first.productDescription }}</p>
             </div>
         </div>

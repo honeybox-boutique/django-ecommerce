@@ -177,7 +177,7 @@ class Product(models.Model):
 # Add many to many through purchitemcolor table
 class ProductColor(models.Model):
     productColorID = models.AutoField(primary_key=True)
-    productColorName = models.CharField(max_length=40)
+    productColorName = models.CharField(max_length=120)
 
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
     colorID = models.ForeignKey(Color, on_delete=models.CASCADE)

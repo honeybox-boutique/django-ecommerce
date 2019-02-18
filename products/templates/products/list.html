@@ -11,7 +11,7 @@
     >
     <a href="{% url 'products:list' %}{{view.kwargs.category}}">{{ category }}</a>
         {% if category_image_obj %}
-        <img src="{{ category_image_obj.categoryImagePath.url }}" alt="category image" style="width:100%">
+        <img class="border-custom" src="{{ category_image_obj.categoryImagePath.url }}" alt="category image" style="width:100%">
         {% else %}
         <h1 class="text-center">{{ category }}</h1>
         {% endif %}
@@ -30,11 +30,11 @@
         <!-- Category Name Header -->
 
         <!-- Sorting drop down menu -->
-        <label>Sort By: 
-            <select name="action" required="">
-                <option value="" selected="">---------</option>
-            </select>
-        </label>
+        <!--<label>Sort By: 
+            <!--<select name="action" required="">
+                <!--<option value="" selected="">---------</option>
+            <!--</select>
+        <!--</label>
         <!-- Sorting drop down menu -->
 
         <!-- Product Cards -->

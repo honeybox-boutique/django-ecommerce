@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=EB+Garamond|Montserrat" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Domine|Playfair+Display" rel="stylesheet">
     <title>{% block title %}Ashley's Site{% endblock %}</title>
     <style>
       .breadcrumbs a, footer a {
@@ -20,20 +22,34 @@
         word-wrap: break-word;
       }
       h1, h2, h3, h4, h5 {
-        font-family: 'Montserrat', sans-serif;
+        font-family: 'EB Garamond', serif;
       }
-      .navbar-custom a {
-        font-family: 'Montserrat', sans-serif;
+      .navbar-custom a, .nav-link {
+        font-family: 'EB Garamond', serif;
         color: black;
+      }
+      .btn {
+        background-color: #ba6f12;
       }
       p, s, form, label {
         font-family: 'EB Garamond', serif;
       }
-
+      .border-custom, footer, hr {
+        border: 2px solid #ba6f12;
+      }
+      hr {
+        border: 1px solid #ba6f12;
+      }
+      label {
+        font-size: 25px;
+      }
       /* Small devices (landscape phones, 576px and up) */
       @media (max-width: 575.98px) { 
         h2 {
           font-size: 30px;
+        }
+        nav {
+          font-size: 20px;
         }
       }
       @media (min-width: 576px) {  h1 {
@@ -58,8 +74,8 @@
       @media (min-width: 992px) { h1 {
           font-size: 40px;
         }
-        h2 {
-          font-size: 30px;
+        h2, nav {
+          font-size: 25px;
         } 
         }
 
@@ -89,21 +105,21 @@
           <a class="btn" href="{% url 'users:signup' next=request.path %}">Sign up</a>
         {% else %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown"><i class="btn fas fa-user blackiconcolor"></i>{{ user.username }}</a>
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown"><i class="fas fa-user blackiconcolor"></i></a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
-              <a class="dropdown-item" href="{% url 'users:dashboard' %}">My Account</a>
+              <a class="dropdown-item" href="{% url 'users:dashboard' %}"> My Account</a>
               <a class="dropdown-item" href="{% url 'users:logout' %}?next={{request.path}}">Logout</a>
             </div>
           </li>
         {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'shopcart:home' %}">{{ request.session.cart_count }} <i class="btn fas fa-shopping-cart blackiconcolor" href="{% url 'shopcart:home' %}"></i></a>
+          <a class="nav-link" href="{% url 'shopcart:home' %}">{{ request.session.cart_count }} <i class="fas fa-shopping-cart blackiconcolor" href="{% url 'shopcart:home' %}"></i></a>
         </li>
       </ul>
       </div>
     </nav>
 
-    <nav class="navbar navbar-light navbar-expand-md">
+    <nav class="navbar navbar-light navbar-expand-md border-custom border-left-0 border-right-0">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -168,7 +184,7 @@
     </div>
 
     {% block footer %}
-    <footer>
+    <footer class="border-left-0 border-right-0">
     <div class="container-fluid">
       <div class="row text-center">
         <div class="col-md-4">
