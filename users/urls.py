@@ -15,7 +15,7 @@ urlpatterns = [
     path('password_reset/', PasswordResetView.as_view(email_template_name='registration/password_reset_email.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'),
     path('dashboard/', dashboard, name='dashboard'),
-    path('dashboard/addresses/', DashboardAddressListView.as_view(), name='dashboard_addresses'),
+    path('dashboard/addresses/', dashboard_addresses, name='dashboard_addresses'),
     path('dashboard/payment-methods/', dashboard_payment_methods, name='dashboard_payment_methods'),
     path('dashboard/orders/', dashboard_orders, name='dashboard_orders'),
 ]

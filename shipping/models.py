@@ -123,6 +123,10 @@ class Shipment(models.Model):
     def buy_shipment(self, from_address, to_address, parcel):
         # call buy_shipment
         print('creating shipment')
+        easy_shipment_id = None
+        shipment_cost = None
+        shipment_track_num = None
+        shipment_label_url = None
         shipment = easypost.Shipment.create(
             to_address=to_address,
             from_address=from_address,
@@ -150,6 +154,7 @@ class Shipment(models.Model):
     def create_shipment(self, from_address, to_address, parcel):
         # create_shipment
         print('creating shipment')
+        
         shipment = easypost.Shipment.create(
             to_address=to_address,
             from_address=from_address,
@@ -172,6 +177,7 @@ class Shipment(models.Model):
 
     def create_return_shipment(self, shipment):
         print('creating return label')
+        return_easy_shipment_id = None
         # get passed shipmentid and get shipment
         shipment = easypost.Shipment.retrieve(shipment)
         return_shipment = easypost.Shipment.create(
@@ -199,6 +205,10 @@ class Shipment(models.Model):
 
     def buy_return_shipment(self, shipment):
         print('creating return label')
+        return_easy_shipment_id = None
+        return_shipment_cost = None
+        return_shipment_label_url = None
+        return_shipment_track_num = None
         # get passed shipmentid and get shipment
         shipment = easypost.Shipment.retrieve(shipment)
         return_shipment = easypost.Shipment.create(

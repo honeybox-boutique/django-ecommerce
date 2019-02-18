@@ -21,10 +21,8 @@
         </a>
     </div>
     <div class="col-md-9">
-        <p>Addresses</p>
-        {% for obj in address_list %}
-        <p>{{ obj }}</p>
-        {% endfor %}
+        <h4>Addresses</h4>
+        {% include 'users/snippets/user_account_addresses_form.html' %}
     </div>
 <div>
 </div>

@@ -1,0 +1,12 @@
+<form method="POST" action="{% url 'users:dashboard_addresses' %}"> {% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}"
+    {% endif %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    {{ form.as_p }}
+    {% endfor %}
+    <input type="submit" value="Save Changes" class="btn btn-info">
+</form>
+<form method="post">
+</form>
