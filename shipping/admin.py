@@ -20,7 +20,12 @@ class ShipmentAdmin(admin.ModelAdmin):
         'shipmentEasyPostID',
         'shipmentCost',
         'shipmentTrackingNumber',
+        'shipmentTrackingURL',
         'shipmentLabelURL',
+        'shipmentReturnEasyPostID',
+        'shipmentReturnLabelCost',
+        'shipmentReturnTrackingNumber',
+        'shipmentReturnLabelURL',
     )
 admin.site.register(Shipment, ShipmentAdmin)
 

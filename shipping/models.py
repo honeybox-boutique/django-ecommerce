@@ -39,10 +39,10 @@ class Shipment(models.Model):
         ('Express', 'Express'),
     )
     shipmentID = models.AutoField(primary_key=True)
-    shipmentDateCreated = models.DateTimeField('shipment date created')
+    shipmentDateRequested = models.DateTimeField('shipment date created')
+    shipmentDateLabelPrinted = models.DateTimeField('shipment date label printed', blank=True, null=True)
     shipmentNote = models.CharField(max_length=120, default='Default Shipment Note')
     warehouseID = models.ForeignKey(Warehouse, on_delete=models.PROTECT, blank=True, null=True)
-    shipmentFromAddress = models.ForeignKey(Address, related_name='shipmentFromAddress', null=True, blank=True, on_delete=models.PROTECT)
     shipmentToAddress = models.ForeignKey(Address, related_name='shipmentToAddress', null=True, blank=True, on_delete=models.PROTECT)
     # shipmentToAddress = models.ForeignKey(Address, on_delete=models.PROTECT)
     shipmentLabelIsBought = models.BooleanField(default=False)
@@ -58,12 +58,13 @@ class Shipment(models.Model):
     shipmentEasyPostID = models.CharField(max_length=120, blank=True, null=True)
     shipmentCost = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     shipmentTrackingNumber = models.CharField(max_length=120, blank=True, null=True)
+    shipmentTrackingURL = models.URLField(verbose_name='tracking url', blank=True, null=True)
     shipmentLabelURL = models.URLField(blank=True, null=True)
 
     shipmentReturnEasyPostID = models.CharField(max_length=120, blank=True, null=True)
     shipmentReturnLabelCost = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
     shipmentReturnTrackingNumber = models.CharField(max_length=120, blank=True, null=True)
-    shipmentReturnLabelURL = models.CharField(max_length=120, blank=True, null=True)
+    shipmentReturnLabelURL = models.URLField(blank=True, null=True)
 
     class Meta:
         db_table = 'shipment'
@@ -85,10 +86,11 @@ class Shipment(models.Model):
                 # now call create easy_post stuff
                 for parcel in self.parcel_set.all():
                     if parcel.parcelName and parcel.parcelWeight > 0:
-                        self.shipmentEasyPostID, self.shipmentCost, self.shipmentTrackingNumber, self.shipmentLabelURL, self.shipmentReturnEasyPostID, self.shipmentReturnLabelCost, self.shipmentReturnTrackingNumber, self.shipmentReturnLabelURL = self.create_easypost()
+                        self.shipmentEasyPostID, self.shipmentCost, self.shipmentTrackingNumber, self.shipmentTrackingURL, self.shipmentLabelURL, self.shipmentReturnEasyPostID, self.shipmentReturnLabelCost, self.shipmentReturnTrackingNumber, self.shipmentReturnLabelURL = self.create_easypost()
                         if self.shipmentTrackingNumber and self.shipmentLabelURL:
                             # if tracking num and label are gotten set status to printed
                             self.shipmentStatus = 'printed'
+                            self.shipmentDateLabelPrinted = timezone.now()
         super(Shipment, self).save(*args, **kwargs)
     
     def create_easypost(self):
@@ -98,6 +100,7 @@ class Shipment(models.Model):
         
         shipment_cost = None
         shipment_track_num = None
+        shipment_track_url = None
         shipment_label_url = None
         return_shipment_cost = None
         return_shipment_track_num = None
@@ -106,7 +109,7 @@ class Shipment(models.Model):
         
         # if marked bought
         if self.shipmentLabelIsBought and self.shipmentEasyPostID:
-            easy_shipment_id, shipment_cost, shipment_track_num, shipment_label_url = self.buy_shipment(from_address, to_address, parcel)
+            easy_shipment_id, shipment_cost, shipment_track_num, shipment_track_url, shipment_label_url = self.buy_shipment(from_address, to_address, parcel)
             # get current EasypostID
             return_shipment_id = self.shipmentEasyPostID
             return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url = self.buy_return_shipment(return_shipment_id)
@@ -117,7 +120,7 @@ class Shipment(models.Model):
             # get current EasypostID
             return_easy_shipment_id, return_shipment_cost = self.create_return_shipment(easy_shipment_id)
 
-        return easy_shipment_id, shipment_cost, shipment_track_num, shipment_label_url, return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url
+        return easy_shipment_id, shipment_cost, shipment_track_num, shipment_track_url, shipment_label_url, return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url
         
             
     def buy_shipment(self, from_address, to_address, parcel):
@@ -126,6 +129,7 @@ class Shipment(models.Model):
         easy_shipment_id = None
         shipment_cost = None
         shipment_track_num = None
+        shipment_track_url = None
         shipment_label_url = None
         shipment = easypost.Shipment.create(
             to_address=to_address,
@@ -149,7 +153,8 @@ class Shipment(models.Model):
                 shipment_label_url = shipment.postage_label.label_url
                 ## Print Tracking Code
                 shipment_track_num = shipment.tracking_code
-        return easy_shipment_id, shipment_cost, shipment_track_num, shipment_label_url
+                shipment_track_url = shipment.tracker.public_url
+        return easy_shipment_id, shipment_cost, shipment_track_num, shipment_track_url, shipment_label_url
 
     def create_shipment(self, from_address, to_address, parcel):
         # create_shipment
@@ -232,7 +237,7 @@ class Shipment(models.Model):
                 ## Print Tracking Code
                 return_shipment_track_num = return_shipment.tracking_code
                 # call create_return_shipment
-        return return_easy_shipment_id, return_shipment_cost, return_shipment_label_url, return_shipment_track_num
+        return return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url
 
     def get_from_address(self):
         print('creating from address')
@@ -314,7 +319,7 @@ def post_save_create_shipment(sender, instance, *args, **kwargs):
         # create shipment
         print('creating shipment')
         Shipment.objects.create(
-            shipmentDateCreated=timezone.now(),# change: add timezone import
+            shipmentDateRequested=timezone.now(),# change: add timezone import
             shipmentToAddress=instance.saleShippingAddress,
             saleID=instance,
         )

@@ -4,6 +4,7 @@ from django.forms import modelformset_factory, inlineformset_factory
 from addresses.forms import AddressForm
 from addresses.models import Address
 from billing.models import BillingProfile
+from sales.models import Sale
 from .forms import SignUpForm, GuestForm, UserAccountInfoForm
 from django.contrib.auth import authenticate, login, logout
 from django.utils.http import is_safe_url
@@ -94,6 +95,19 @@ def dashboard_addresses(request):
 
 def dashboard_payment_methods(request):
     return render(request, 'users/dashboard_payment_methods.html')
+
+class DashboardOrderListView(ListView):
+    model = Sale
+    template_name = 'users/dashboard_orders.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_obj = self.request.user
+        billing_profile = user_obj.billingprofile
+        sale_qs = Sale.objects.filter(saleBillingProfile=billing_profile).exclude(saleStatus='created')
+        # address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
+        context['sale_list'] = sale_qs
+        return context
 
 def dashboard_orders(request):
     return render(request, 'users/dashboard_orders.html')

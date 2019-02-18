@@ -4,26 +4,56 @@
 
 {% block content %}
 
-<div class="container">
 <div class="row">
     <h2>My Account</h2>
     <p>Welcome, {{ user.email }}! To manage your information and preferences or to see your order history, please use the options below.</p>
 </div>
+</div><!-- Container -->
+<div class="container-fluid">
 <div class="row">
-    <div class="col-md-3">
-        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard' %}">Account Details
+    <div class="col-12 col-md-2">
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard' %}">Account Details
         </a>
-        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard_addresses' %}">Addresses
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_addresses' %}">Addresses
         </a>
-        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard_payment_methods' %}">Payment Methods
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_payment_methods' %}">Payment Methods
         </a>
-        <a class="btn btn-outline-secondary active" href="{% url 'users:dashboard_orders' %}">Orders
+        <a class="btn btn-block btn-outline-secondary active" href="{% url 'users:dashboard_orders' %}">Orders
         </a>
     </div>
-    <div class="col-md-9">
-        <p>Lorem Ipsum</p>
+    <div class="col">
+        <h4>My Orders</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <th>
+                        <h5>Order ID</h5>
+                    </th>
+                    <th>
+                        <h5>Shipment Tracking Number</h5>
+                    </th>
+                    <th>
+                        <h5>Order Date</h5>
+                    </th>
+                    <th>
+                        <h5>Shipping Label Printed</h5>
+                    </th>
+                </thead>
+                <tbody>
+                {% for sale in sale_list %}
+                    <tr>
+                    <td><p>{{ sale }}</p></td>
+                    <td><a href="{{ sale.shipment_set.first.shipmentTrackingURL }}">{{ sale.shipment_set.first.shipmentTrackingNumber }}</a></td>
+                    <td><p>{{ sale.saleDate }}</p></td>
+                    <td><p>{{ sale.shipment_set.first.shipmentDateLabelPrinted }}</p></td>
+                    <td><a href="">Details</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div><!-- Table responsive div-->
+    </div>
     </div>
 <div>
-</div>
 
 {% endblock %}
