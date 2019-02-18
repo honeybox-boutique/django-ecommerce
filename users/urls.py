@@ -2,7 +2,7 @@ from django.urls import path, reverse_lazy, re_path
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 
-from .views import guest_register_view, SignUpView, PasswordResetView, dashboard, dashboard_addresses, dashboard_payment_methods, dashboard_orders, DashboardOrderListView
+from .views import guest_register_view, SignUpView, PasswordResetView, dashboard, dashboard_addresses, dashboard_payment_methods, dashboard_orders, DashboardOrderListView, DashboardOrderDetailView
 
 app_name = 'users'
 urlpatterns = [
@@ -18,4 +18,5 @@ urlpatterns = [
     path('dashboard/addresses/', dashboard_addresses, name='dashboard_addresses'),
     path('dashboard/payment-methods/', dashboard_payment_methods, name='dashboard_payment_methods'),
     path('dashboard/orders/', DashboardOrderListView.as_view(), name='dashboard_orders'),
+    path('dashboard/orders/<pk>', DashboardOrderDetailView.as_view(), name='dashboard_order_detail'),
 ]

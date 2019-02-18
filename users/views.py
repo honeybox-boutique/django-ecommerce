@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, reverse
-from django.views.generic import FormView, CreateView, ListView
+from django.views.generic import FormView, CreateView, ListView, DetailView
 from django.forms import modelformset_factory, inlineformset_factory
 from addresses.forms import AddressForm
 from addresses.models import Address
@@ -108,6 +108,17 @@ class DashboardOrderListView(ListView):
         # address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
         context['sale_list'] = sale_qs
         return context
+
+class DashboardOrderDetailView(DetailView):
+    model = Sale
+    context_object_name = 'sale'
+    template_name = 'users/dashboard_order_detail.html'
+
+    # def get_context_data(self, **kwargs):
+        # context = super().get_context_data(**kwargs)
+        # # # address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
+        # # context['sale_list'] = sale_qs
+        # return context
 
 def dashboard_orders(request):
     return render(request, 'users/dashboard_orders.html')

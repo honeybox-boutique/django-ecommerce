@@ -4,21 +4,25 @@
 
 {% block content %}
 
-<div class="container">
 <div class="row">
-    <h2>My Account</h2>
-    <p>Welcome, {{ user.email }}! To manage your information and preferences or to see your order history, please use the options below.</p>
+    <div class="col-12">
+        <h2>My Account</h2>
+        <p>Welcome, {{ user.email }}! To manage your information and preferences or to see your order history, please use the options below.</p>
+    </div>
 </div>
+</div><!-- Container -->
+<div class="container-fluid">
 <div class="row">
-    <div class="col-md-3">
-        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard' %}">Account Details
+    <div class="col-12 col-md-3 col-lg-2 text-center">
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard' %}">Account
         </a>
-        <a class="btn btn-outline-secondary active" href="{% url 'users:dashboard_addresses' %}">Addresses
+        <a class="btn btn-block btn-outline-secondary active" href="{% url 'users:dashboard_addresses' %}">Addresses
         </a>
-        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard_payment_methods' %}">Payment Methods
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_payment_methods' %}">Saved Cards
         </a>
-        <a class="btn btn-outline-secondary" href="{% url 'users:dashboard_orders' %}">Orders
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_orders' %}">Orders
         </a>
+        <br>
     </div>
     <div class="col-md-9">
         <h4>Addresses</h4>

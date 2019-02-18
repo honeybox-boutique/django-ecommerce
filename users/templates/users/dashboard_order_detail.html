@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block title %}Sign Up | {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <h2>My Account</h2>
+        <p>Welcome, {{ user.email }}! To manage your information and preferences or to see your order history, please use the options below.</p>
+    </div>
+</div>
+</div><!-- Container -->
+<div class="container-fluid">
+<div class="row">
+    <div class="col-12 col-md-3 col-lg-2 text-center">
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard' %}">Account Details
+        </a>
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_addresses' %}">Addresses
+        </a>
+        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_payment_methods' %}">Saved Cards
+        </a>
+        <a class="btn btn-block btn-outline-secondary active" href="{% url 'users:dashboard_orders' %}">Orders
+        </a>
+        <br>
+    </div>
+    <div class="col-12 col-md-9">
+        <h4>Order {{ sale }}</h4>
+        <div class="row">
+        <div class="table-responsive">
+            <table class="table table-condensed">
+                <thead>
+                <tr class="d-flex">
+                    <th class="col-5 col-sm-6 col-md-6">
+                        <p>Item</p>
+                    </th>
+                    <th class="col-2 col-sm-2 col-md-2">
+                        <p>Qty</p>
+                    </th>
+                    <th class="col-2 col-sm-2 col-md-2">
+                        <p>Price</p>
+                    </th>
+                    <th class="col-sm-2 col-md-2">
+                        <p>Total</p>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in sale.saleitems_set.all %}
+                <tr class="d-flex">
+                    <td class="d-none d-sm-block col-md-2">
+                        <img style="width:100%" src="{{ item.prodStockID.get_image_set.first.productImagePath.url }}" alt="{{ item.prodStockID.productID }}">
+                    </td>
+                    <td class="col-5 col-md-4">
+                        <p>{{ item.prodStockID.productID }}-{{ item.prodStockID.piSize }}, {{ item.prodStockID.piColor }}</p>
+                    </td>
+                    <td class="col-2">
+                        <p>1</p>
+                    </td>
+                    <td class="col-2">
+                        <s>${{ item.siBasePrice }} </s>
+                        <p>${{ item.siSalePrice }} </p>
+                    </td>
+                    <td class="col-2">
+                        <p>${{ item.siSalePrice }} </p>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+    </div>
+<div>
+
+{% endblock %}

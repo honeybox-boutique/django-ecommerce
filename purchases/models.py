@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from products.models import Product, Color
+from products.models import Product, Color, ProductImage
 
 # Create your models here.
 
@@ -53,3 +53,16 @@ class PurchaseItems(models.Model):
 
     def __str__(self):
         return str(self.productID)
+    
+    def get_image_set(self):
+        ''' gets product color image set for prodstock '''
+        item_color = self.piColor
+        # get images
+        item_images = ProductImage.objects.filter(
+            # item_color
+            productColorID__colorID=item_color,
+            # product_id
+            productColorID__productID=self.productID
+        )
+        print(item_images.first())
+        return item_images
