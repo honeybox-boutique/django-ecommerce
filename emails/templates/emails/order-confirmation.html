@@ -86,14 +86,14 @@
         <td width="15%">
         </td>
         <td width="25%">
-            <p>Subtotal:</p>
+            <p>Subtotal: </p>
             {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount:</p>{% endif %}
             <p>Shipping and Handling:</p>
             <p>Tax:</p>
             <p>Order Total:</p>
         </td>
         <td width="15%">
-            <p>${{ item.siSalePrice }} </p>
+            <p>${{ sale_obj.saleSubTotal }}</p>
             {% if sale_obj.saleDiscountAmount != 0.00 %}<p>${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
             <p>${{ sale_obj.saleShipCostAmountCharged }}</p>
             <p>${{ sale_obj.saleTaxAmount }}</p>

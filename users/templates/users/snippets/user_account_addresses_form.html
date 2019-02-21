@@ -4,7 +4,17 @@
     {% endif %}
     {{ formset.management_form }}
     {% for form in formset %}
-    {{ form.as_p }}
+    <p>
+        {{ form.addressLine1.value|default_if_none:"" }}, {{ form.addressCity.value|default_if_none:"" }}, {{ form.addressState.value|default_if_none:"" }}
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+            Edit
+        </a>
+    </p>
+    <div class="collapse" id="collapseForm{{ forloop.counter }}">
+        <div class="card card-body">
+            {{ form.as_p }}
+        </div>
+    </div>
     {% endfor %}
     <input type="submit" value="Save Changes" class="btn btn-info">
 </form>

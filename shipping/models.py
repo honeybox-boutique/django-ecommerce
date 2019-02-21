@@ -91,7 +91,29 @@ class Shipment(models.Model):
                             # if tracking num and label are gotten set status to printed
                             self.shipmentStatus = 'printed'
                             self.shipmentDateLabelPrinted = timezone.now()
+                            # send shipping email
+                            sent_ship_email = self.send_shipping_email()
+
         super(Shipment, self).save(*args, **kwargs)
+
+    def send_shipping_email(self):
+        from django.core.mail import send_mail
+        from django.conf import settings
+        from django.template.loader import render_to_string
+        from django.utils.html import strip_tags
+        sent = False
+        # get sale obj
+        sale_obj = self.saleID
+        # # send order confirmation email
+        from_email = settings.EMAIL_HOST_USER
+        to_email = str(sale_obj.saleBillingProfile)
+        html_message = render_to_string('emails/shipping-information.html', {
+            'sale_obj': sale_obj,
+            })
+        plain_message = strip_tags(html_message)
+        subject = 'HoneyBox Boutique - Order Shipped! - %s' % (sale_obj.saleStringID)
+        send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+        return sent
     
     def create_easypost(self):
         from_address = self.get_from_address()
