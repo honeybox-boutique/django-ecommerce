@@ -210,33 +210,38 @@ def checkout_home(request):
         if not is_done:
             print('something is not done')
         elif is_done:
-            print('clearing stuff becuase isdone')
-            # set cart status to submitted
-            cart_obj.shopCartStatus = 'Submitted'
-            cart_obj.save()
-            sale_obj.mark_paid()
+            did_charge, charge_msg = billing_profile.charge(sale_obj)
+            if did_charge:
+                print('clearing stuff becuase isdone')
+                # set cart status to submitted
+                cart_obj.shopCartStatus = 'Submitted'
+                cart_obj.save()
+                sale_obj.mark_paid()
 
 
-            # # send order confirmation email
-            from_email = settings.EMAIL_HOST_USER
-            to_email = str(sale_obj.saleBillingProfile)
-            html_message = render_to_string('emails/order-confirmation.html', {
-                'sale_obj': sale_obj,
-                })
-            plain_message = strip_tags(html_message)
-            subject = 'HoneyBox Boutique - Order Confirmation %s' % (sale_obj.saleStringID)
-            send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+                # # send order confirmation email
+                from_email = settings.EMAIL_HOST_USER
+                to_email = str(sale_obj.saleBillingProfile)
+                html_message = render_to_string('emails/order-confirmation.html', {
+                    'sale_obj': sale_obj,
+                    })
+                plain_message = strip_tags(html_message)
+                subject = 'HoneyBox Boutique - Order Confirmation %s' % (sale_obj.saleStringID)
+                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
 
-            # clear guest_email_id from session
-            if 'guest_email_id' in request.session:
-                del request.session['guest_email_id']
-            # clear carts session stuff
-            request.session['cart_count'] = 0
-            # clear items from user cart if authenticated
-            is_empty = cart_obj.empty_shopcart()
-            print(is_empty)
+                # clear guest_email_id from session
+                if 'guest_email_id' in request.session:
+                    del request.session['guest_email_id']
+                # clear carts session stuff
+                request.session['cart_count'] = 0
+                # clear items from user cart if authenticated
+                is_empty = cart_obj.empty_shopcart()
+                print(is_empty)
 
-            return redirect('shopcart:success')
+                return redirect('shopcart:success')
+            else:
+                print(charge_msg)
+                return redirect('shopcart:checkout')
 
     context = {
         "cart_obj": cart_obj,

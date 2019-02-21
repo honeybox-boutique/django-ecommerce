@@ -39,9 +39,6 @@ def payment_method_create_view(request):
             return redirect('shopcart:home')
         token = request.POST.get('token')
         if token is not None:
-            customer = stripe.Customer.retrieve(billing_profile.billingToken)
-            card_respone = customer.sources.create(source=token)
-            new_card_obj = Card.objects.add_new(billing_profile, card_respone)
-            print(new_card_obj)
+            new_card_obj = Card.objects.add_new(billing_profile, token)
             return JsonResponse({'message': 'Done'})
     return HttpResponse('error', status_code=401)

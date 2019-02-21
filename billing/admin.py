@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import BillingProfile, Card
+from .models import BillingProfile, Card, Charge
 from addresses.models import Address
 # Register your models here.
 class AddressInline(admin.StackedInline):
@@ -15,3 +15,4 @@ class BillingProfileAdmin(admin.ModelAdmin):
         AddressInline
     ]
 admin.site.register(BillingProfile, BillingProfileAdmin)
+admin.site.register(Charge)

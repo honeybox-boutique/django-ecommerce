@@ -44,6 +44,9 @@ class BillingProfile(models.Model):
 
     objects = BillingProfileManager()
 
+    def charge(self, order_obj, card=None):
+        return Charge.objects.do(self, order_obj, card)
+
     def __str__(self):
         return self.billingEmail
 
@@ -52,7 +55,8 @@ def billing_profile_created_receiver(sender, instance, *args, **kwargs):
     if not instance.billingToken and instance.billingEmail:
         print('Actual api request to Stripe to get token')
         customer = stripe.Customer.create(
-            email=instance.billingEmail
+            email=instance.billingEmail,
+            description=instance.user
         )
         print(customer)
         instance.billingToken = customer.id
@@ -66,8 +70,10 @@ post_save.connect(user_created_receiver, sender=User)
 
 
 class CardManager(models.Manager):
-    def add_new(self, billing_profile, stripe_card_response):
-        if str(stripe_card_response.object) == 'card':
+    def add_new(self, billing_profile, token):
+        if token:
+            customer = stripe.Customer.retrieve(billing_profile.billingToken)
+            stripe_card_response = customer.sources.create(source=token)
             new_card = self.model(
                 billingProfile=billing_profile,
                 cardStripeID=stripe_card_response.id,
@@ -89,7 +95,7 @@ class Card(models.Model):
     cardExpMonth = models.IntegerField(null=True, blank=True)
     cardExpYear = models.IntegerField(null=True, blank=True)
     cardLast4 = models.CharField(max_length=4)
-    cardDefault = models.BooleanField(default=False)
+    cardDefault = models.BooleanField(default=True)
 
     objects = CardManager()
 
@@ -98,3 +104,48 @@ class Card(models.Model):
 
     class Meta:
         db_table = 'card'
+
+class ChargeManager(models.Manager):
+    def do(self, billing_profile, sale_obj, card=None):
+        card_obj = card
+        if card_obj is None:
+            cards = billing_profile.card_set.filter(cardDefault=True)
+            if cards.exists():
+                card_obj = cards.first()
+        if card_obj is None:
+            return False, 'No cards available'
+        
+        c = stripe.Charge.create(
+            amount=int(sale_obj.saleTotal * 100), #amount in cents
+            currency='usd',
+            customer=billing_profile.billingToken,
+            source=card_obj.cardStripeID,
+            metadata={'order_id': sale_obj.saleStringID},
+        )
+        new_charge_obj = self.model(
+            billingProfile=billing_profile,
+            chargeStripeID=c.id,
+            chargePaid=c.paid,
+            chargeRefunded=c.refunded,
+            chargeOutcome=c.outcome,
+            chargeOutcomeType=c.outcome['type'],
+            chargeSellerMessage=c.outcome.get('seller_message'),
+            chargeRiskLevel=c.outcome.get('risk_level'),
+        )
+        new_charge_obj.save()
+        return new_charge_obj.chargePaid, new_charge_obj.chargeSellerMessage
+
+class Charge(models.Model):
+    billingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
+    chargeStripeID = models.CharField(max_length=120)
+    chargePaid = models.BooleanField(default=False)
+    chargeRefunded = models.BooleanField(default=False)
+    chargeOutcome = models.TextField(max_length=255, blank=True, null=True)
+    chargeOutcomeType = models.CharField(max_length=120, blank=True, null=True)
+    chargeSellerMessage = models.CharField(max_length=120, blank=True, null=True)
+    chargeRiskLevel = models.CharField(max_length=120, blank=True, null=True)
+
+    objects = ChargeManager()
+
+    class Meta:
+        db_table = 'charge'
