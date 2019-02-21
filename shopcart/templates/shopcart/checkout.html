@@ -167,6 +167,8 @@
             <h4>Billing Address</h4>
             <p>{{ sale_obj.saleBillingAddress.addressLine1 }}, {{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
             {% include 'shopcart/edit-billing-form.html' with form=edit_form %}
+            <h4>Payment Method</h4>
+            <p>{{ billing_profile.default_card }} (<a href="{{ billing_profile.get_payment_method_url }}?next={{ request.build_absolute_uri }}">Change</a>)</p>
         </div>
         <div class="col 6">
             <h4>Your Items</h4>

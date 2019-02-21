@@ -86,8 +86,7 @@ form.addEventListener('submit', function(event) {
 
 // Submit the form with the token ID.
 function stripeTokenHandler(nextUrl, token) {
-    var paymentMethodEndpoint = "{% url 'billing:payment_method_create' %}"
-    console.log(token.id)
+    var paymentMethodEndpoint = "create/"
     var data = {
         'token': token.id
     }
@@ -108,16 +107,6 @@ function stripeTokenHandler(nextUrl, token) {
             console.log(error)
         }
     })
-  // Insert the token ID into the form so it gets submitted to the server
-  // var form = document.getElementById('payment-form');
-  // var hiddenInput = document.createElement('input');
-  // hiddenInput.setAttribute('type', 'hidden');
-  // hiddenInput.setAttribute('name', 'stripeToken');
-  // hiddenInput.setAttribute('value', token.id);
-  // form.appendChild(hiddenInput);
-
-  // Submit the form
-  // form.submit();
 }
 }
 })
