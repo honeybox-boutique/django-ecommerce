@@ -38,7 +38,7 @@ urlpatterns = [
     path('contact-us/', send_email_view, name='contact'),
     path('contact-us/thanks/', email_success_view, name='contact_thanks'),
     path('coming-soon/', TemplateView.as_view(template_name="coming-soon.html"), name='coming-soon'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar

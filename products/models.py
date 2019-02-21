@@ -38,7 +38,7 @@ class CategoryImage(models.Model):
 class Product(models.Model):
     productID = models.AutoField(primary_key=True)
     productName = models.CharField(max_length=200)
-    productDescription = models.CharField(max_length=200)
+    productDescription = models.TextField(max_length=200)
     productSlug = models.SlugField(unique=True)
     productCategories = models.ManyToManyField(Category)
 

@@ -32,7 +32,6 @@ class CategoryList(generic.ListView):
             category_arg = self.kwargs['category']
             context['category'] = category_arg
             query = CategoryImage.objects.filter(categoryID__categoryName=self.kwargs['category'])
-            print(query.count())
             context['category_image_obj'] = query.first()
 
         product_list_query = Product.objects.filter(

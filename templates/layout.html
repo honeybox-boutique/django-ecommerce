@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+  {% load static %}
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -13,78 +14,7 @@
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Domine|Playfair+Display" rel="stylesheet">
     <title>{% block title %}Ashley's Site{% endblock %}</title>
-    <style>
-      .breadcrumbs a, footer a {
-        font-family: 'EB Garamond', serif;
-        color: grey;
-      }
-      a {
-        word-wrap: break-word;
-      }
-      h1, h2, h3, h4, h5 {
-        font-family: 'EB Garamond', serif;
-      }
-      .navbar-custom a, .nav-link {
-        font-family: 'EB Garamond', serif;
-        color: black;
-      }
-      .btn {
-        background-color: #ba6f12;
-      }
-      p, s, form, label {
-        font-family: 'EB Garamond', serif;
-      }
-      .border-custom, footer, hr {
-        border: 2px solid #ba6f12;
-      }
-      hr {
-        border: 1px solid #ba6f12;
-      }
-      label {
-        font-size: 25px;
-      }
-      /* Small devices (landscape phones, 576px and up) */
-      @media (max-width: 575.98px) { 
-        h2 {
-          font-size: 30px;
-        }
-        nav {
-          font-size: 20px;
-        }
-      }
-      @media (min-width: 576px) {  h1 {
-          font-size: 30px;
-        }
-        h2 {
-          font-size: 30px;
-        } 
-        }
-        
-
-      /* Medium devices (tablets, 768px and up) */
-      @media (min-width: 768px) { h1 {
-          font-size: 30px;
-        }
-        h2 {
-          font-size: 20px;
-        } 
-        }
-
-      /* Large devices (desktops, 992px and up) */
-      @media (min-width: 992px) { h1 {
-          font-size: 40px;
-        }
-        h2, nav {
-          font-size: 25px;
-        } 
-        }
-
-      /* Extra large devices (large desktops, 1200px and up) */
-      @media (min-width: 1200px) { 
-      h1 {
-          font-size: 50px;
-      }}
-    </style>
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
   </head>
 
 
@@ -97,7 +27,7 @@
               <a class="text-muted" href="#"></a>
             </div>
             <div class="col-4 text-center">
-              <img src="{% static 'pasted image 0.png' %}" class="w-50"><a class="blog-header-logo text-dark" href="/"></a></img>
+              <img src="{% static 'img/logo-just-h.png' %}" class="w-50"><a class="blog-header-logo text-dark" href="/"></a></img>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center">
         {% if not user.is_authenticated %}
