@@ -25,7 +25,7 @@ def checkout_address_create_view(request):
     context = {
         "form": form,
     }
-    next_post = request.POST['next']
+    next_post = request.POST.get('next')
     if form.is_valid():
         instance = form.save(commit=False)
 

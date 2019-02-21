@@ -86,7 +86,7 @@ form.addEventListener('submit', function(event) {
 
 // Submit the form with the token ID.
 function stripeTokenHandler(nextUrl, token) {
-    var paymentMethodEndpoint = "create/"
+    var paymentMethodEndpoint = "/billing/payment-method/create/"
     var data = {
         'token': token.id
     }

@@ -68,8 +68,8 @@ class BillingProfile(models.Model):
 
     def set_cards_inactive(self):
         card_qs = self.get_cards()
-        card_qs.update(active=False)
-        return card_qs.filter(active=True).count()
+        card_qs.update(cardActive=False)
+        return card_qs.filter(cardActive=True).count()
 
     def __str__(self):
         return self.billingEmail
