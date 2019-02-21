@@ -63,3 +63,38 @@ def user_created_receiver(sender, instance, created, *args, **kwargs):
     if created and instance.email:
         BillingProfile.objects.get_or_create(user=instance, billingEmail=instance.email)
 post_save.connect(user_created_receiver, sender=User)
+
+
+class CardManager(models.Manager):
+    def add_new(self, billing_profile, stripe_card_response):
+        if str(stripe_card_response.object) == 'card':
+            new_card = self.model(
+                billingProfile=billing_profile,
+                cardStripeID=stripe_card_response.id,
+                cardBrand=stripe_card_response.brand,
+                cardCountry=stripe_card_response.country,
+                cardExpMonth=stripe_card_response.exp_month,
+                cardExpYear=stripe_card_response.exp_year,
+                cardLast4=stripe_card_response.last4,
+            )
+            new_card.save()
+            return new_card
+        return None
+
+class Card(models.Model):
+    billingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
+    cardStripeID = models.CharField(max_length=120)
+    cardBrand = models.CharField(max_length=120, null=True, blank=True)
+    cardCountry = models.CharField(max_length=20, null=True, blank=True)
+    cardExpMonth = models.IntegerField(null=True, blank=True)
+    cardExpYear = models.IntegerField(null=True, blank=True)
+    cardLast4 = models.CharField(max_length=4)
+    cardDefault = models.BooleanField(default=False)
+
+    objects = CardManager()
+
+    def __str__(self):
+        return '{} {}'.format(self.cardBrand, self.cardLast4)
+
+    class Meta:
+        db_table = 'card'

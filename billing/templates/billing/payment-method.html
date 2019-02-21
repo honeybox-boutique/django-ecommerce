@@ -2,39 +2,11 @@
 {% block content %}
 
 <!-- Stripe Form -->
-<script src="https://js.stripe.com/v3/"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<style>
-/**
- * The CSS shown here will not be introduced in the Quickstart guide, but shows
- * how you can use CSS to style your Element's container.
- */
-.StripeElement {
-  background-color: white;
-  height: 40px;
-  padding: 10px 12px;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  box-shadow: 0 1px 3px 0 #e6ebf1;
-  -webkit-transition: box-shadow 150ms ease;
-  transition: box-shadow 150ms ease;
-}
-
-.StripeElement--focus {
-  box-shadow: 0 1px 3px 0 #cfd7df;
-}
-
-.StripeElement--invalid {
-  border-color: #fa755a;
-}
-
-.StripeElement--webkit-autofill {
-  background-color: #fefde5 !important;
-}
-</style>
+<script src="https://js.stripe.com/v3/"></script>
 <div class="col-10 col-md-6 mx-auto">
     <h2>Add Payment Method</h2>
-    <form class="payment-form" action="/charge" method="post" id="payment-form" data-token="{{ publish_key }}" data-next-url="/billing">
+    <form class="payment-form" action="/charge" method="post" id="payment-form" data-token="{{ publish_key }}" data-next-url="{% if next_url %}{{ next_url }}{% endif %}">
     <div class="form-row">
         <div id="card-element" class="form-control">
         <!-- A Stripe Element will be inserted here. -->
@@ -44,7 +16,7 @@
         <div id="card-errors" role="alert"></div>
     </div>
 
-    <button class="btn btn-primary my-3">Add Payment Method</button>
+    <button class="btn my-3">Add Payment Method</button>
     </form>
 </div>
 
@@ -59,7 +31,7 @@ if (paymentForm.length > 1){
 else if (paymentForm.length == 1){
 
 var pubKey = paymentForm.attr('data-token')
-
+var nextUrl = paymentForm.attr('data-next-url')
 var stripe = Stripe(pubKey);
 
 // Create an instance of Elements.
@@ -112,14 +84,15 @@ form.addEventListener('submit', function(event) {
       errorElement.textContent = result.error.message;
     } else {
       // Send the token to your server.
-      stripeTokenHandler(result.token);
+      stripeTokenHandler(nextUrl, result.token);
     }
   });
 });
 
 // Submit the form with the token ID.
-function stripeTokenHandler(token) {
-    var paymentMethodEndpoint = '/billing/payment-method/create/'
+function stripeTokenHandler(nextUrl, token) {
+    var paymentMethodEndpoint = "{% url 'billing:payment_method_create' %}"
+    console.log(token.id)
     var data = {
         'token': token.id
     }
@@ -128,7 +101,13 @@ function stripeTokenHandler(token) {
         url: paymentMethodEndpoint,
         method: "POST",
         success: function(data){
-            console.log(data)
+            var successMsg = data.message || 'Success! Your card was added.'
+            card.clear()
+            if (nextUrl) {
+              window.location.href= nextUrl
+            } else {
+              window.location.reload()
+            }
         },
         error: function(error){
             console.log(error)
