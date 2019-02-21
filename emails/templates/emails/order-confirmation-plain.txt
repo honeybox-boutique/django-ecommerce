@@ -1,1 +1,0 @@
-Hello {{ username }} - your account is activated.

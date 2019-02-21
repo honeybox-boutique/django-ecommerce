@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% include 'base/css.html' %}
+    <title>{% block title %}Ashley's Site{% endblock %}</title>
+  </head>
+
+
+  <body>
+
+    <!-- Nav Bar --> 
+    {% include 'base/navbar.html' %}
+    <!-- /Nav Bar --> 
+
+    <div class="container-fluid">
+
+      <!-- Breadcrumbs -->
+      <div class="breadcrumbs">
+        {% block breadcrumbs %}
+        {% endblock %}
+      </div>
+      <!-- Breadcrumbs -->
+
+    </div>
+
+    <div class="container">
+    {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    {% include 'base/footer.html' %}
+
+    <!-- Optional JavaScript -->
+    {% include 'base/js.html' %}
+  </body>
+</html>

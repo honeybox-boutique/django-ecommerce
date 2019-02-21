@@ -1,26 +1,52 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 {% block content %}
 
 <!-- Stripe Form -->
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/1.0.2/jsrender.min.js"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <div class="col-10 col-md-6 mx-auto">
     <h2>Add Payment Method</h2>
-    <form class="payment-form" action="/charge" method="post" id="payment-form" data-token="{{ publish_key }}" data-next-url="{% if next_url %}{{ next_url }}{% endif %}">
-    <div class="form-row">
-        <div id="card-element" class="form-control">
-        <!-- A Stripe Element will be inserted here. -->
-        </div>
-
-        <!-- Used to display form errors. -->
-        <div id="card-errors" role="alert"></div>
-    </div>
-
-    <button class="btn my-3">Add Payment Method</button>
-    </form>
+    <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{% if next_url %}
+    {{ next_url }}{% endif %}"></div>
 </div>
 
+
+{% verbatim %}
+<script id="stripeTemplate" type="text/x-jsrender">
+<form class="payment-form" action="/charge" method="post" id="payment-form" data-token="
+{{:publish_key }}" data-next-url="{{:next_url}}">
+  <div class="form-row">
+      <div id="card-element" class="form-control">
+      <!-- A Stripe Element will be inserted here. -->
+      </div>
+
+      <!-- Used to display form errors. -->
+      <div id="card-errors" role="alert"></div>
+  </div>
+
+  <button class="btn my-3">Add Payment Method</button>
+</form>
+</script>
+{% endverbatim %}
+
 <script>
+
+var stripeFormModule = $(".stripe-payment-form")
+var stripeModuleToken = stripeFormModule.attr("data-token")
+var stripeModuleNextUrl = stripeFormModule.attr("data-next-url")
+
+var stripeTemplate = $.templates("#stripeTemplate")
+var stripeTemplateDataContext = {
+  publish_key: stripeModuleToken,
+  next_url: stripeModuleNextUrl
+}
+var stripeTemplateHtml = stripeTemplate.render(stripeTemplateDataContext)
+stripeFormModule.html(stripeTemplateHtml)
+
+
+
 
 var paymentForm = $(".payment-form")
 
