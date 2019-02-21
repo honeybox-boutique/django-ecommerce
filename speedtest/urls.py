@@ -37,4 +37,5 @@ urlpatterns = [
     path('terms-of-service/', TemplateView.as_view(template_name="terms-of-service.html"), name='tos'),
     path('contact-us/', send_email_view, name='contact'),
     path('contact-us/thanks/', email_success_view, name='contact_thanks'),
+    path('coming-soon/', TemplateView.as_view(template_name="coming-soon.html"), name='coming-soon'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

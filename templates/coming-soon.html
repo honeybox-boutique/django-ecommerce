@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=EB+Garamond|Montserrat" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Domine|Playfair+Display" rel="stylesheet">
+    <title>{% block title %}Ashley's Site{% endblock %}</title>
+    <style>
+      .breadcrumbs a, footer a {
+        font-family: 'EB Garamond', serif;
+        color: grey;
+      }
+      a {
+        word-wrap: break-word;
+      }
+      h1, h2, h3, h4, h5 {
+        font-family: 'EB Garamond', serif;
+      }
+      .navbar-custom a, .nav-link {
+        font-family: 'EB Garamond', serif;
+        color: black;
+      }
+      .btn {
+        background-color: #ba6f12;
+      }
+      p, s, form, label {
+        font-family: 'EB Garamond', serif;
+      }
+      .border-custom, footer, hr {
+        border: 2px solid #ba6f12;
+      }
+      hr {
+        border: 1px solid #ba6f12;
+      }
+      label {
+        font-size: 25px;
+      }
+      /* Small devices (landscape phones, 576px and up) */
+      @media (max-width: 575.98px) { 
+        h2 {
+          font-size: 30px;
+        }
+        nav {
+          font-size: 20px;
+        }
+      }
+      @media (min-width: 576px) {  h1 {
+          font-size: 30px;
+        }
+        h2 {
+          font-size: 30px;
+        } 
+        }
+        
+
+      /* Medium devices (tablets, 768px and up) */
+      @media (min-width: 768px) { h1 {
+          font-size: 30px;
+        }
+        h2 {
+          font-size: 20px;
+        } 
+        }
+
+      /* Large devices (desktops, 992px and up) */
+      @media (min-width: 992px) { h1 {
+          font-size: 40px;
+        }
+        h2, nav {
+          font-size: 25px;
+        } 
+        }
+
+      /* Extra large devices (large desktops, 1200px and up) */
+      @media (min-width: 1200px) { 
+      h1 {
+          font-size: 50px;
+      }}
+    </style>
+  </head>
+
+
+  <body>
+
+    <!-- Nav Bar --> 
+    {% load static %}
+    <div class="flex-nowrap justify-content-between align-items-center">
+            <div class="col-12 text-center">
+              <img src="{% static 'logo_white_background.png' %}" class="w-50"><a class="blog-header-logo text-dark" href="/"></a></img>
+              <h1>Coming February 28th!</h1>
+            </div>
+    </div>
+
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  </body>
+</html>
