@@ -2,17 +2,15 @@
 {% block content %}
 
 <!-- Stripe Form -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/1.0.2/jsrender.min.js"></script>
-<script src="https://js.stripe.com/v3/"></script>
 <div class="col-10 col-md-6 mx-auto">
     <h2>Add Payment Method</h2>
     <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{% if next_url %}
     {{ next_url }}{% endif %}"></div>
 </div>
 
+{% endblock %}
 
+{% block javascript %}
 {% verbatim %}
 <script id="stripeTemplate" type="text/x-jsrender">
 <form class="payment-form" action="/charge" method="post" id="payment-form" data-token="
