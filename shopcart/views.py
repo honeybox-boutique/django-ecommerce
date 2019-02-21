@@ -94,6 +94,22 @@ def edit_shipping(request):
             sale_obj.save()
     return redirect('shopcart:checkout')
 
+def edit_ship_method(request):
+    """ removes ship method selection from sale """
+    form = EditSaleForm(request.POST)
+
+    if form.is_valid():
+        print('form valid')
+        sale_id = form.cleaned_data.get('sale')
+        sale_obj = Sale.objects.get(saleID=sale_id)
+        if sale_obj.saleStatus == 'created':
+            sale_obj.customerShipMethodID = None
+            print('set ship method to None')
+            print(sale_obj.customerShipMethodID)
+            sale_obj.save()
+    return redirect('shopcart:checkout')
+
+
 def edit_billing(request):
     """ removes prodStockItem from cart """
     form = EditSaleForm(request.POST)
