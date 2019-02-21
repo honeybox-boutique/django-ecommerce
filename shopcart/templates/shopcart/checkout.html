@@ -145,7 +145,11 @@
                 <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
             </div>
         </div>
-
+    {% elif not has_card %}
+        <div class="col-10 col-md-6 mx-auto">
+            <h2>Add Payment Method</h2>
+            <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{{ request.build_absolute_uri }}" data-btn-title="Add Payment Method"></div>
+        </div>
     {% else %}
 
         <div class="row">

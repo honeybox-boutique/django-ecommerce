@@ -14,6 +14,11 @@ from sales.models import Sale, SaleItems
 from addresses.models import Address
 from pricing.models import SDiscount
 
+import stripe
+STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '***REMOVED***')
+STRIPE_PUB_KEY = getattr(settings, 'STRIPE_PUB_KEY', '***REMOVED***')
+stripe.api_key = STRIPE_SECRET_KEY
+
 def cart_home(request):
     """ Displays cart contents """
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
@@ -180,6 +185,7 @@ def checkout_home(request):
                 return redirect('shopcart:home')
 
     # get billing profile
+    has_card = False
     billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
     if billing_profile is not None:
         if request.user.is_authenticated:
@@ -201,6 +207,7 @@ def checkout_home(request):
             del request.session['billing_address_id']
         if billing_address_id or shipping_address_id:
             sale_obj.save()
+        has_card = billing_profile.has_card
         
 
     
@@ -256,6 +263,8 @@ def checkout_home(request):
         "ship_method_form": ship_method_form,
         "address_qs": address_qs,
         "discount_qs": discount_qs,
+        "publish_key": STRIPE_PUB_KEY,
+        "has_card": has_card,
     }
     return render(request, 'shopcart/checkout.html', context)
 
