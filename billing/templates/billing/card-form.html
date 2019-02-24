@@ -1,0 +1,20 @@
+<form method="POST" action="{% url 'users:dashboard_payment_methods' %}">
+{% csrf_token %}
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}"/>
+    {% endif %}
+
+    {{ formset.management_form }}
+    {% for form in formset %}
+    <p>
+        {{ form.cardBrand.value }} **************{{ form.cardLast4.value }}
+        <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">Remove</a>
+    </p>
+    <div class="collapse" id="collapseForm{{ forloop.counter }}">
+        <div class="card card-body">
+            {{ form.as_p }}
+        </div>
+    </div>
+    {% endfor %}
+    <input type="submit" value="Save" class="btn"/>
+</form>

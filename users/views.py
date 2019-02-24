@@ -4,6 +4,7 @@ from django.forms import inlineformset_factory, modelformset_factory
 from addresses.forms import AddressForm
 from addresses.models import Address
 from billing.models import BillingProfile, Card
+from billing.forms import CardForm, BaseCardFormSet
 from sales.models import Sale
 from .forms import SignUpForm, GuestForm, UserAccountInfoForm
 from django.contrib.auth import authenticate, login, logout, mixins
@@ -97,7 +98,53 @@ def dashboard_addresses(request):
 def dashboard_payment_methods(request):
     if not request.user.is_authenticated:
         return redirect('users:login')
-    return render(request, 'users/dashboard_payment_methods.html')
+    # stripe stuff
+    from django.conf import settings
+    import stripe
+    STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '***REMOVED***')
+    STRIPE_PUB_KEY = getattr(settings, 'STRIPE_PUB_KEY', '***REMOVED***')
+    stripe.api_key = STRIPE_SECRET_KEY
+
+    #next url stuff
+    next_url = None
+    next_ = request.GET.get('next')
+    if is_safe_url(next_, request.get_host()):
+        next_url = next_
+    
+    #get user and billingprofile
+    user_obj = request.user
+    billing_profile = user_obj.billingprofile
+    # get active cards associated with billing profile
+    card_qs = Card.objects.filter(
+        billingProfile=billing_profile,
+        cardActive=True,
+    )
+    # Make formset for Addresses
+    CardFormSet = inlineformset_factory(BillingProfile, Card, form=CardForm, formset=BaseCardFormSet, extra=0, can_delete=True)
+    if request.method == 'POST':
+        # move this to template as include
+        formset = CardFormSet(request.POST or None, instance=billing_profile)
+        # form = NewAddressForm(request.POST or None, instance=billing_profile)
+        if formset.is_valid() :
+            for form in formset:
+                if form.is_valid():
+                    if form.cleaned_data.get('DELETE') and form.instance.pk:
+                        form.instance.cardActive = False
+                        form.instance.save()
+            
+        return redirect('users:dashboard_payment_methods')
+    else:
+        formset = CardFormSet(instance=billing_profile, queryset=card_qs)
+        address_form = AddressForm(instance=billing_profile)
+
+    context = {
+        'formset': formset,
+        'address_qs': card_qs,
+        'address_form': address_form,
+        'publish_key': STRIPE_PUB_KEY,
+        'next_url': next_url,
+    }
+    return render(request, 'users/dashboard_payment_methods.html', context)
 class DashboardCardListView(mixins.LoginRequiredMixin, ListView):
     model = Card
     template_name = 'users/dashboard_payment_methods.html'

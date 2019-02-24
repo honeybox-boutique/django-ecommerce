@@ -1,0 +1,16 @@
+<!-- Stripe Form -->
+<div class="col-12 mx-auto">
+    <h2>Add Payment Method</h2>
+    <form action="{% url 'billing:payment_method_create' %}" method="POST">{% csrf_token %}
+    {% load css %}
+    <p>{{ address_form.addressName.label }}: {{ address_form.addressName|add_class_and_placeholder:'data-addressName' }}</p>
+    <p>{{ address_form.addressLine1.label }}: {{ address_form.addressLine1|add_class_and_placeholder:'data-addressLine1' }}</p>
+    <p>{{ address_form.addressLine2.label }}: {{ address_form.addressLine2|add_class_and_placeholder:'data-addressLine2' }}</p>
+    <p>{{ address_form.addressCity.label }}: {{ address_form.addressCity|add_class_and_placeholder:'data-addressCity' }}</p>
+    <p>{{ address_form.addressCountry.label }}: {{ address_form.addressCountry|add_class_and_placeholder:'data-addressCountry' }}</p>
+    <p>{{ address_form.addressState.label }}: {{ address_form.addressState|add_class_and_placeholder:'data-addressState' }}</p>
+    <p>{{ address_form.addressPostalCode.label }}: {{ address_form.addressPostalCode|add_class_and_placeholder:'data-addressPostalCode' }}</p>
+    </form>
+    <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{% if next_url %}
+    {{ next_url }}{% endif %}"></div>
+</div>

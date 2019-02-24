@@ -4,32 +4,38 @@
 
 {% block content %}
 
-<div class="row">
-    <div class="col-12">
-        <h2>My Account</h2>
-        <p>Welcome, {{ user.email }}! To manage your information and preferences or to see your order history, please use the options below.</p>
+    <div class="row">
+        <div class="col-12">
+            <h2>My Account</h2>
+            <p>Welcome, {{ user.email }}! To manage your information and preferences or to see your order history, please use the options below.</p>
+        </div>
     </div>
-</div>
 </div><!-- Container -->
+
 <div class="container-fluid">
-<div class="row">
-    <div class="col-12 col-md-3 col-lg-2 text-center">
-        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard' %}">Account
-        </a>
-        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_addresses' %}">Addresses
-        </a>
-        <a class="btn btn-block btn-outline-secondary active" href="{% url 'users:dashboard_payment_methods' %}">Saved Cards
-        </a>
-        <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_orders' %}">Orders
-        </a>
-        <br>
-    </div>
-    <div class="col-md-9">
-        {% for obj in card_list %}
-        <p>{{obj}}</p>
-        {% endfor %}
-    </div>
-<div>
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2 text-center">
+            <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard' %}">Account
+            </a>
+            <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_addresses' %}">Addresses
+            </a>
+            <a class="btn btn-block btn-outline-secondary active" href="{% url 'users:dashboard_payment_methods' %}">Saved Cards
+            </a>
+            <a class="btn btn-block btn-outline-secondary" href="{% url 'users:dashboard_orders' %}">Orders
+            </a>
+            <br>
+        </div>
+        <div class="col-md-9">
+            <h4>Saved Payment Methods</h4>
+            {% include 'billing/card-form.html' %}
+            <p>
+                <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false" aria-controls="collapseExample">Add</a>
+            </p>
+            <div class="collapse" id="collapseForm">
+            {% include 'billing/payment-method-form.html' %}
+            </div>
+        </div>
+    <div>
 </div>
 
 {% endblock %}

@@ -7,9 +7,9 @@
     <p>
     {% if form.addressLine1.value %}
         {{ form.addressLine1.value }}, {{ form.addressCity.value }}, {{ form.addressState.value }}, {{ form.addressPostalCode.value }}
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">Edit</a>
+        <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">Edit</a>
     {% else %}
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">Add</a>
+        <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">Add</a>
     {% endif %}
     </p>
     <div class="collapse" id="collapseForm{{ forloop.counter }}">
