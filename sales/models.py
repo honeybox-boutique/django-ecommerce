@@ -52,9 +52,8 @@ class SaleManager(models.Manager):
                         print('deleted')
 
             # if cart has changed
-            if cart_items.count() != obj.saleItems.count():# bug: will not detect if item is different but quantity is the same
                 # update sale from 
-                obj.update_sale_from_cart(cart_items)
+            obj.update_sale_from_cart(cart_items)
             print(obj)
             return obj, created
         elif qs.count() > 1:

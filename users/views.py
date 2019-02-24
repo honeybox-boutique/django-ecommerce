@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, reverse
 from django.views.generic import FormView, CreateView, ListView, DetailView
-from django.forms import modelformset_factory, inlineformset_factory
+from django.forms import inlineformset_factory, modelformset_factory
 from addresses.forms import AddressForm
 from addresses.models import Address
-from billing.models import BillingProfile
+from billing.models import BillingProfile, Card
 from sales.models import Sale
 from .forms import SignUpForm, GuestForm, UserAccountInfoForm
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, mixins
 from django.utils.http import is_safe_url
 from django.contrib.auth import views as auth_views
 
@@ -14,6 +14,8 @@ from .models import Guest
 # Create your views here.
 
 def dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('users:login')
     user_obj = request.user
     data = {
         'username': user_obj.username,
@@ -54,38 +56,37 @@ class DashboardAddressListView(ListView):
         return context
 
 def dashboard_addresses(request):
+    if not request.user.is_authenticated:
+        return redirect('users:login')
     user_obj = request.user
     billing_profile = user_obj.billingprofile
-    address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
-    next_post = None  
-    # form = AddressForm()
-    AddressFormSet = inlineformset_factory(BillingProfile, Address, form=AddressForm, extra=0)
+    address_qs = Address.objects.filter(addressBillingProfile=billing_profile,
+        addressActive=True,
+    )
+    # Make formset for Addresses
+    AddressFormSet = inlineformset_factory(BillingProfile, Address, form=AddressForm, extra=1, can_delete=True)
     if request.method == 'POST':
         # move this to template as include
-        formset = AddressFormSet(request.POST, instance=billing_profile or None)
-        if formset.is_valid():
+        formset = AddressFormSet(request.POST or None, instance=billing_profile)
+        # form = NewAddressForm(request.POST or None, instance=billing_profile)
+        if formset.is_valid() :
             for form in formset:
                 if form.is_valid():
-                    if form.cleaned_data.get('DELETE') and form.instance.pk:
-                        form.instance.delete()
-                    else:
-                        # get cleaned_data and save to user
-                        instance = form.save(commit=False)
-                        # address_line_1 = formset.cleaned_data.get('addressLine1')
-                        # address_line_2 = formset.cleaned_data.get('addressLine2')
-                        # address_city = formset.cleaned_data.get('addressCity')
-                        # address_country = formset.cleaned_data.get('addressCountry')
-                        # address_state = formset.cleaned_data.get('addressState')
-                        # address_postal_code = formset.cleaned_data.get('addressPostalCode')
-                        # address_type = formset.cleaned_data.get('addressType')
-                        print(instance.addressLine2)
-                        # instance.addressType = address_type
-                        print('changed some stuff')
-                        instance.save()
+                    # check if form was filled out
+                    if form.cleaned_data.get('addressLine1'):
+                        if form.cleaned_data.get('DELETE') and form.instance.pk:
+                            form.instance.addressActive = False
+                            form.instance.save()
+                        else:
+                            # get cleaned_data and save to user
+                            instance = form.save(commit=False)
+                            if not instance.addressType:
+                                instance.addressType = 'shipping'
+                            instance.save()
+            
+        return redirect('users:dashboard_addresses')
     else:
-        print('making formset')
-        formset = AddressFormSet(instance=billing_profile)
-        # form = AddressForm(initial=data)
+        formset = AddressFormSet(queryset=address_qs, instance=billing_profile)
 
     context = {
         'formset': formset,
@@ -94,9 +95,23 @@ def dashboard_addresses(request):
     return render(request, 'users/dashboard_addresses.html', context)
 
 def dashboard_payment_methods(request):
+    if not request.user.is_authenticated:
+        return redirect('users:login')
     return render(request, 'users/dashboard_payment_methods.html')
+class DashboardCardListView(mixins.LoginRequiredMixin, ListView):
+    model = Card
+    template_name = 'users/dashboard_payment_methods.html'
 
-class DashboardOrderListView(ListView):
+    # def get_context_data(self, **kwargs):
+        # context = super().get_context_data(**kwargs)
+        # user_obj = self.request.user
+        # billing_profile = user_obj.billingprofile
+        # sale_qs = Sale.objects.filter(saleBillingProfile=billing_profile).exclude(saleStatus='created')
+        # # address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
+        # context['sale_list'] = sale_qs
+        # return context
+
+class DashboardOrderListView(mixins.LoginRequiredMixin, ListView):
     model = Sale
     template_name = 'users/dashboard_orders.html'
 
@@ -109,7 +124,7 @@ class DashboardOrderListView(ListView):
         context['sale_list'] = sale_qs
         return context
 
-class DashboardOrderDetailView(DetailView):
+class DashboardOrderDetailView(mixins.LoginRequiredMixin, DetailView):
     model = Sale
     context_object_name = 'sale'
     template_name = 'users/dashboard_order_detail.html'

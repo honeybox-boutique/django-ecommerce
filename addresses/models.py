@@ -17,6 +17,8 @@ class Address(models.Model):
     addressState = models.CharField(max_length=120)
     addressPostalCode = models.CharField(max_length=120)
 
+    addressActive = models.BooleanField(default=True)
+
     addressEasyPostID = models.CharField(max_length=120, blank=True, null=True)
 
 

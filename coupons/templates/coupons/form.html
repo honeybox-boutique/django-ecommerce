@@ -1,4 +1,11 @@
-<form method="POST" action="{{ action_url }}">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Apply Discount" class="btn-primary"/>
+<form class="card p-2" method="POST" action="{{ action_url }}">{% csrf_token %}
+<div class="input-group">
+{% load css %}
+    {% for field in form %}
+    {{ field|add_class_and_placeholder:'form-control,Promo Code' }}
+    {% endfor %}
+    <div class="input-group-append">
+        <input type="submit" value="Apply Discount" class="btn btn-secondary"/>
+    </div>
+</div>
 </form>

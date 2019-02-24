@@ -5,10 +5,12 @@
     {{ formset.management_form }}
     {% for form in formset %}
     <p>
-        {{ form.addressLine1.value|default_if_none:"" }}, {{ form.addressCity.value|default_if_none:"" }}, {{ form.addressState.value|default_if_none:"" }}, {{ form.addressPostalCode.value|default_if_none:"" }}
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">
-            Edit
-        </a>
+    {% if form.addressLine1.value %}
+        {{ form.addressLine1.value }}, {{ form.addressCity.value }}, {{ form.addressState.value }}, {{ form.addressPostalCode.value }}
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">Edit</a>
+    {% else %}
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseForm{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="collapseExample">Add</a>
+    {% endif %}
     </p>
     <div class="collapse" id="collapseForm{{ forloop.counter }}">
         <div class="card card-body">

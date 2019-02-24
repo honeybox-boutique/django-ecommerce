@@ -25,6 +25,8 @@ class BillingProfileManager(models.Manager):
             # guest checkout
             print('guest checkout')
             guest_obj = Guest.objects.get(id=guest_email_id)
+            # this needs to be able to distinguish between guest emails and user emails
+            # create new billing profile if guest
             obj, created = self.model.objects.get_or_create(billingEmail=guest_obj.guestEmail)
             print(obj)
         else:
@@ -33,7 +35,7 @@ class BillingProfileManager(models.Manager):
         return obj, created
 
 class BillingProfile(models.Model):
-    billingEmail = models.EmailField()
+    billingEmail = models.EmailField()# make this a related field to user.email or guest.email
     active = models.BooleanField(default=True)
     lastUpdated = models.DateTimeField(auto_now=True)
     dateCreated = models.DateTimeField(auto_now_add=True)

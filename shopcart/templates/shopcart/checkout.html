@@ -66,31 +66,9 @@
                 {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='shipping' %}
             </div>
 
-            <div class="col-6">
-                <h4>Your Items</h4>
-                {% for item in sale_obj.saleItems.all %}
-
-                    <p>{{ item.productID }}, {{ item.piColor }}, {{ item.piSize }}</p>
-
-                {% endfor %}
-                <p>Subtotal: ${{ sale_obj.saleSubTotal }}</p>
-                {% if discount_qs.exists %}
-                <p>Discounts Applied:</p>
-                {% for discount in discount_qs %}
-                <p>{{ discount.sDiscountName }}</p>
-                {% endfor %}
-                {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount: ${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
-                {% endif %}
-                <p>Enter a Coupon Code</p>
-                {% url 'coupons:apply_discount' as apply_discount %}
-                {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
-                <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
-                <p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
-                <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
-            </div>
+        {% include 'shopcart/snippets/cart-display.html' %}
 
         </div><!-- End of Row -->
-
     {% elif not sale_obj.customerShipMethodID %}
 
         <div class="row">
@@ -105,14 +83,14 @@
                 <br>
                 {% include 'shopcart/ship-method-form.html' with form=ship_method_form %}
             </div>
+        {% include 'shopcart/snippets/cart-display.html' %}
         </div>
 
     {% elif not sale_obj.saleBillingAddress %}
 
-        {{ cart_obj }}
         <div class="row">
             <div class="col-12">
-                <p class="lead">Billing Address</p>
+                <h1>Billing Address</h1>
                 <hr/>
             </div>
             <div class="col-6">
@@ -122,32 +100,14 @@
                 {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='billing' %}
             </div>
 
-            <div class="col-6">
-                <h4>Your Items</h4>
-                {% for item in sale_obj.saleItems.all %}
-
-                    <p>{{ item.productID }}, {{ item.piColor }}, {{ item.piSize }}</p>
-
-                {% endfor %}
-                <p>Subtotal: ${{ sale_obj.saleSubTotal }}</p>
-                {% if discount_qs.exists %}
-                <p>Discounts Applied:</p>
-                {% for discount in discount_qs %}
-                <p>{{ discount.sDiscountName }}</p>
-                {% endfor %}
-                {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount: ${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
-                {% endif %}
-                <p>Enter a Coupon Code</p>
-                {% url 'coupons:apply_discount' as apply_discount %}
-                {% include 'coupons/form.html' with form=coupon_form action_url=apply_discount %}
-                <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
-                <p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
-                <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
-            </div>
+        {% include 'shopcart/snippets/cart-display.html' %}
         </div>
     {% elif not has_card %}
-        <div class="col-10 col-md-6 mx-auto">
-            <h2>Add Payment Method</h2>
+        <div class="row">
+            <div class="col-12">
+                <h1>Add Payment Info</h1>
+                <hr/>
+            </div>
             <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{{ request.build_absolute_uri }}" data-btn-title="Add Payment Method"></div>
         </div>
     {% else %}
@@ -170,29 +130,7 @@
             <h4>Payment Method</h4>
             <p>{{ billing_profile.default_card }} (<a href="{{ billing_profile.get_payment_method_url }}?next={{ request.build_absolute_uri }}">Change</a>)</p>
         </div>
-        <div class="col 6">
-            <h4>Your Items</h4>
-            {% for item in sale_obj.saleItems.all %}
-
-                <p>{{ item.productID }}, {{ item.piColor }}, {{ item.piSize }}</p>
-
-            {% endfor %}
-            <p>Subtotal: ${{ sale_obj.saleSubTotal }}</p>
-            {% if discount_qs.exists %}
-            <p>Discounts Applied:</p>
-            {% for discount in discount_qs %}
-            <p>{{ discount.sDiscountName }}</p>
-            {% endfor %}
-            {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount: ${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
-            {% endif %}
-            <p>Shipping Cost: ${{ sale_obj.saleShipCostAmountCharged }}</p>
-            <p>Sales Tax: ${{ sale_obj.saleTaxAmount }}</p>
-            <p>Sale Total: ${{ sale_obj.saleTotal }}</p>
-
-            <form class="form" method="POST" action="{% url 'shopcart:checkout' %}">{% csrf_token %}
-                <button type="submit" class="btn">Complete Checkout</button>
-            </form>
-        </div>
+        {% include 'shopcart/snippets/cart-display-finalize.html' %}
         </div>
     {% endif %}
 

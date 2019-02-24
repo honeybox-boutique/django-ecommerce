@@ -12,3 +12,11 @@ class AddressForm(forms.ModelForm):
             'addressState',
             'addressPostalCode',
         )
+        labels = {
+            'addressLine1': 'Address',
+            'addressLine2': 'Apt., Suite, Etc.',
+            'addressCity': 'City',
+            'addressCountry': 'Country',
+            'addressState': 'State',
+            'addressPostalCode': 'Zip',
+        }

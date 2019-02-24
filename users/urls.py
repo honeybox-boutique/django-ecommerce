@@ -2,7 +2,7 @@ from django.urls import path, reverse_lazy, re_path
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 
-from .views import guest_register_view, SignUpView, PasswordResetView, dashboard, dashboard_addresses, dashboard_payment_methods, dashboard_orders, DashboardOrderListView, DashboardOrderDetailView
+from .views import guest_register_view, SignUpView, PasswordResetView, dashboard, dashboard_addresses, dashboard_payment_methods, dashboard_orders, DashboardOrderListView, DashboardOrderDetailView, DashboardCardListView
 
 app_name = 'users'
 urlpatterns = [
@@ -16,7 +16,7 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'),
     path('dashboard/', dashboard, name='dashboard'),
     path('dashboard/addresses/', dashboard_addresses, name='dashboard_addresses'),
-    path('dashboard/payment-methods/', dashboard_payment_methods, name='dashboard_payment_methods'),
+    path('dashboard/payment-methods/', DashboardCardListView.as_view(), name='dashboard_payment_methods'),
     path('dashboard/orders/', DashboardOrderListView.as_view(), name='dashboard_orders'),
     path('dashboard/orders/<pk>', DashboardOrderDetailView.as_view(), name='dashboard_order_detail'),
 ]

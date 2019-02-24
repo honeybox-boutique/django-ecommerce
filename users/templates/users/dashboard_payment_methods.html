@@ -25,7 +25,9 @@
         <br>
     </div>
     <div class="col-md-9">
-        <p>Lorem Ipsum</p>
+        {% for obj in card_list %}
+        <p>{{obj}}</p>
+        {% endfor %}
     </div>
 <div>
 </div>

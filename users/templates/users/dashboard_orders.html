@@ -48,9 +48,9 @@
                 {% for sale in sale_list %}
                     <tr class="d-flex">
                     <td class="col-2 col-md-3"><a href="{% url 'users:dashboard_order_detail' pk=sale.saleID %}">{{ sale }}</a></td>
-                    <td class="col-2 col-sm-3 col-md-3"><a href="{{ sale.shipment_set.first.shipmentTrackingURL }}">{{ sale.shipment_set.first.shipmentTrackingNumber }}</a></td>
+                    <td class="col-2 col-sm-3 col-md-3"><a href="{{ sale.shipment_set.first.shipmentTrackingURL|default_if_none:"" }}">{{ sale.shipment_set.first.shipmentTrackingNumber|default_if_none:"Not Shipped" }}</a></td>
                     <td class="col-2 col-sm-3"><p>{{ sale.saleDate|date:"M d Y" }}</p></td>
-                    <td class="col-2 col-sm-3"><p>{{ sale.shipment_set.first.shipmentDateLabelPrinted|date:"M d Y" }}</p></td>
+                    <td class="col-2 col-sm-3"><p>{{ sale.shipment_set.first.shipmentDateLabelPrinted|date:"M d Y"|default:"Not Shipped" }}</p></td>
                     </tr>
                 {% endfor %}
                 </tbody>

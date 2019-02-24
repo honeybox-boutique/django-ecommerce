@@ -1,0 +1,15 @@
+
+<form method="POST" action="{% url 'users:dashboard_addresses' %}"> {% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}"
+    {% endif %}
+    <p>
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseFormAdd" role="button" aria-expanded="false" aria-controls="collapseExample">Add</a>
+    </p>
+    <div class="collapse" id="collapseFormAdd">
+        <div class="card card-body">
+            {{ form.as_p }}
+        <input type="submit" value="Add Address" class="btn btn-info">
+        </div>
+    </div>
+</form>
