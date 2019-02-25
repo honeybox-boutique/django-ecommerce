@@ -7,7 +7,7 @@ from billing.models import BillingProfile, Card
 from billing.forms import CardForm, BaseCardFormSet
 from sales.models import Sale
 from .forms import SignUpForm, GuestForm, UserAccountInfoForm
-from django.contrib.auth import authenticate, login, logout, mixins
+from django.contrib.auth import authenticate, login, logout, mixins, views
 from django.utils.http import is_safe_url
 from django.contrib.auth import views as auth_views
 
@@ -189,6 +189,18 @@ class PasswordResetView(auth_views.PasswordResetView):
 
     def get_success_url(self):
         return reverse('users:password_reset_done')
+
+class CustomLoginView(views.LoginView):
+
+    def form_valid(self, form):
+        """ Override to clear guest_session_id """
+        valid = super(CustomLoginView, self).form_valid(form)
+        # delete session thing
+        if 'guest_email_id' in self.request.session:
+            del self.request.session['guest_email_id']
+            print('deleted guest session')
+
+        return valid
 
 class SignUpView(CreateView):
     form_class = SignUpForm

@@ -2,13 +2,13 @@ from django.urls import path, reverse_lazy, re_path
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 
-from .views import guest_register_view, SignUpView, PasswordResetView, dashboard, dashboard_addresses, dashboard_payment_methods, dashboard_orders, DashboardOrderListView, DashboardOrderDetailView, DashboardCardListView
+from .views import guest_register_view, SignUpView, PasswordResetView, dashboard, dashboard_addresses, dashboard_payment_methods, dashboard_orders, DashboardOrderListView, DashboardOrderDetailView, DashboardCardListView, CustomLoginView
 
 app_name = 'users'
 urlpatterns = [
     path('guest/register/', guest_register_view, name='guest_register'),
     path('signup/next<path:next>', SignUpView.as_view(), name='signup'),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('password_reset/complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('password_reset/confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(success_url=reverse_lazy('users:password_reset_complete')), name='password_reset_confirm'),
