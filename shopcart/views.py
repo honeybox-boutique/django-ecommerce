@@ -258,7 +258,7 @@ def checkout_home(request):
                 if 'guest_email_id' in request.session:
                     del request.session['guest_email_id']
                     if not billing_profile.user:
-                        billing_profile.set_cards_inactive()
+                        billing_profile.set_inactive()
                 # clear carts session stuff
                 request.session['cart_count'] = 0
                 # clear items from user cart if authenticated

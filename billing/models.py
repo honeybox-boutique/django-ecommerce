@@ -19,15 +19,31 @@ class BillingProfileManager(models.Manager):
         if user.is_authenticated:
             # user checkout
             print('user checkout')
-            obj, created = self.model.objects.get_or_create(user=user, billingEmail=user.email)
+            obj, created = self.model.objects.get_or_create(
+                user=user, 
+                billingEmail=user.email,
+                profileType='user',
+            )
             print('billing profile: ', obj.id)
         elif guest_email_id is not None:
             # guest checkout
             print('guest checkout')
             guest_obj = Guest.objects.get(id=guest_email_id)
-            # this needs to be able to distinguish between guest emails and user emails
-            # create new billing profile if guest
-            obj, created = self.model.objects.get_or_create(billingEmail=guest_obj.guestEmail)
+            # query for guest profile thats active, has email, and profile type is guest
+            profile_qs = self.get_queryset().filter(
+                billingEmail=guest_obj.guestEmail,
+                active=True,
+                profileType='guest',
+            )
+            if profile_qs.count() == 1:
+                obj = profile_qs.first()
+            elif profile_qs.count() == 0:
+                # create new billing profile if guest
+                created = True
+                obj = self.model.objects.create(
+                    billingEmail=guest_obj.guestEmail,
+                    profileType='guest',
+                )
             print(obj)
         else:
             # change: do we need error raise here?
@@ -39,6 +55,11 @@ class BillingProfile(models.Model):
     active = models.BooleanField(default=True)
     lastUpdated = models.DateTimeField(auto_now=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
+    PROFILE_TYPES = (
+        ('guest', 'Guest'),
+        ('user', 'User'),
+    )
+    profileType = models.CharField(max_length=120, choices=PROFILE_TYPES)
 
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
 
@@ -68,6 +89,11 @@ class BillingProfile(models.Model):
         if default_cards.exists():
             return default_cards.first()
         return None
+
+    def set_inactive(self):
+        self.active = False
+        self.save()
+        return self.active
 
     def set_cards_inactive(self):
         card_qs = self.get_cards()
