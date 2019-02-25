@@ -102,6 +102,7 @@ class Shipment(models.Model):
         from django.conf import settings
         from django.template.loader import render_to_string
         from django.utils.html import strip_tags
+        # change: add error handling here. currently this is always false
         sent = False
         # get sale obj
         sale_obj = self.saleID

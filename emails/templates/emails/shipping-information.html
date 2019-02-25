@@ -1,94 +1,118 @@
+<p>Order Confirmation</p>
 <p>Order number: {{ sale_obj.saleStringID }}</p>
 
 <table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
     <tr align="center">
         <td>
-            <p>Your order has been shipped!</p>
+            <p>{{ sale_obj.saleBillingProfile }}, your order has been shipped!</p>
             <p>Your order number is: {{ sale_obj.saleStringID }}</p>
             <a href="{{ sale_obj.shipment_set.first.shipmentTrackingURL }}">Track Order</a>
         </td>
     </tr>
 </table>
 <br>
-<h2>Shipping Information</h2>
-<lr>
-<p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
-<p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressPostalCode }}</p>
-<p>{{ sale_obj.saleShippingAddress.addressCountry }}</p>
-<br> 
-<lr>
-<h2>Billing Information</h2>
-<lr>
-<table style="width:70%" border="0" cellspacing="0" cellpadding="0">
-    <tr>
-      <td width="50%" valign="top" style="vertical-align:top;">
-        <h3>Billing Address</h3>
-        <p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
-        <p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressPostalCode }}</p>
-        <p>{{ sale_obj.saleBillingAddress.addressCountry }}</p>
-      </td>
-      <td width="50%" valign="top" style="vertical-align:top;">
-        <h3>Payment Method</h3>
-        <p>Visa</p>
+<table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr align="center">
+      <td>
+        <td><h2>Address Information</h2></td>
       </td>
     </tr>
-</table>
-<br>
-<lr>
-<table style="width:70%" border="0" cellspacing="0" cellpadding="0">
-    <tr>
-        <td><h2>Items Shipped: </h2></td>
-    </tr>
-</table>
-
-<table style="width:90%" border="2px" align="center">
-{% for item in sale_obj.saleItems.all %}
-    <tr>
-        <td width="50%">
-            <p>{{ item.productID }} (1)</p>
-            <p>Size {{ item.piSize }}</p>
-            <p>Image</p>
+ </table>
+ <table style="width:70%" align="center">
+ <tr align="center">
+        <td align="center">
+            <h3>Shipping Address:</h3>
+            <p>{{ sale_obj.saleShippingAddress.addressLine1 }}</p>
+            <p>{{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressPostalCode }}</p>
+            <p>{{ sale_obj.saleShippingAddress.addressCountry }}</p>
         </td>
-        <td width="50%" align="right">
-            <p>Price: ${{ item.saleitems_set.first.siSalePrice }}</p>
+        <td align="center">
+            <h3>Billing Address:</h3>
+            <p>{{ sale_obj.saleBillingAddress.addressLine1 }}</p>
+            <p>{{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressPostalCode }}</p>
+            <p>{{ sale_obj.saleBillingAddress.addressCountry }}</p>
+        </td>
+    </tr>
+ </table>
+ <table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr align="center">
+      <td>
+        <td><h2>Payed With:      {{ sale_obj.salePaymentCard.cardBrand }}</h2></td>
+      </td>
+    </tr>
+ </table>
+ <br> 
+ <table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr align="center">
+      <td>
+        <td><h2>Order Items</h2></td>
+      </td>
+    </tr>
+ </table>
+ <table style="width:90%" align="center">
+   <tr align="center">
+          <td width="45%">
+              <h3>Item</h3>
+          </td>
+          <td width="15%">
+              <h3>Qty</h3>
+          </td>
+          <td width="20%">
+              <h3>Price</h3>
+          </td>
+          <td width="20%">
+              <h3>Total Price</h3>
+          </td>
+   </tr>
+</table>
+<table style="width:90%" align="center">
+{% for item in sale_obj.saleitems_set.all %}
+    <tr align="center">
+        <td width="11%">
+            <h3>Image</h3>
+        </td>
+        <td width="34%">
+            <p>{{ item.prodStockID.productID }}-{{ item.prodStockID.piSize }}, {{ item.prodStockID.piColor }}</p>
+        </td>
+        <td width="15%">
+            <h3>1</h3>
+        </td>
+        <td width="25%">
+            <p>${{ item.siSalePrice }} </p>
+        </td>
+        <td width="15%">
+            <p>${{ item.siSalePrice }} </p>
         </td>
     </tr>
 {% endfor %}
-</table>
-<br>
-<lr>
-<table style="width:90%" align="right">
     <tr align="right">
-        <td width="50%">
+        <td width="11%">
         </td>
-        <th width="50%" align="right">
-            <h3>Order Summary</h3>
-        </th>
-    </tr>
-    <tr align="center">
-        <td width="50%">
+        <td width="34%">
         </td>
-        <td width="35%" align="right">
-            <p>Subtotal:</p>
+        <td width="15%">
+        </td>
+        <td width="25%">
+            <p>Subtotal: </p>
             {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount:</p>{% endif %}
-            <p>Shipping and Handling:</p>
-            {% if sale_obj.saleTaxAmount != 0.00 %}<p>Tax:</p>{% endif %}
-            <p>Order Total:</p>
+            <p>Shipping:</p>
+            <p>Tax:</p>
+            <p>Total:</p>
         </td>
-        <td width="15%" align="right">
+        <td width="15%">
             <p>${{ sale_obj.saleSubTotal }}</p>
             {% if sale_obj.saleDiscountAmount != 0.00 %}<p>${{ sale_obj.saleDiscountAmount }}</p>{% endif %}
             <p>${{ sale_obj.saleShipCostAmountCharged }}</p>
-            {% if sale_obj.saleTaxAmount != 0.00 %}<p>${{ sale_obj.saleTaxAmount }}</p>{% endif %}
+            <p>${{ sale_obj.saleTaxAmount }}</p>
             <p>${{ sale_obj.saleTotal }}</p>
         </td>
     </tr>
  </table>
- <br>
- <table style="width:100%" border="0" cellspacing="0" cellpadding="0">
-    <tr align="center">
+ <table align="center">
+    <tr>
         <td>
             <p>Questions? Feel free to contact us at HoneyboxDerek@gmail.com</p>
         </td>
     </tr>
 </table>
+<br>

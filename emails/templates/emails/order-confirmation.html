@@ -38,6 +38,14 @@
  <table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
     <tr align="center">
       <td>
+        <td><h2>Payed With:      {{ sale_obj.salePaymentCard.cardBrand }}</h2></td>
+      </td>
+    </tr>
+ </table>
+ <br>
+ <table style="width:70%" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr align="center">
+      <td>
         <td><h2>Order Items</h2></td>
       </td>
     </tr>
@@ -59,13 +67,13 @@
    </tr>
 </table>
 <table style="width:90%" align="center">
-{% for item in sale_obj.saleItems.all %}
+{% for item in sale_obj.saleitems_set.all %}
     <tr align="center">
         <td width="11%">
             <h3>Image</h3>
         </td>
         <td width="34%">
-            <p>{{ item.productID }}-{{ item.piSize }}, {{ item.piColor }}</p>
+            <p>{{ item.prodStockID.productID }}-{{ item.prodStockID.piSize }}, {{ item.prodStockID.piColor }}</p>
         </td>
         <td width="15%">
             <h3>1</h3>
@@ -88,9 +96,9 @@
         <td width="25%">
             <p>Subtotal: </p>
             {% if sale_obj.saleDiscountAmount != 0.00 %}<p>Discount:</p>{% endif %}
-            <p>Shipping and Handling:</p>
+            <p>Shipping:</p>
             <p>Tax:</p>
-            <p>Order Total:</p>
+            <p>Total:</p>
         </td>
         <td width="15%">
             <p>${{ sale_obj.saleSubTotal }}</p>
@@ -101,8 +109,8 @@
         </td>
     </tr>
  </table>
- <table>
-    <tr align="center">
+ <table align="center">
+    <tr>
         <td>
             <p>Questions? Feel free to contact us at HoneyboxDerek@gmail.com</p>
         </td>

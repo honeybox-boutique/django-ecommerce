@@ -140,7 +140,6 @@ class CardManager(models.Manager):
                 stripe_card.address_zip = address_obj.addressPostalCode
                 stripe_card.name = address_obj.addressName
                 stripe_card.save()
-                print(stripe_card.address_city)
 
 
             new_card = self.model(
