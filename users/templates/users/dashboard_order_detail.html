@@ -66,7 +66,43 @@
                     </td>
                 </tr>
                 {% endfor %}
-                <tr>
+                <tr class="d-flex">
+                    <td class="d-none d-sm-block col-md-2">
+                    </td>
+                    <td class="col-5 col-md-4">
+                    </td>
+                    <td class="col-2">
+                    </td>
+                    <td class="col-2">
+                        <p>Subtotal:</p>
+                        {% if sale.salediscounts_set.exists %}
+                        <p>Discounts:</p>
+                        {% for discount in sale.salediscounts_set.all %}
+                        <p></p>
+                        {% endfor %}
+                        <p>Total Discount:</p>
+                        {% endif %}
+                        <p>Shipping:</p>
+                        {% if sale.saleTaxAmount > 0 %}
+                        <p>Tax:</p>
+                        {% endif %}
+                        <p>Total:</p>
+                    </td>
+                    <td class="col-2">
+                        <p>${{ sale.saleSubTotal }}</p>
+                        {% if sale.salediscounts_set.exists %}
+                        <p>{{ sale.salediscounts_set.count }}</p>
+                        {% for discount in sale.salediscounts_set.all %}
+                        <p>{{ discount }}</p>
+                        {% endfor %}
+                        <p>${{ sale.saleDiscountAmount }}</p>
+                        {% endif %}
+                        <p>${{ sale.saleShipCostAmountCharged }}</p>
+                        {% if sale.saleTaxAmount > 0 %}
+                        <p>${{ sale.saleTaxAmount }}</p>
+                        {% endif %}
+                        <p>${{ sale.saleTotal }}</p>
+                    </td>
                 </tr>
                 </tbody>
             </table>
