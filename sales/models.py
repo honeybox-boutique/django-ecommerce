@@ -5,7 +5,7 @@ from django.db.models.signals import pre_save, post_save, m2m_changed
 from speedtest.utils import unique_sale_id_generator
 from purchases.models import PurchaseItems
 from shopcart.models import ShopCart
-from billing.models import BillingProfile
+from billing.models import BillingProfile, Card
 from addresses.models import Address
 from pricing.models import SDiscount
 from tax.models import Jurisdiction
@@ -107,6 +107,7 @@ class Sale(models.Model):
     saleDiscounts = models.ManyToManyField(SDiscount, blank=True)
     saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
     saleBillingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
+    salePaymentCard = models.ForeignKey(Card, on_delete=models.CASCADE, blank=True, null=True)
 
     objects = SaleManager()
 
@@ -133,8 +134,10 @@ class Sale(models.Model):
         billing_address = self.saleBillingAddress
         sub_total = self.saleSubTotal
         total = self.saleTotal
+        card = self.salePaymentCard
+        cust_ship_method = self.customerShipMethodID
 
-        if billing_profile and shipping_address and billing_address and sub_total > 0 and total > 0:
+        if billing_profile and card and cust_ship_method and shipping_address and billing_address and sub_total > 0 and total > 0:
             return True
         return False
 

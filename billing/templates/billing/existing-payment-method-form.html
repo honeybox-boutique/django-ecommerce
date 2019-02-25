@@ -1,0 +1,18 @@
+{% if card_qs.exists %}
+
+<form method="POST" action="{% url 'billing:payment_method_create' %}">{% csrf_token %}
+
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}"/>
+    {% endif %}
+    {{ form }}
+    {% for card in card_qs %}
+        <label for="card-{{ card.id }}">
+            <input class="data-card" id="card-{{ card.id }}" type="radio" name="cID" value="{{ card.id }}"/>
+        {{ card.cardLast4 }}
+        </label><br/>
+    {% endfor %}
+    <button type="submit" class="btn badge badge-secondary badge-pill">Save and Continue</button>
+</form>
+
+{% endif %}

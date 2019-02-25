@@ -1,4 +1,4 @@
 <form method="POST" action="{% url 'shopcart:edit_billing' %}">{% csrf_token %}
     <input type="hidden" name="sale" value={{ sale_obj.saleID }} />
-    <input type="submit" value="Edit Billing" class="btn"/>
+    <input type="submit" value="Edit Billing" class="btn badge-secondary"/>
 </form>

@@ -47,8 +47,9 @@ class BillingProfile(models.Model):
 
     objects = BillingProfileManager()
 
-    def charge(self, order_obj, card=None):
-        return Charge.objects.do(self, order_obj, card)
+    def charge(self, sale_obj):
+        card = sale_obj.salePaymentCard
+        return Charge.objects.do(self, sale_obj, card)
 
     def get_cards(self):
         return self.card_set.all()
@@ -172,12 +173,8 @@ def new_card_post_save_receiver(sender, instance, created, *args, **kwargs):
 post_save.connect(new_card_post_save_receiver, sender=Card)
 
 class ChargeManager(models.Manager):
-    def do(self, billing_profile, sale_obj, card=None):
+    def do(self, billing_profile, sale_obj, card):
         card_obj = card
-        if card_obj is None:
-            cards = billing_profile.card_set.filter(cardDefault=True)
-            if cards.exists():
-                card_obj = cards.first()
         if card_obj is None:
             return False, 'No cards available'
         

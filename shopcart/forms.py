@@ -6,6 +6,9 @@ class CustomerShipMethodForm(forms.ModelForm):
     class Meta:
         model = Sale
         fields = ('customerShipMethodID',)
+        labels = {
+            'customerShipMethodID': 'Shipping Method'
+        }
         # change: widget to radio button
 
 class CartRemoveItemForm(forms.Form):

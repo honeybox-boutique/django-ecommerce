@@ -87,21 +87,22 @@ form.addEventListener('submit', function(event) {
 // Submit the form with the token ID.
 function stripeTokenHandler(nextUrl, token) {
     var paymentMethodEndpoint = "/billing/payment-method/create/"
-    var addressLine1 = $(".data-addressLine1").val()
-    var addressLine2 = $(".data-addressLine2").val()
-    var addressCity = $(".data-addressCity").val()
-    var addressCountry = $(".data-addressCountry").val()
-    var addressState = $(".data-addressState").val()
-    var addressPostalCode = $(".data-addressPostalCode").val()
-    var data = {
-        'token': token.id,
-        'addressLine1': addressLine1,
-        'addressLine2': addressLine2,
-        'addressCity': addressCity,
-        'addressCountry': addressCountry,
-        'addressState': addressState,
-        'addressPostalCode': addressPostalCode,
-    }
+
+      var addressLine1 = $(".data-addressLine1").val()
+      var addressLine2 = $(".data-addressLine2").val()
+      var addressCity = $(".data-addressCity").val()
+      var addressCountry = $(".data-addressCountry").val()
+      var addressState = $(".data-addressState").val()
+      var addressPostalCode = $(".data-addressPostalCode").val()
+      var data = {
+          'token': token.id,
+          'addressLine1': addressLine1,
+          'addressLine2': addressLine2,
+          'addressCity': addressCity,
+          'addressCountry': addressCountry,
+          'addressState': addressState,
+          'addressPostalCode': addressPostalCode,
+      }
     $.ajax({
         data: data,
         url: paymentMethodEndpoint,

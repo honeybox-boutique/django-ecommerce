@@ -36,6 +36,7 @@ class Shipment(models.Model):
     RATE_OPTIONS = (
         ('Priority', 'Priority'),
         ('ParcelSelect', 'Parcel Select'),
+        ('First', 'First Class'),
         ('Express', 'Express'),
     )
     shipmentID = models.AutoField(primary_key=True)
@@ -125,6 +126,7 @@ class Shipment(models.Model):
         shipment_track_url = None
         shipment_label_url = None
         return_shipment_cost = None
+        return_easy_shipment_id = None
         return_shipment_track_num = None
         return_shipment_label_url = None
 
@@ -139,8 +141,11 @@ class Shipment(models.Model):
         # if not marked for buying
         else:
             easy_shipment_id, shipment_cost = self.create_shipment(from_address, to_address, parcel)
-            # get current EasypostID
-            return_easy_shipment_id, return_shipment_cost = self.create_return_shipment(easy_shipment_id)
+            if easy_shipment_id:
+                # get current EasypostID
+                return_easy_shipment_id, return_shipment_cost = self.create_return_shipment(easy_shipment_id)
+            else:
+                print('could not create shipment for some reason')
 
         return easy_shipment_id, shipment_cost, shipment_track_num, shipment_track_url, shipment_label_url, return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url
         
@@ -182,6 +187,8 @@ class Shipment(models.Model):
         # create_shipment
         print('creating shipment')
         
+        easy_shipment_id = None
+        shipment_cost = None
         shipment = easypost.Shipment.create(
             to_address=to_address,
             from_address=from_address,
@@ -200,7 +207,10 @@ class Shipment(models.Model):
                 easy_shipment_id = shipment.id
                 print(shipment_cost)
                 # call create_return_shipment
+                return easy_shipment_id, shipment_cost
+
         return easy_shipment_id, shipment_cost
+
 
     def create_return_shipment(self, shipment):
         print('creating return label')

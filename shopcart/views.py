@@ -130,6 +130,21 @@ def edit_billing(request):
             sale_obj.save()
     return redirect('shopcart:checkout')
 
+def edit_card(request):
+    """ removes prodStockItem from cart """
+    form = EditSaleForm(request.POST)
+
+    if form.is_valid():
+        print('form valid')
+        sale_id = form.cleaned_data.get('sale')
+        sale_obj = Sale.objects.get(saleID=sale_id)
+        if sale_obj.saleStatus == 'created':
+            sale_obj.salePaymentCard = None
+            print('set card to None')
+            print(sale_obj.salePaymentCard)
+            sale_obj.save()
+    return redirect('shopcart:checkout')
+
 def ship_method(request):
     """ removes prodStockItem from cart """
     form = CustomerShipMethodForm(request.POST)
@@ -157,6 +172,7 @@ def checkout_home(request):
     sale_obj = None
     address_qs = None
     discount_qs = None
+    card_qs = None
     coupon_form = None
     ship_method_form = None
     billing_address_id = request.session.get('billing_address_id', None)
@@ -208,6 +224,7 @@ def checkout_home(request):
         if billing_address_id or shipping_address_id:
             sale_obj.save()
         has_card = billing_profile.has_card
+        card_qs = billing_profile.get_cards()
         
 
     
@@ -266,6 +283,7 @@ def checkout_home(request):
         "ship_method_form": ship_method_form,
         "address_qs": address_qs,
         "discount_qs": discount_qs,
+        "card_qs": card_qs,
         "publish_key": STRIPE_PUB_KEY,
         "has_card": has_card,
     }

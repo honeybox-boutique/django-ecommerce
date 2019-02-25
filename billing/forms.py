@@ -16,3 +16,11 @@ class BaseCardFormSet(forms.models.BaseInlineFormSet):
     def add_fields(self, form, index):
         super(BaseCardFormSet, self).add_fields(form, index)
         form.fields['DELETE'].label = 'Are you sure?'
+
+class CardIDForm(forms.ModelForm):
+    cID = forms.CharField()
+    class Meta:
+        model = Card
+        fields = (
+            'cardBrand',
+        )

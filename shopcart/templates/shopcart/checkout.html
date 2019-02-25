@@ -60,10 +60,19 @@
                 <hr/>
             </div>
             <div class="col-6">
-                {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
-                {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
+                <h5>Use Existing Address</h5>
                 {% url 'addresses:checkout_address_reuse' as checkout_address_reuse %}
                 {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='shipping' %}
+
+
+                <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false" aria-controls="collapseExample">Use a Different Address</a>
+                <div class="collapse" id="collapseForm">
+                    <div class="card card-body">
+                        {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
+                        {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='shipping' %}
+                    </div>
+                </div>
+
             </div>
 
         {% include 'shopcart/snippets/cart-display.html' %}
@@ -78,8 +87,9 @@
             </div>
             <div class="col-6">
                 <h5>Shipping Address</h5>
-                <p>{{ sale_obj.saleShippingAddress.addressLine1 }}, {{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
-                {% include 'shopcart/edit-shipping-form.html' with form=edit_form %}
+
+                    <p>{{ sale_obj.saleShippingAddress.addressLine1 }}, {{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
+                    {% include 'shopcart/edit-shipping-form.html' with form=edit_form %}
                 <br>
                 {% include 'shopcart/ship-method-form.html' with form=ship_method_form %}
             </div>
@@ -94,21 +104,33 @@
                 <hr/>
             </div>
             <div class="col-6">
-                {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
-                {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='billing' %}
+                <h5>Use Existing Address</h5>
                 {% url 'addresses:checkout_address_reuse' as checkout_address_reuse %}
                 {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='billing' %}
+
+
+                <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false" aria-controls="collapseExample">Use a Different Address</a>
+                <div class="collapse" id="collapseForm">
+                    <div class="card card-body">
+                {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
+                {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='billing' %}
+                    </div>
+                </div>
             </div>
 
         {% include 'shopcart/snippets/cart-display.html' %}
         </div>
-    {% elif not has_card %}
-        <div class="row">
-            <div class="col-12">
-                <h1>Add Payment Info</h1>
-                <hr/>
+    {% elif not sale_obj.salePaymentCard %}
+        <div class="col-6">
+            <h4>Saved Payment Methods</h4>
+            <p>Pick existing card: </p>
+            {% include 'billing/existing-payment-method-form.html' %}
+            <p>
+                <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false" aria-controls="collapseExample">Add New Card</a>
+            </p>
+            <div class="collapse" id="collapseForm">
+            {% include 'billing/payment-method-form.html' %}
             </div>
-            <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{{ request.build_absolute_uri }}" data-btn-title="Add Payment Method"></div>
         </div>
     {% else %}
 
@@ -128,7 +150,8 @@
             <p>{{ sale_obj.saleBillingAddress.addressLine1 }}, {{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
             {% include 'shopcart/edit-billing-form.html' with form=edit_form %}
             <h4>Payment Method</h4>
-            <p>{{ billing_profile.default_card }} (<a href="{{ billing_profile.get_payment_method_url }}?next={{ request.build_absolute_uri }}">Change</a>)</p>
+            <p>{{ sale_obj.salePaymentCard }}</p>
+            {% include 'shopcart/edit-card-form.html' with form=edit_form %}
         </div>
         {% include 'shopcart/snippets/cart-display-finalize.html' %}
         </div>
