@@ -34,6 +34,17 @@ class CategoryImage(models.Model):
 
     class Meta:
         db_table = 'category_image'
+class Size(models.Model):
+    sizeID = models.AutoField(primary_key=True)
+    sizeName = models.CharField(max_length=200)
+    sizeDescription = models.TextField(max_length=200)
+    sizeNotes = models.TextField(max_length=255)
+
+    class Meta:
+        db_table = 'size'
+
+    def __str__(self):
+        return self.sizeName
 
 class Product(models.Model):
     productID = models.AutoField(primary_key=True)
@@ -41,6 +52,7 @@ class Product(models.Model):
     productDescription = models.TextField(max_length=200)
     productSlug = models.SlugField(unique=True)
     productCategories = models.ManyToManyField(Category)
+    productSizes = models.ManyToManyField(Size)
 
     #Calculated fields
     productDiscountAmount = models.DecimalField(null=True, max_digits=12, decimal_places=2)

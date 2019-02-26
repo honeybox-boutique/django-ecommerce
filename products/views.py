@@ -4,8 +4,9 @@ from django.shortcuts import render
 from django.utils import timezone
 from pricing.models import Product, Pricing, PDiscount
 from purchases.models import PurchaseItems
-from products.models import ProductImage, CategoryImage
 from shopcart.models import ShopCart
+
+from .models import ProductImage, CategoryImage, ProductColor
 
 
 class ProductList(generic.ListView):
@@ -62,9 +63,20 @@ class ProductDetail(generic.DetailView):
 
         # change: change these disaster queries and remove template logics
         # Get colorset for product
-        product_color_query = Product.objects.filter(productSlug__exact=self.kwargs['productSlug'],
-                                        productcolor__productimage__isnull=False
-                                    )
+        product_color_query = Product.objects.filter(
+            productSlug__exact=self.kwargs['productSlug'],
+            productcolor__productimage__isnull=False
+        )
+        # get product from slug
+        product_obj = Product.objects.get(
+            productSlug__exact=self.kwargs['productSlug'],
+        )
+        # get colors of product
+        product_colors = product_obj.productcolor_set.all()
+        # images will be gotten in template
+        # get all sizes
+        product_all_sizes = product_obj.productSizes.all()
+        # get available sizes
 
         # check if pitems associated with product id available == 0
         # if 0 add out_of_stock message
@@ -73,6 +85,9 @@ class ProductDetail(generic.DetailView):
         cart_obj, new_obj = ShopCart.objects.get_or_new(self.request)
 
         # add to context
+        context['prod_obj'] = product_obj
+        context['product_colors'] = product_colors
+        context['product_sizes'] = product_all_sizes
         context['shopcart'] = cart_obj
         context['product1'] = product_color_query
         # context['product'] = productQuerySet

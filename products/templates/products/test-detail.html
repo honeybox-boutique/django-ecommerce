@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+<!-- Breadcrumbs -->
+{% block breadcrumbs %}
+    <a href="{% url 'homepage:home' %}">Home</a>
+    >
+    <a href="{% url 'products:list' %}">Shop</a>
+    >
+    <a href="{% url 'products:category' view.kwargs.category %}">{{view.kwargs.category}}</a>
+    > 
+    <a href="{% url 'products:detail' view.kwargs.category product.productSlug %}">{{product.productName}}</a>
+{% endblock %}
+<!-- Breadcrumbs -->
+
+{% block content %}
+{% load product_extras %}
+{% load humanize %}
+    
+        <div class="row">
+            <div class="col-lg-2"><!-- small images column -->
+                <div id="data-product-small-image" class="thumbnail">
+                    {% for productImage in product1.first.productcolor_set.first.productimage_set.all %}
+                    <img class="img-fluid" style="width:100%" src="{{ productImage.productImagePath.url }}" alt="">
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="data-product-big-image" class="col-md-6"><!-- big image column -->
+                <img style="width:100%" src="{{ product1.first.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
+                {% for color in product_colors %}
+                    <p>{{ color }}</p>
+                    {% for productimage in color.productimage_set.all %}
+                    <img style="width:100%" src="{{ productimage.productImagePath.url }}" alt="{{ color }}">
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            <div class="col-md-4"><!-- details column -->
+                <h3 id="product" class="mb-1" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h3>
+
+
+                {% if product.productDiscountAmount %}
+
+                <div>
+                    <s class="text-danger">${{ product.productBasePrice }}</s>
+                    <p>${{ product.productSalePrice }}</p>
+                </div>
+                
+                {% else %}
+
+                <div>
+                    <p>${{ product.productSalePrice }}</p>
+                </div>
+
+                {% endif %}
+                <hr>
+                <!-- update_cart form -->
+                {% include 'products/test-update-cart.html' %}
+
+                <hr>
+                <h4>Description</h4>
+                <p>{{ product1.first.productDescription|linebreaks }}</p>
+            </div>
+        </div>
+
+{% endblock %}

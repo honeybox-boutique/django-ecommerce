@@ -1,39 +1,76 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Cart</h1>
 {% if shopcart.shopCartItems.exists %}
-<table class="table table-border">
-    <tbody>
-        {% for item in shopcart.shopCartItems.all %}
-        <tr>
-            <th scope="row">-</th>
-            <td>{{ item.productID }}</td>
-            <td>{{ item.piColor }}</td>
-            <td>{{ item.piSize }}</td>
-            <td>{{ item.productID.productBasePrice }}</td>
-            <td>{{ item.productID.productDiscountAmount }}</td>
-            <td>{{ item.productID.productSalePrice }}</td>
-            <td>{% include 'shopcart/form.html' with prod=item %}</td>
-        </tr>
-        {% endfor %}
-<!--
-            <form method="post" action="{% url 'shopcart:remove' %}">{% csrf_token %}
-            <input type="hidden" value="{{ item.prodStockID }}">
-            <td><input type="submit" class="btn btn-info" value="Remove"></td>
-            </form>
--->
-        <tr>
-            <td colspan="6">-</td>
-            <td><b>Subtotal:</b> {{ shopcart.shopCartSubTotal }}</td>
-        </tr>
-        <tr>
-            <td colspan="6">-</td>
-            <td><a class="btn btn-block btn-success" href="{% url 'shopcart:checkout' %}">Checkout</a></td>
-        </tr>
-
-    </tbody>
-</table>
+    <div class="col-12">
+        <h1>Cart</h1>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-condensed">
+                    <thead>
+                    <tr class="d-flex">
+                        <th class="col-5 col-sm-6 col-md-6">
+                            <p>Item</p>
+                        </th>
+                        <th class="col-2 col-sm-2 col-md-2">
+                            <p>Qty</p>
+                        </th>
+                        <th class="col-2 col-sm-2 col-md-2">
+                            <p>Price</p>
+                        </th>
+                        <th class="col-sm-2 col-md-2">
+                            <p>Total</p>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in shopcart.shopCartItems.all %}
+                    <tr class="d-flex">
+                        <td class="d-none d-sm-block col-md-2">
+                            <img style="width:100%" src="{{ item.get_image_set.first.productImagePath.url }}" alt="{{ item.productID }}">
+                        </td>
+                        <td class="col-5 col-md-4">
+                            <p>{{ item }}-{{ item.piSize }}, {{ item.piColor }}</p>
+                        </td>
+                        <td class="col-2">
+                            <p>1</p>
+                        </td>
+                        <td class="col-2">
+                            <s>${{ item.productID.productBasePrice }} </s>
+                            <p>${{ item.productID.productSalePrice }} </p>
+                        </td>
+                        <td class="col-2">
+                            <p>${{ item.productID.productSalePrice }} </p>
+                            {% include 'shopcart/form.html' with prod=item %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="d-flex">
+                        <td class="d-none d-sm-block col-md-2">
+                        </td>
+                        <td class="col-5 col-md-4">
+                        </td>
+                        <td class="col-2">
+                        </td>
+                        <td class="col-2">
+                            <p>Subtotal:</p>
+                        </td>
+                        <td class="col-2">
+                            <p>${{ shopcart.shopCartSubTotal }}</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-right">
+                <a class="btn badge-secondary" href="{% url 'shopcart:checkout' %}">Checkout</a>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
 {% else %}
 <h2>Shopping cart is empty.</h2>
 {% endif %}

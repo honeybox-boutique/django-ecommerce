@@ -6,13 +6,15 @@ from billing.models import BillingProfile
 class GuestSessionsMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         is_checkout = request.get_full_path() == reverse('shopcart:checkout')
+        is_registering = request.get_full_path() == reverse('users:guest_register') 
+        is_static = request.path.startswith(settings.STATIC_URL)
         # if app not billing, addresses, coupons or request path users/register
         checkout_keywords = ['billing', 'address', 'coupons', 'ship', 'edit']
         if any(word in request.get_full_path() for word in checkout_keywords):
             return response
         else:
-            if not request.path.startswith(settings.STATIC_URL) and request.get_full_path() != reverse('users:guest_register') and request.get_full_path() != reverse('shopcart:home'):
-                if 'guest_email_id' in request.session and is_checkout == False :
+            if not is_registering and not is_static:
+                if 'guest_email_id' in request.session and is_checkout == False:
                     guest_email_id = request.session.get('guest_email_id')
                     if guest_email_id:
                         # get guest
