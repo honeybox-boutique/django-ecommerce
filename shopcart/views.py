@@ -4,7 +4,7 @@ from django.utils.html import strip_tags
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import CartRemoveItemForm, EditSaleForm, CustomerShipMethodForm
-from users.forms import LoginForm, GuestForm
+from users.forms import LoginForm, GuestForm, SignUpForm
 from addresses.forms import AddressForm
 from coupons.forms import SDiscountForm
 from billing.models import BillingProfile
@@ -166,6 +166,7 @@ def checkout_home(request):
     cart_items = cart_obj.shopCartItems.all()
     login_form = LoginForm()
     guest_form = GuestForm()
+    signup_form = SignUpForm()
     address_form = AddressForm()
     edit_form = EditSaleForm()
     #initializers
@@ -204,8 +205,7 @@ def checkout_home(request):
     has_card = False
     billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
     if billing_profile is not None:
-        if request.user.is_authenticated:
-            address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
+        address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
         # create sale
         sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_obj)
         # initialize coupon form with sale object
@@ -277,6 +277,7 @@ def checkout_home(request):
         "billing_profile": billing_profile,
         "login_form": login_form,
         "guest_form": guest_form,
+        "signup_form": signup_form,
         "address_form": address_form,
         "coupon_form": coupon_form,
         "edit_form": edit_form,

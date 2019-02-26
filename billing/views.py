@@ -75,7 +75,10 @@ def payment_method_create_view(request):
                 print('existing card')
                 # get card_obj
                 # change: add try thing for error handling?
-                card_obj = Card.objects.get(id=card)
+                card_obj = Card.objects.get(
+                    id=card,
+                    billingProfile=billing_profile
+                )
                 # add card to sale
                 sale_obj.salePaymentCard = card_obj
                 # save sale
@@ -86,38 +89,4 @@ def payment_method_create_view(request):
                 return redirect('shopcart:home')
         else:
             print(form.errors)
-    return HttpResponse('error', status_code=401)
-
-def checkout_add_payment_method(request):
-    if request.method == 'POST' and request.is_ajax():
-        form = AddressForm(request.POST or None)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            print(request.POST)
-            billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
-            if billing_profile:
-                instance.addressBillingProfile = billing_profile
-                instance.addressType = 'billing'
-                instance.save()
-
-
-                request.session[instance.addressType + "_address_id"] = instance.id
-                token = request.POST.get('token')
-                card = request.POST.get('card')
-                if card:
-                    # get card_obj
-                    # change: add try thing for error handling?
-                    card_obj = Card.objects.get(cardStripeID=card)
-                    # get sale_obj
-                    # add card to sale
-                    # save sale
-                    return JsonResponse({'message': 'Done'})
-                elif token is not None:
-                    new_card_obj = Card.objects.add_new(billing_profile, token, instance)
-                    return JsonResponse({'message': 'Done'})
-
-
-            else:
-                print('no billing profile')
-                return redirect('shopcart:home')
     return HttpResponse('error', status_code=401)

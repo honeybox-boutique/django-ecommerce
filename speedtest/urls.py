@@ -33,6 +33,7 @@ urlpatterns = [
     path('coupons/', include('coupons.urls')),
     path('', include('homepage.urls')),
     path('returns/', TemplateView.as_view(template_name="returns.html"), name='returns'),
+    path('shipping/', TemplateView.as_view(template_name="shipping.html"), name='shipping'),
     path('data-privacy/', TemplateView.as_view(template_name="data-privacy.html"), name='dataprivacy'),
     path('terms-of-service/', TemplateView.as_view(template_name="terms-of-service.html"), name='tos'),
     path('contact-us/', send_email_view, name='contact'),

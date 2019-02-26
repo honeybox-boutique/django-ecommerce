@@ -18,16 +18,13 @@ class BillingProfileManager(models.Manager):
         obj = None
         if user.is_authenticated:
             # user checkout
-            print('user checkout')
             obj, created = self.model.objects.get_or_create(
                 user=user, 
                 billingEmail=user.email,
                 profileType='user',
             )
-            print('billing profile: ', obj.id)
         elif guest_email_id is not None:
             # guest checkout
-            print('guest checkout')
             guest_obj = Guest.objects.get(id=guest_email_id)
             # query for guest profile thats active, has email, and profile type is guest
             profile_qs = self.get_queryset().filter(
@@ -44,7 +41,6 @@ class BillingProfileManager(models.Manager):
                     billingEmail=guest_obj.guestEmail,
                     profileType='guest',
                 )
-            print(obj)
         else:
             # change: do we need error raise here?
             pass
@@ -93,6 +89,7 @@ class BillingProfile(models.Model):
     def set_inactive(self):
         self.active = False
         self.save()
+        self.set_cards_inactive()
         return self.active
 
     def set_cards_inactive(self):
@@ -118,7 +115,11 @@ pre_save.connect(billing_profile_created_receiver, sender=BillingProfile)
 # creates billing profile on user creation
 def user_created_receiver(sender, instance, created, *args, **kwargs):
     if created and instance.email:
-        BillingProfile.objects.get_or_create(user=instance, billingEmail=instance.email)
+        BillingProfile.objects.get_or_create(
+            user=instance,
+            billingEmail=instance.email,
+            profileType='user'
+        )
 post_save.connect(user_created_receiver, sender=User)
 
 

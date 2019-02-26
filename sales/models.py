@@ -32,7 +32,6 @@ class SaleManager(models.Manager):
             saleBillingProfile=billing_profile,
             # saleItems__prodStockID=cart_items.first().prodStockID
         )
-        print('salecount: ', qs.count())
         if qs.count() == 1:
             obj = qs.first()
             sale_items = obj.saleItems.all()
@@ -41,20 +40,16 @@ class SaleManager(models.Manager):
             for item in sale_items:
                 #check
                 if item.piIsAvailable == False:
-                    print('this item has become unavailable: ', item)
                     sale_item_qs = SaleItems.objects.filter(
                         prodStockID=item.prodStockID,
                         saleID=obj.saleID
                     )
-                    print(sale_item_qs)
                     if sale_item_qs.count() == 1:
                         sale_item_qs.delete()
-                        print('deleted')
 
             # if cart has changed
                 # update sale from 
             obj.update_sale_from_cart(cart_items)
-            print(obj)
             return obj, created
         elif qs.count() > 1:
             print('multiple sales in created')
@@ -71,7 +66,6 @@ class SaleManager(models.Manager):
             obj.save()
 
             obj.update_sale_from_cart(cart_items)
-            print('num items in sale', obj.saleItems.count())
             return obj, created
 
 
@@ -164,7 +158,6 @@ class Sale(models.Model):
         sale_tax_amount = self.saleTaxAmount
         # add saleDiscount calculation
         total = sub_total - sale_discount_amount + sale_shipping_charged + sale_tax_amount # + remaining shipping cost
-        print(total)
         return total
 
     def get_sub_total(self):
@@ -177,7 +170,6 @@ class Sale(models.Model):
             sub_total += item.productID.productSalePrice
         self.saleSubTotal = sub_total
         # add saleDiscount calculation
-        print('saving subtotal: ', sub_total)
         return sub_total
 
     def get_discount_amount(self):
@@ -194,7 +186,6 @@ class Sale(models.Model):
         for discount in s_discounts:
             # get discount value or multiplier
             discount_value, is_multiplier = discount.get_active_sdiscount_amount_or_multiplier()
-            print('discount value: ', discount_value)
 
             # if percentage discount
             if is_multiplier:
@@ -203,7 +194,6 @@ class Sale(models.Model):
             # if decimal discount 
             else:
                 amount += discount_value
-        print('saving discount: ', amount)
         return amount
 
     def get_shipping_ammount(self):
@@ -230,7 +220,6 @@ class Sale(models.Model):
         for discount in ship_discounts:
             # get discount value or multiplier
             discount_value, is_multiplier = discount.get_active_sdiscount_amount_or_multiplier()
-            print('shipping discount value: ', discount_value)
 
             # if percentage discount
             if is_multiplier:
@@ -242,7 +231,6 @@ class Sale(models.Model):
 
         # add discount
         ship_amount = ship_amount - ship_discount_amount
-        print('saving shipamount: ', ship_amount)
         return ship_amount
 
 
@@ -253,17 +241,12 @@ class Sale(models.Model):
         # get jurisdiction
         # START HEREEEEEEEEEEEEEEEEEE
         jurisdiction_obj = self.get_jurisdiction()
-        print(jurisdiction_obj)
         # jurisdiction_obj, jurisdiction_exists = self.get_jurisdiction()
         if jurisdiction_obj is not None:
-            print('jurisdiction exists')
-            print(jurisdiction_obj)
             # call calc_tax
             tax_multiplier, tax_rate_exists = jurisdiction_obj.calc_tax()
             if tax_rate_exists:
-                print('tax rate exists for jurisdiction')
                 tax_amount = (self.saleSubTotal - self.saleDiscountAmount) * tax_multiplier
-        print(tax_amount)
         # call get_tax on jurisdiction
         return tax_amount
 
@@ -318,8 +301,6 @@ class Sale(models.Model):
 
     def update_sale_from_cart(self, cart_items):
         # clear sale items
-        print('clearing items from sale')
-        print('clearing discounts')
         self.saleDiscounts.clear()
         self.saleItems.clear()
         # re add items from cart
@@ -350,7 +331,6 @@ class Sale(models.Model):
                 # if conditions met then apply discount (create many to many)
                 if discount_conditions_met:
                     self.saleDiscounts.add(sdiscount)
-                    print('auto-added a discount')
         return True
 
     def check_discount_conditions(self, discount):
@@ -359,7 +339,6 @@ class Sale(models.Model):
         discount_obj = discount
         # get sale_items
         sale_items = self.saleItems.all()
-        print('num saleitems: ', sale_items.count())
         # get discount_conditions
         discount_conditions = discount_obj.sdiscountcondition_set.all()
         num_discount_conditions = discount_conditions.count()
@@ -377,10 +356,8 @@ class Sale(models.Model):
             compare_operator = condition.sDCCompareOperator
             # value
             condition_value = condition.sDCValue
-            print('Condition Value: ', condition_value)
             # num_required
             num_required = condition.sDCNumRequired
-            print('Number items required to meet condition: ', num_required)
             reason = condition.sDCFailMessage
             if condition_type == 'Sale':
                 if field_name == 'saleSubTotal':
@@ -406,11 +383,8 @@ class Sale(models.Model):
                             # get categories
                             item_categories = item.productID.productCategories.all()
                             for category in item_categories:
-                                print(category.categoryName)
                                 if category.categoryName == condition_value:
                                     is_met_counter += 1
-                                    print('met condition')
-                        print('items that met condition: ', is_met_counter)
                         if is_met_counter >= num_required:
                             is_met_super_counter += 1
                             reason = ''
@@ -422,15 +396,11 @@ class Sale(models.Model):
                             # get categories
                             if item.productID == condition_value:
                                 is_met_counter += 1
-                                print('met condition')
-                        print('items that met condition: ', is_met_counter)
                         if is_met_counter >= num_required:
                             is_met_super_counter += 1
                             reason = ''
             # if type == 'User'
                 # do stuff
-        print('conditions met | total conditions')
-        print(is_met_super_counter, num_discount_conditions)
         if is_met_super_counter == num_discount_conditions:
             is_met = True
         return is_met, reason
