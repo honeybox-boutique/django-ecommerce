@@ -11,15 +11,14 @@ class GuestSessionsMiddleware(MiddlewareMixin):
         if any(word in request.get_full_path() for word in checkout_keywords):
             return response
         else:
-            if not request.path.startswith(settings.STATIC_URL) and request.get_full_path() != reverse('users:guest_register'):
-                if 'guest_email_id' in request.session and is_checkout == False or request.get_full_path() == reverse('shopcart:home'):
-                    print('middleware deletion session')
-                    guest_email_id = request.session['guest_email_id']
-                    # get guest
-                    # guest_obj = Guest.objects.get(id=guest_email_id)
-                    billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
-                    # set inactive
-                    billing_profile.set_inactive()
-                    print(billing_profile.active)
-                    del request.session['guest_email_id']
+            if not request.path.startswith(settings.STATIC_URL) and request.get_full_path() != reverse('users:guest_register') and request.get_full_path() != reverse('shopcart:home'):
+                if 'guest_email_id' in request.session and is_checkout == False :
+                    guest_email_id = request.session.get('guest_email_id')
+                    if guest_email_id:
+                        # get guest
+                        # guest_obj = Guest.objects.get(id=guest_email_id)
+                        billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
+                        # set inactive
+                        billing_profile.set_inactive()
+                        del request.session['guest_email_id']
         return response
