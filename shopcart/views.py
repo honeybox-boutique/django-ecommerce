@@ -3,7 +3,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
 from django.conf import settings
-from .forms import CartRemoveItemForm, EditSaleForm, CustomerShipMethodForm
+from django.contrib import messages
+from .forms import CartRemoveItemForm, EditSaleForm, CustomerShipMethodForm, AddToCartForm
 from users.forms import LoginForm, GuestForm, SignUpForm
 from addresses.forms import AddressForm
 from coupons.forms import SDiscountForm
@@ -54,34 +55,40 @@ def cart_update(request):
     # get cart
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
     # change: maybe? clean these parameters using form method
-    # get POST parameters
-    product_slug = request.POST.get('productSlug')
-    color = request.POST.get('color-selection')
-    size = request.POST.get('size-selection')
-    quantity = request.POST.get('quantity')
+    if request.method == 'POST':
+        cart_form = AddToCartForm(request.POST or None)
+        if cart_form.is_valid():
+            product_slug = cart_form.cleaned_data.get('product_slug')
+            color = cart_form.cleaned_data.get('color_selection')
+            size = cart_form.cleaned_data.get('size_selection')
+            # quantity = request.POST.get('quantity')
+
+            # add to cart--------------------------------------------------------------------------------
+
+            # query for purchaseitems available
+            purchase_item_query = PurchaseItems.objects.filter(
+                productID__productSlug=product_slug,
+                piColor__colorName=color,
+                piSize=size,
+                piIsAvailable=True
+            )
+            # exclude all pitems already in cart
+            for cart_item in cart_obj.shopCartItems.all():
+                purchase_item_query = purchase_item_query.exclude(pk=cart_item.pk)
 
 
-    # query for purchaseitems available
-    purchase_item_query = PurchaseItems.objects.filter(
-        productID__productSlug=product_slug,
-        piColor__colorName=color,
-        piSize=size,
-        piIsAvailable=True
-    )
-    # exclude all pitems already in cart
-    for cart_item in cart_obj.shopCartItems.all():
-        purchase_item_query = purchase_item_query.exclude(pk=cart_item.pk)
+            if not purchase_item_query:
+                messages.warning(request, 'Not enough items in stock to add items to cart.')
+                request.session['cart_count'] = cart_obj.shopCartItems.count()
+                # redirect to same page with error message in context
+                return redirect(request.META.get('HTTP_REFERER', 'shopcart:home'))
+            else:
+                messages.success(request, 'Item added to cart!')
+                purchase_item_obj = purchase_item_query.first()
+                cart_obj.shopCartItems.add(purchase_item_obj)
+                request.session['cart_count'] = cart_obj.shopCartItems.count()
+                return redirect(request.META.get('HTTP_REFERER', 'shopcart:home'))
 
-    # change: add quantity logic here
-    # if quantity + quantity in cart > purchase_item_query.count() return "not enough in stock to add these to cart"
-    if not purchase_item_query:
-        print('Not Enough')
-        request.session['cart_count'] = cart_obj.shopCartItems.count()
-        return redirect('shopcart:home')
-    purchase_item_obj = purchase_item_query.first()
-    cart_obj.shopCartItems.add(purchase_item_obj)
-    request.session['cart_count'] = cart_obj.shopCartItems.count()
-    return redirect('shopcart:home')
 
 # view that clears sale shipping or billing address on breadcrumb click
 def edit_shipping(request):

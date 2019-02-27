@@ -1,9 +1,10 @@
 <div id="root">
-{% for size in sizes %}
-<div id="data-sizes">
-    <input type="radio" name="size-selection" value="{{ size.piSize }}"> {{ size.piSize }}
-</div>
-{% endfor %}
+    <div id="data-sizes">
+    {% for size in sizes %}
+        <input type="radio" name="size_selection" value="{{ size.piSize.sizeID }}"> {{ size.piSize.sizeName }}
+    {% endfor %}
+    </div>
+
     <ol id="data-car-indicators" class="carousel-indicators">
     {% for image in images %}
         {% if forloop.counter == 1 %}

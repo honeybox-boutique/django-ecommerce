@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from products.models import Product, Color, ProductImage
+from products.models import Product, Color, ProductImage, Size
 
 # Create your models here.
 
@@ -35,11 +35,11 @@ class Purchase(models.Model):
 class PurchaseItems(models.Model):
     prodStockID = models.AutoField(primary_key=True)
     piPrice = models.DecimalField(max_digits=8, decimal_places=3)
-    piSize = models.CharField(max_length=20)
     piCondition = models.CharField(max_length=50)
     piNotes = models.TextField(max_length=200)
     piBarcode = models.ImageField(upload_to='barcodes', blank=True, null=True)
 
+    piSize = models.ForeignKey(Size, on_delete=models.CASCADE)
     piColor = models.ForeignKey(Color, on_delete=models.CASCADE)
     purchaseID = models.ForeignKey(Purchase, on_delete=models.CASCADE)
     productID = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -64,5 +64,4 @@ class PurchaseItems(models.Model):
             # product_id
             productColorID__productID=self.productID
         )
-        print(item_images.first())
         return item_images

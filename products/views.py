@@ -103,7 +103,7 @@ def load_sizes(request):
         piColor__colorName__exact=product_color,
         productID__productSlug__iexact=product_slug,
         piIsAvailable=True,
-    ).distinct('piSize').values('piSize')
+    ).distinct('piSize')
 
     images = ProductImage.objects.filter(productColorID__colorID__colorName__iexact=product_color,
                                 productColorID__productID__productSlug__iexact=product_slug

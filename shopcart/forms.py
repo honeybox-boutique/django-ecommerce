@@ -16,3 +16,8 @@ class CartRemoveItemForm(forms.Form):
 
 class EditSaleForm(forms.Form):
     sale = forms.CharField(widget=forms.HiddenInput(), required=True)
+
+class AddToCartForm(forms.Form):
+    product_slug = forms.CharField()
+    color_selection = forms.CharField()
+    size_selection = forms.CharField()

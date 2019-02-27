@@ -16,6 +16,25 @@
 {% load product_extras %}
 {% load humanize %}
     
+    {% if messages %}
+    </div>
+    <div class="container-fluid">
+    <div class="col-12 text-center">
+        {% for message in messages %}
+        {% if message.tags == 'warning' %}
+        <div class="messages alert alert-danger" role="alert">
+            <p class="{{ message.tags }} p-0">{{ message }}</p>
+        </div>
+        {% elif message.tags == 'success' %}
+        <div class="messages alert alert-success" role="alert">
+            <p class="{{ message.tags }} p-0">{{ message }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    </div>
+    {% endif %}
+    <div class="container">
         <div class="row">
             <div class="col-md-2 d-none d-md-block"><!-- small images column -->
                 <div id="data-product-small-image" class="thumbnail">
@@ -134,7 +153,9 @@
                 <hr>
                 <h4>Description</h4>
                 <p>{{ product1.first.productDescription|linebreaks }}</p>
+                <br/>
             </div>
+        </div>
         </div>
 
 {% endblock %}

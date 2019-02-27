@@ -2,6 +2,21 @@
 
 {% block content %}
 {% if shopcart.shopCartItems.exists %}
+    {% if messages %}
+    <div class="col-12 text-center">
+        {% for message in messages %}
+        {% if message.tags == 'warning' %}
+        <div class="messages alert alert-danger" role="alert">
+            <p class="{{ message.tags }} p-0">{{ message }}</p>
+        </div>
+        {% elif message.tags == 'success' %}
+        <div class="messages alert alert-success" role="alert">
+            <p class="{{ message.tags }} p-0">{{ message }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
     <div class="col-12">
         <h1>Cart</h1>
         <div class="row">

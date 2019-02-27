@@ -34,7 +34,6 @@ def dashboard(request):
             # user_obj.username = username
             user_obj.first_name = first_name
             user_obj.last_name = last_name
-            print('changed some stuff')
             user_obj.save()
     else:
         form = UserAccountInfoForm(initial=data)
@@ -198,7 +197,6 @@ class CustomLoginView(views.LoginView):
         # delete session thing
         if 'guest_email_id' in self.request.session:
             del self.request.session['guest_email_id']
-            print('deleted guest session')
 
         return valid
 
