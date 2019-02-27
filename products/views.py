@@ -99,9 +99,11 @@ def load_sizes(request):
     product_slug = request.GET.get('productSlug')
 
     # change: fix these queries
-    sizes = PurchaseItems.objects.filter(piColor__colorName__exact=product_color,
-                                    productID__productSlug__iexact=product_slug,
-                                ).distinct('piSize').values('piSize')
+    sizes = PurchaseItems.objects.filter(
+        piColor__colorName__exact=product_color,
+        productID__productSlug__iexact=product_slug,
+        piIsAvailable=True,
+    ).distinct('piSize').values('piSize')
 
     images = ProductImage.objects.filter(productColorID__colorID__colorName__iexact=product_color,
                                 productColorID__productID__productSlug__iexact=product_slug

@@ -17,7 +17,7 @@
 {% load humanize %}
     
         <div class="row">
-            <div class="col-lg-2"><!-- small images column -->
+            <div class="col-md-2 d-none d-md-block"><!-- small images column -->
                 <div id="data-product-small-image" class="thumbnail">
                     {% for productImage in product1.first.productcolor_set.first.productimage_set.all %}
                     <img class="img-fluid" style="width:100%" src="{{ productImage.productImagePath.url }}" alt="">
@@ -25,7 +25,38 @@
                 </div>
             </div>
             <div id="data-product-big-image" class="col-md-6"><!-- big image column -->
-                <img style="width:100%" src="{{ product1.first.productcolor_set.first.productimage_set.first.productImagePath.url }}" alt="{{ product.productName }}">
+                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                    <ol id="data-car-indicators" class="carousel-indicators">
+                    {% for image in product_colors.first.productimage_set.all %}
+                        {% if forloop.counter == 1 %}
+                        <li data-target="#carouselExampleIndicators" data-slide-to="{{ forloop.counter }}" class="active"></li>
+                        {% else %}
+                        <li data-target="#carouselExampleIndicators" data-slide-to="{{ forloop.counter }}"></li>
+                        {% endif %}
+                    {% endfor %}
+                    </ol>
+                    <div id="data-car-images" class="carousel-inner">
+                    {% for image in product_colors.first.productimage_set.all %}
+                        {% if forloop.counter == 1 %}
+                        <div class="carousel-item active">
+                            <img class="d-block w-100" src="{{ image.productImagePath.url }}" alt="picture-{{ forloop.counter }}">
+                        </div>
+                        {% else %}
+                        <div class="carousel-item">
+                            <img class="d-block w-100" src="{{ image.productImagePath.url }}" alt="picture-{{ forloop.counter }}">
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
             </div>
             <div class="col-md-4"><!-- details column -->
                 <h3 id="product" class="mb-1" data-product-slug="{{product1.first.productSlug}}">{{product1.first.productName}}</h3>
@@ -47,7 +78,7 @@
                 {% endif %}
                 <hr>
                 <!-- update_cart form -->
-                {% include 'products/update_cart.html' with productcolor=product1.first.productcolor_set.all shopcart=shopcart  %}
+                {% include 'products/test-update-cart.html' %}
                 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
                 <!-- ajax/load-sizes script -->
@@ -67,6 +98,13 @@
                             },
 
                             success: function (data) {   // `data` is the return of the `load_cities` view function
+                                var $response=$(data);
+
+
+                                var images = $response.find('#data-small-images');
+                                var sizes = $response.find('#data-sizes');
+                                var carIndicators = $response.find('#data-car-indicators');
+                                var carImages = $response.find('#data-car-images');
                                 // split response into array on newline
                                 var array = data.split("\n");
                                 // initialize containers for sizes and images
@@ -83,9 +121,11 @@
                                     }
 
                                 }
-                                $("#size").html(sizeArray);  // replace the contents of the city input with the data that came from the server
+                                $("#size").html(sizes.html());  // replace the contents of the city input with the data that came from the server
                                 $("#data-product-small-image").html(imgArray)
-                                $("#data-product-big-image").html(imgArray)
+                                $("#data-product-small-image").html(images.html())
+                                $("#data-car-indicators").html(carIndicators.html())
+                                $("#data-car-images").html(carImages.html())
                             }
                         });
 

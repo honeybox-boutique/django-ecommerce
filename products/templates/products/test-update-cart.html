@@ -4,7 +4,7 @@
         <label class="mt-2">Color: 
         <div>
         {% for color in product_colors %}
-            <input type="radio" name="color-selection" value="{{ color.colorID }}"/> {{color.colorName}}
+            <input type="radio" name="color-selection" value="{{ color.colorID }}"/> {{ color.colorID.colorName }}
         {% endfor %}
         </div>
         </label>
@@ -19,7 +19,6 @@
         </label>
     </div>
     <div>
-        <input type="number" name="quantity" class="d-flex mt-3 col-2" value="1"/>
         <input type="submit" value="Add to Bag" class="btn btn-inline mt-4 mb-3"/>
     </div>
 
