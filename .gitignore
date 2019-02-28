@@ -9,7 +9,6 @@ log/**
 !log/placeholder
 media/**
 !media/**/init.txt
-speedtest/settings.py
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
