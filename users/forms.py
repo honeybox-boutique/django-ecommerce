@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 
 class SignUpForm(UserCreationForm):
+    # send_promos = forms.BooleanField(required=False, initial=True, label='Send me emails about new HoneyBox Boutique Products')
     class Meta:
         fields = ("email", "password1", "password2", "first_name", "last_name")
         model = User
@@ -39,6 +40,7 @@ class UserAccountInfoForm(forms.ModelForm):
     
     username = forms.CharField(disabled=True, label='Username')
     email = forms.CharField(disabled=True, label='Email')
+    # send_promos = forms.BooleanField(required=False, initial=True, label='Send me emails about new HoneyBox Boutique Products')
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email',)
@@ -48,7 +50,13 @@ class UserAccountInfoForm(forms.ModelForm):
         } 
 
 class GuestForm(forms.Form):
-    email = forms.EmailField()
+    email = forms.EmailField(label='')
+    # send_promos = forms.BooleanField(required=False, initial=True, label='Sign me up for HoneyBox Boutique emails (you can unsubscribe at any time).')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].widget.attrs.update({'class': 'form-control', 'placeholder': 'Email*'})
+        # self.fields["send_promos"].widget.attrs.update({'class': 'form-control', 'align': 'left',})
 
 class LoginForm(forms.Form):
     username = forms.CharField()

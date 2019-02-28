@@ -22,7 +22,7 @@
         <div class="text-success">
         <h6 class="my-0">Discounts Applied: {{ discount_qs.count }}</h6>
         {% for discount in discount_qs %}
-        <small class="text-muted">{{ discount.sDiscountName }}</small>
+        <small class="text-muted">{{ discount.sDiscountName }}</small><br>
         {% endfor %}
         {% if sale_obj.saleDiscountAmount != 0.00 %}<span class="text-success">Total Discount: -${{ sale_obj.saleDiscountAmount }}</span>{% endif %}
         </div>

@@ -10,6 +10,7 @@
     <p>{{ address_form.addressCountry.label }}: {{ address_form.addressCountry|add_class_and_placeholder:'data-addressCountry' }}</p>
     <p>{{ address_form.addressState.label }}: {{ address_form.addressState|add_class_and_placeholder:'data-addressState' }}</p>
     <p>{{ address_form.addressPostalCode.label }}: {{ address_form.addressPostalCode|add_class_and_placeholder:'data-addressPostalCode' }}</p>
+    <p>{{ address_form.remember_address.label }}: {{ address_form.remember_address|add_class_and_placeholder:'data-remember_address' }}</p>
     </form>
     <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{% if next_url %}
     {{ next_url }}{% endif %}"></div>

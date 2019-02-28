@@ -242,7 +242,11 @@ def guest_register_view(request):
     next_post = request.POST['next']
     if form.is_valid():
         email = form.cleaned_data.get("email")
-        new_guest_email = Guest.objects.create(guestEmail=email)
+        # send_promos = form.cleaned_data.get("send_promos")
+        new_guest_email = Guest.objects.create(
+            guestEmail=email,
+            # guestSendPromos=send_promos,
+        )
         request.session['guest_email_id'] = new_guest_email.id
         if is_safe_url(next_post, request.get_host()):
             return redirect(next_post)

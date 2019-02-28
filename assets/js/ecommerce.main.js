@@ -94,14 +94,29 @@ function stripeTokenHandler(nextUrl, token) {
       var addressCountry = $(".data-addressCountry").val()
       var addressState = $(".data-addressState").val()
       var addressPostalCode = $(".data-addressPostalCode").val()
-      var data = {
-          'token': token.id,
-          'addressLine1': addressLine1,
-          'addressLine2': addressLine2,
-          'addressCity': addressCity,
-          'addressCountry': addressCountry,
-          'addressState': addressState,
-          'addressPostalCode': addressPostalCode,
+      var $rememberAddress = $("input[name=remember_address]:checked")
+      if ($rememberAddress.length != 0){
+        var data = {
+            'token': token.id,
+            'addressLine1': addressLine1,
+            'addressLine2': addressLine2,
+            'addressCity': addressCity,
+            'addressCountry': addressCountry,
+            'addressState': addressState,
+            'addressPostalCode': addressPostalCode,
+            'remember_address': 'True',
+        }
+      } else {
+        var data = {
+            'token': token.id,
+            'addressLine1': addressLine1,
+            'addressLine2': addressLine2,
+            'addressCity': addressCity,
+            'addressCountry': addressCountry,
+            'addressState': addressState,
+            'addressPostalCode': addressPostalCode,
+            'remember_address': 'False',
+        }
       }
     $.ajax({
         data: data,

@@ -49,6 +49,7 @@ def payment_method_create_view(request):
         print(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            remember = form.cleaned_data.get('remember_address')
             if billing_profile:
                 instance.addressBillingProfile = billing_profile
                 instance.addressType = 'billing'
@@ -59,8 +60,9 @@ def payment_method_create_view(request):
                 token = request.POST.get('token')
                 if token:
                     print('new card')
-                    new_card_obj = Card.objects.add_new(billing_profile, token, instance)
+                    new_card_obj = Card.objects.add_new(billing_profile, token, instance, remember)
                     sale_obj.salePaymentCard = new_card_obj
+                    sale_obj.saleBillingAddress = instance
                     sale_obj.save()
                     return JsonResponse({'message': 'Done'})
 
@@ -77,7 +79,8 @@ def payment_method_create_view(request):
                 # change: add try thing for error handling?
                 card_obj = Card.objects.get(
                     id=card,
-                    billingProfile=billing_profile
+                    billingProfile=billing_profile,
+                    cardActive=True,
                 )
                 # add card to sale
                 sale_obj.salePaymentCard = card_obj

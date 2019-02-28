@@ -127,7 +127,7 @@ class CardManager(models.Manager):
     def all(self, *args, **kwargs):
         return self.get_queryset().filter(cardActive=True)
 
-    def add_new(self, billing_profile, token, address_obj=None):
+    def add_new(self, billing_profile, token, address_obj=None, remember=False):
         if token:
             customer = stripe.Customer.retrieve(billing_profile.billingToken)
             stripe_card = customer.sources.create(source=token)
@@ -142,22 +142,40 @@ class CardManager(models.Manager):
                 stripe_card.name = address_obj.addressName
                 stripe_card.save()
 
-
-            new_card = self.model(
-                billingProfile=billing_profile,
-                cardStripeID=stripe_card.id,
-                cardBrand=stripe_card.brand,
-                cardCountry=stripe_card.country,
-                cardExpMonth=stripe_card.exp_month,
-                cardExpYear=stripe_card.exp_year,
-                cardLast4=stripe_card.last4,
-                cardAddressLine1=stripe_card.address_line1,
-                cardAddressLine2=stripe_card.address_line2,
-                cardCity=stripe_card.address_city,
-                cardState=stripe_card.address_state,
-                cardPostalCode=stripe_card.address_zip,
-                cardName=stripe_card.name,
-            )
+            print(remember)
+            if remember:
+                new_card = self.model(
+                    billingProfile=billing_profile,
+                    cardStripeID=stripe_card.id,
+                    cardBrand=stripe_card.brand,
+                    cardCountry=stripe_card.country,
+                    cardExpMonth=stripe_card.exp_month,
+                    cardExpYear=stripe_card.exp_year,
+                    cardLast4=stripe_card.last4,
+                    cardAddressLine1=stripe_card.address_line1,
+                    cardAddressLine2=stripe_card.address_line2,
+                    cardCity=stripe_card.address_city,
+                    cardState=stripe_card.address_state,
+                    cardPostalCode=stripe_card.address_zip,
+                    cardName=stripe_card.name,
+                )
+            else:
+                new_card = self.model(
+                    billingProfile=billing_profile,
+                    cardStripeID=stripe_card.id,
+                    cardBrand=stripe_card.brand,
+                    cardCountry=stripe_card.country,
+                    cardExpMonth=stripe_card.exp_month,
+                    cardExpYear=stripe_card.exp_year,
+                    cardLast4=stripe_card.last4,
+                    cardAddressLine1=stripe_card.address_line1,
+                    cardAddressLine2=stripe_card.address_line2,
+                    cardCity=stripe_card.address_city,
+                    cardState=stripe_card.address_state,
+                    cardPostalCode=stripe_card.address_zip,
+                    cardName=stripe_card.name,
+                    cardActive=False,
+                )
             new_card.save()
             return new_card
         return None

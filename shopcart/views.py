@@ -212,7 +212,9 @@ def checkout_home(request):
     has_card = False
     billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
     if billing_profile is not None:
-        address_qs = Address.objects.filter(addressBillingProfile=billing_profile)
+        address_qs = Address.objects.filter(addressBillingProfile=billing_profile,
+            addressActive=True,
+        )
         # create sale
         sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_obj)
         # initialize coupon form with sale object
