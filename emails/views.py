@@ -17,7 +17,7 @@ def send_email_view(request):
             phone_num = form.cleaned_data.get('phone_num')
             subject = 'Contact-Us Email - %s - %s - %s' % (name, from_email, phone_num)
             try:
-                send_mail(subject, message, settings.EMAIL_HOST_USER, [settings.EMAIL_HOST_USER])
+                send_mail(subject, message, settings.EMAIL_HOST_ALIAS_CONTACT, [settings.EMAIL_HOST_ALIAS_CONTACT], auth_user=settings.EMAIL_HOST_USER, auth_password=settings.EMAIL_HOST_PASSWORD)
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
             return redirect('contact_thanks')
