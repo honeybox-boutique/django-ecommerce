@@ -10,3 +10,8 @@ log/**
 media/**
 !media/**/init.txt
 speedtest/settings.py
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
