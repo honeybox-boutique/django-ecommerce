@@ -109,14 +109,14 @@ class Shipment(models.Model):
         # get sale obj
         sale_obj = self.saleID
         # # send order confirmation email
-        from_email = settings.EMAIL_HOST_USER
+        from_email = settings.EMAIL_HOST_ALIAS_SUPPORT
         to_email = str(sale_obj.saleBillingProfile)
         html_message = render_to_string('emails/shipping-information.html', {
             'sale_obj': sale_obj,
             })
         plain_message = strip_tags(html_message)
         subject = 'HoneyBox Boutique - Order Shipped! - %s' % (sale_obj.saleStringID)
-        send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+        send_mail(subject, plain_message, from_email, [to_email], auth_user=settings.EMAIL_HOST_USER, auth_password=settings.EMAIL_HOST_PASSWORD, html_message=html_message)
         return sent
     
     def create_easypost(self):
