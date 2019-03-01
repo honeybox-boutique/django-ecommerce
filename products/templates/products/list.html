@@ -2,7 +2,9 @@
 
 <!-- Picture/Advertisement for category -->
 <!-- Picture/Advertisement for category -->
-
+{% block title %}
+<title>{{ category }} | HoneyBox Boutique</title>
+{% endblock %}
 <!-- Breadcrumbs -->
 {% block breadcrumbs %}
     <a href="{% url 'homepage:home' %}">Home</a>
