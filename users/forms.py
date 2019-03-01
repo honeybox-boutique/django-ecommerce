@@ -7,9 +7,10 @@ from django.contrib.auth.models import User
 class SignUpForm(UserCreationForm):
     # send_promos = forms.BooleanField(required=False, initial=True, label='Send me emails about new HoneyBox Boutique Products')
     class Meta:
-        fields = ("email", "password1", "password2", "first_name", "last_name")
+        fields = ("username", "email", "password1", "password2", "first_name", "last_name")
         model = User
         labels = {
+            'username': '',
             'email': '',
             'password1': '',
             'password2': '',
@@ -17,6 +18,7 @@ class SignUpForm(UserCreationForm):
             'last_name': '',
         }
         help_texts = {
+            'username': '',
             'email': '',
             'password1': '',
             'password2': '',
@@ -26,6 +28,7 @@ class SignUpForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs.update({'class': 'form-control', 'placeholder': 'Username*'})
         self.fields["email"].widget.attrs.update({'class': 'form-control', 'placeholder': 'Email*'})
         self.fields["first_name"].widget.attrs.update({'class': 'form-control', 'placeholder': 'First Name'})
         self.fields["last_name"].widget.attrs.update({'class': 'form-control', 'placeholder': 'Last Name'})
