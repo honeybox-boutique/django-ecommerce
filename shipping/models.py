@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from django.utils import timezone
 
@@ -7,7 +8,8 @@ from addresses.models import Address
 
 
 import easypost
-easypost.api_key = '***REMOVED***'
+# test key#  easypost.api_key = '***REMOVED***'
+easypost.api_key = settings.EASYPOST_SECRET_KEY
 
 
 class Warehouse(models.Model):
@@ -298,6 +300,7 @@ class Shipment(models.Model):
             city=shipping_address_obj.addressCity,
             state=shipping_address_obj.addressState,
             zip=shipping_address_obj.addressPostalCode,
+            name=shipping_address_obj.addressName,
         )
         print(to_address.id)
         return to_address

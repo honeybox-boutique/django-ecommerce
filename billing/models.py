@@ -8,7 +8,7 @@ User = settings.AUTH_USER_MODEL
 
 
 import stripe
-stripe.api_key = "***REMOVED***"
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class BillingProfileManager(models.Manager):
     def new_or_get(self, request):
