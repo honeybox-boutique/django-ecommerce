@@ -42,8 +42,27 @@
 <!-- Breadcrumbs -->
 {% block content %}
 
-{% if not billing_profile %}
+{% if messages %}
+</div>
+<div class="container-fluid">
+<div class="col-12 text-center">
+    {% for message in messages %}
+    {% if message.tags == 'warning' %}
+    <div class="messages alert alert-danger" role="alert">
+        <p class="{{ message.tags }} p-0">{{ message }}</p>
+    </div>
+    {% elif message.tags == 'success' %}
+    <div class="messages alert alert-success" role="alert">
+        <p class="{{ message.tags }} p-0">{{ message }}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+</div>
+{% endif %}
 
+{% if not billing_profile %}
+<div class="container">
     <div class="row text-center">
         <div class="col-12 col-md-6"> 
             <h3>Login</h3>
@@ -67,9 +86,11 @@
             <a class="btn btn-small badge-secondary btn-block" href="{% url 'users:signup' next=request.build_absolute_uri %}">Sign Up</a>
         </div>
     </div>
+</div>
 {% else %}
 
     {% if not sale_obj.saleShippingAddress %}
+<div class="container">
         <div class="row">
             <div class="col-12">
                 <h1>Shipping Address</h1>
@@ -101,8 +122,10 @@
                 <a class="btn badge badge-secondary" href="{% url 'shopcart:home' %}">Return to Cart</a>
             </div>
         </div>
+    </div>
     {% elif not sale_obj.customerShipMethodID %}
 
+<div class="container">
         <div class="row">
             <div class="col-12">
                 <h1>Shipping Method</h1>
@@ -124,9 +147,10 @@
                 <a class="btn badge badge-secondary" href="{% url 'shopcart:home' %}">Return to Cart</a>
             </div>
         </div>
-
+</div>
     {% elif not sale_obj.saleBillingAddress %}
 
+<div class="container">
         <div class="row">
             <div class="col-12">
                 <h1>Billing Address</h1>
@@ -165,8 +189,9 @@
                 <a class="btn badge badge-secondary" href="{% url 'shopcart:home' %}">Return to Cart</a>
             </div>
         </div>
-
+</div>
     {% elif not sale_obj.salePaymentCard %}
+<div class="container">
     <div class="row">
         <div class="col-12">
             <h1>Payment Info</h1>
@@ -192,8 +217,10 @@
             <a class="btn badge badge-secondary" href="{% url 'shopcart:home' %}">Return to Cart</a>
         </div>
     </div>
+</div>
     {% else %}
 
+<div class="container">
     <div class="row">
         <div class="col-12">
             <h1>Finalize Checkout</h1>
@@ -228,6 +255,7 @@
         <div class="col-12 text-center">
             <a class="btn badge badge-secondary" href="{% url 'shopcart:home' %}">Return to Cart</a>
         </div>
+    </div>
     </div>
     {% endif %}
 

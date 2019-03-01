@@ -84,4 +84,5 @@ def payment_method_create_view(request):
             else:
                 return redirect('shopcart:home')
         else:
+            pass
     return HttpResponse('error', status_code=401)

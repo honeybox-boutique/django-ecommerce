@@ -1,6 +1,11 @@
 import decimal
 from django.db import models
 from django.utils.text import slugify
+from io import BytesIO
+import sys
+from PIL import Image, ExifTags
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models.signals import pre_save, post_save
 
 
 # Add color table
@@ -34,6 +39,7 @@ class CategoryImage(models.Model):
 
     class Meta:
         db_table = 'category_image'
+
 class Size(models.Model):
     sizeID = models.AutoField(primary_key=True)
     sizeName = models.CharField(max_length=200)
@@ -167,17 +173,6 @@ class Product(models.Model):
         # set product_sale_price variable
         product_sale_price = prod_base_price - product_discount_amount
 
-        print(self.productName)
-        print('Base Price')
-        print(prod_base_price)
-        print('Discount Type')
-        print(discount_type)
-        print('Discount Value')
-        print(discount_value)
-        print('Discount')
-        print(product_discount_amount)
-        print('Sale Price')
-        print(product_sale_price)
         self.productBasePrice = prod_base_price
         self.productDiscountType = discount_type
         self.productDiscountValue = discount_value

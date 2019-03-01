@@ -54,8 +54,16 @@
                             <p>1</p>
                         </td>
                         <td class="col-2">
-                            <s>${{ item.productID.productBasePrice }} </s>
-                            <p>${{ item.productID.productSalePrice }} </p>
+                    {% if item.productID.productDiscountAmount %}
+
+                    <s>${{ item.productID.productBasePrice }} </s>
+                    <p>${{ item.productID.productSalePrice }} </p>
+                
+                    {% else %}
+
+                    <p>${{ item.productID.productSalePrice }}</p>
+
+                    {% endif %}
                         </td>
                         <td class="col-2">
                             <p>${{ item.productID.productSalePrice }} </p>

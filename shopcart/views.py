@@ -96,13 +96,10 @@ def edit_shipping(request):
     form = EditSaleForm(request.POST)
 
     if form.is_valid():
-        print('form valid')
         sale_id = form.cleaned_data.get('sale')
         sale_obj = Sale.objects.get(saleID=sale_id)
         if sale_obj.saleStatus == 'created':
             sale_obj.saleShippingAddress = None
-            print('set shipping to None')
-            print(sale_obj.saleShippingAddress)
             sale_obj.save()
     return redirect('shopcart:checkout')
 
@@ -111,13 +108,10 @@ def edit_ship_method(request):
     form = EditSaleForm(request.POST)
 
     if form.is_valid():
-        print('form valid')
         sale_id = form.cleaned_data.get('sale')
         sale_obj = Sale.objects.get(saleID=sale_id)
         if sale_obj.saleStatus == 'created':
             sale_obj.customerShipMethodID = None
-            print('set ship method to None')
-            print(sale_obj.customerShipMethodID)
             sale_obj.save()
     return redirect('shopcart:checkout')
 
@@ -127,13 +121,10 @@ def edit_billing(request):
     form = EditSaleForm(request.POST)
 
     if form.is_valid():
-        print('form valid')
         sale_id = form.cleaned_data.get('sale')
         sale_obj = Sale.objects.get(saleID=sale_id)
         if sale_obj.saleStatus == 'created':
             sale_obj.saleBillingAddress = None
-            print('set shipping to None')
-            print(sale_obj.saleShippingAddress)
             sale_obj.save()
     return redirect('shopcart:checkout')
 
@@ -142,7 +133,6 @@ def edit_card(request):
     form = EditSaleForm(request.POST)
 
     if form.is_valid():
-        print('form valid')
         sale_id = form.cleaned_data.get('sale')
         sale_obj = Sale.objects.get(saleID=sale_id)
         if sale_obj.saleStatus == 'created':
@@ -157,7 +147,6 @@ def ship_method(request):
     form = CustomerShipMethodForm(request.POST)
 
     if form.is_valid():
-        print('form valid')
         ship_method_id = form.cleaned_data.get('customerShipMethodID')
         sale_id = form.cleaned_data.get('sale')
         # get sale obj
@@ -165,7 +154,6 @@ def ship_method(request):
         sale_obj.customerShipMethodID = ship_method_id
         sale_obj.save()
         print(sale_obj.customerShipMethodID)
-        print('saved ship method')
     return redirect('shopcart:checkout')
 
 def checkout_home(request):
@@ -192,8 +180,7 @@ def checkout_home(request):
     # first check if cart_items are available
     for item in cart_items:
         if item.piIsAvailable == False:
-            print('this item has become unavailable: ', item)
-            print('removing ', item)
+            messages.warning(request, 'An item in your cart has become unavailable and was removed. This does not necessarily mean we are out of stock. Please attempt to add it back to cart to verify.')
             cart_obj.shopCartItems.remove(item)
             # if sale was already created remove the item from the sale as well
             billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
@@ -204,7 +191,6 @@ def checkout_home(request):
                     saleID__saleStatus='created',
                     saleID__saleBillingProfile=billing_profile
                 )
-                print(sale_item.count())
                 sale_item.delete()
                 return redirect('shopcart:home')
 
@@ -222,8 +208,6 @@ def checkout_home(request):
         ship_method_form = CustomerShipMethodForm(initial={'sale': sale_obj.saleStringID})
         # get discount qs
         discount_qs = SDiscount.objects.filter(sale=sale_obj)
-        print('Applied Discounts')
-        print(discount_qs.count())
         if shipping_address_id:
             sale_obj.saleShippingAddress = Address.objects.get(id=shipping_address_id)
             del request.session['shipping_address_id']
@@ -241,19 +225,17 @@ def checkout_home(request):
         '''check if sale is done'''
         is_done = sale_obj.check_done()
         if not is_done:
-            print('something is not done')
+            pass
         elif is_done:
             did_charge, charge_msg = billing_profile.charge(sale_obj)
             if did_charge:
-                print('clearing stuff becuase isdone')
                 # set cart status to submitted
                 cart_obj.shopCartStatus = 'Submitted'
                 cart_obj.save()
                 sale_obj.mark_paid()
 
-
+                from_email = getattr(settings, 'EMAIL_HOST_ALIAS_SUPPORT', settings.EMAIL_HOST_USER)
                 # # send order confirmation email
-                from_email = settings.EMAIL_HOST_ALIAS_SUPPORT
                 to_email = str(sale_obj.saleBillingProfile)
                 html_message = render_to_string('emails/order-confirmation.html', {
                     'sale_obj': sale_obj,
@@ -272,11 +254,11 @@ def checkout_home(request):
                 request.session['cart_count'] = 0
                 # clear items from user cart if authenticated
                 is_empty = cart_obj.empty_shopcart()
-                print(is_empty)
 
                 return redirect('shopcart:success')
             else:
-                print(charge_msg)
+                # add error message here
+                messages.warning(request, charge_msg)
                 return redirect('shopcart:checkout')
 
     context = {

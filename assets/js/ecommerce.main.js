@@ -88,6 +88,7 @@ form.addEventListener('submit', function(event) {
 function stripeTokenHandler(nextUrl, token) {
     var paymentMethodEndpoint = "/billing/payment-method/create/"
 
+      var addressName = $(".data-addressName").val()
       var addressLine1 = $(".data-addressLine1").val()
       var addressLine2 = $(".data-addressLine2").val()
       var addressCity = $(".data-addressCity").val()
@@ -98,6 +99,7 @@ function stripeTokenHandler(nextUrl, token) {
       if ($rememberAddress.length != 0){
         var data = {
             'token': token.id,
+            'addressName': addressName,
             'addressLine1': addressLine1,
             'addressLine2': addressLine2,
             'addressCity': addressCity,
@@ -109,6 +111,7 @@ function stripeTokenHandler(nextUrl, token) {
       } else {
         var data = {
             'token': token.id,
+            'addressName': addressName,
             'addressLine1': addressLine1,
             'addressLine2': addressLine2,
             'addressCity': addressCity,
