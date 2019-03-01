@@ -23,7 +23,6 @@ def payment_method_view(request):
         customer_id = billing_profile.billingToken
     billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)
     if not billing_profile:
-        print('no billing profile')
         return redirect('shopcart:home')
     next_url = None
     next_ = request.GET.get('next')
@@ -46,7 +45,6 @@ def payment_method_create_view(request):
     sale_obj, sale_obj_created = Sale.objects.new_or_get(billing_profile, cart_obj)
     if request.method == 'POST' and request.is_ajax():
         form = AddressForm(request.POST or None)
-        print(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             remember = form.cleaned_data.get('remember_address')
@@ -59,7 +57,6 @@ def payment_method_create_view(request):
                 request.session[instance.addressType + "_address_id"] = instance.id
                 token = request.POST.get('token')
                 if token:
-                    print('new card')
                     new_card_obj = Card.objects.add_new(billing_profile, token, instance, remember)
                     sale_obj.salePaymentCard = new_card_obj
                     sale_obj.saleBillingAddress = instance
@@ -69,12 +66,9 @@ def payment_method_create_view(request):
 
     elif request.method == 'POST':
         form = CardIDForm(request.POST or None)
-        print(request.POST)
         if form.is_valid():
             card = form.cleaned_data['cID']
-            print(card)
             if card:
-                print('existing card')
                 # get card_obj
                 # change: add try thing for error handling?
                 card_obj = Card.objects.get(
@@ -88,8 +82,6 @@ def payment_method_create_view(request):
                 sale_obj.save()
                 return redirect('shopcart:checkout')
             else:
-                print('unable to find card')
                 return redirect('shopcart:home')
         else:
-            print(form.errors)
     return HttpResponse('error', status_code=401)

@@ -17,14 +17,10 @@ def apply_discount_view(request):
                                     saleStatus='created',
                                     saleBillingProfile=billing_profile,
                                 )
-        print('Sale Query Count')
-        print(sale_qs.count())
         # get discount from coupon_code
         discount_qs = SDiscount.objects.filter(sDiscountCouponCode=discount_code,
                                     sDiscountIsActive=True,
                                 )
-        print('Discount Query Count')
-        print(discount_qs.count())
         if sale_qs.count() == 1:
             sale_obj = sale_qs.first()
             if discount_qs.count() == 1:

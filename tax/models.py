@@ -32,18 +32,15 @@ class Jurisdiction(models.Model):
         )
         if tax_qs.count() == 1:
             active_rate_exists = True
-            print('active tax rate')
             # get tax obj
             tax_obj = tax_qs.first()
             # get multiplier
             tax_multiplier = tax_obj.taxRateMultiplier
         if tax_qs.count() > 1:
             active_rate_exists = True
-            print('multiple, getting last')# change: get last
             tax_obj = tax_qs.last()
             # get multiplier
             tax_multiplier = tax_obj.taxRateMultiplier
-        print(tax_multiplier)
         return tax_multiplier, active_rate_exists
 
 
@@ -69,7 +66,6 @@ class TaxRate(models.Model):
 def pre_save_tax_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
     # check if timezone.now is between start and endate of instance
-    print("checking if tax rate active")
     if instance.taxRateValidFrom < current_time < instance.taxRateValidUntil:
         #set active
         instance.taxRateIsActive = True

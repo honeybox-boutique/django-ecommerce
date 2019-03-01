@@ -31,7 +31,6 @@ class Pricing(models.Model):
 def pre_save_pricing_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
     # check if timezone.now is between start and endate of instance
-    print("checking if pricing active")
     if instance.pricingValidFrom < current_time < instance.pricingValidUntil: 
         # change: check if product has other active pricings
         # if has other active pricings then don't save and return error "already active pricing"
@@ -133,7 +132,7 @@ class CDiscount(models.Model):
                 discount_returned = discount_value / ONE_HUNDRED_D
             return discount_returned, is_multiplier
         else:
-            print('not active')
+            pass
 
 def pre_save_cdiscount_active(sender, instance, *args, **kwargs):
     current_time = timezone.now()
@@ -189,7 +188,7 @@ class SDiscount(models.Model):
                 discount_returned = discount_value / ONE_HUNDRED_D
             return discount_returned, is_multiplier
         else:
-            print('not active')
+            pass
 
 
 def pre_save_sdiscount_active(sender, instance, *args, **kwargs):

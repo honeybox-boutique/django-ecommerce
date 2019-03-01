@@ -103,12 +103,10 @@ class BillingProfile(models.Model):
 # Stripe tokenizer API request
 def billing_profile_created_receiver(sender, instance, *args, **kwargs):
     if not instance.billingToken and instance.billingEmail:
-        print('Actual api request to Stripe to get token')
         customer = stripe.Customer.create(
             email=instance.billingEmail,
             description=instance.user
         )
-        print(customer)
         instance.billingToken = customer.id
 pre_save.connect(billing_profile_created_receiver, sender=BillingProfile)
 
@@ -142,7 +140,6 @@ class CardManager(models.Manager):
                 stripe_card.name = address_obj.addressName
                 stripe_card.save()
 
-            print(remember)
             if remember:
                 new_card = self.model(
                     billingProfile=billing_profile,

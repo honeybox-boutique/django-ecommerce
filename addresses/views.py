@@ -21,8 +21,6 @@ def checkout_address_create_view(request):
         if billing_profile is not None:
             address_type = request.POST.get('addressType')
             remember_address = form.cleaned_data.get('remember_address')
-            print(address_type)
-            print(remember_address)
             instance.addressBillingProfile = billing_profile
             instance.addressType = address_type
             instance.addressActive = remember_address
@@ -32,7 +30,6 @@ def checkout_address_create_view(request):
             request.session[address_type + "_address_id"] = instance.id
 
         else:
-            print('address error of some kind')
             return redirect('shopcart:checkout')
         if is_safe_url(next_post, request.get_host()):
             return redirect(next_post)
@@ -44,7 +41,6 @@ def checkout_address_reuse_view(request):
     form = AddressForm(request.POST or None)
     next_post = request.POST['next']
     if request.method == 'POST':
-        print(request.POST)
         address = request.POST.get('address', None)
         address_type = request.POST.get('addressType')
         billing_profile, billing_profile_created = BillingProfile.objects.new_or_get(request)

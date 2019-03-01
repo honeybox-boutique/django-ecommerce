@@ -52,7 +52,7 @@ class SaleManager(models.Manager):
             obj.update_sale_from_cart(cart_items)
             return obj, created
         elif qs.count() > 1:
-            print('multiple sales in created')
+            pass
 
 
         #cart already used, checkout not finished
@@ -137,7 +137,6 @@ class Sale(models.Model):
 
     def mark_paid(self):
         """ marks the sale paid """
-        print('marking paid')
         if self.check_done():
             self.saleStatus = 'payed'
             self.save()
@@ -150,7 +149,6 @@ class Sale(models.Model):
 
     # calculates total based on present values. if ANY null return error?
     def get_total(self):
-        print('getting total')
         total = decimal.Decimal("0.00")
         sub_total = self.saleSubTotal
         sale_discount_amount = self.saleDiscountAmount
@@ -161,7 +159,6 @@ class Sale(models.Model):
         return total
 
     def get_sub_total(self):
-        print('updating subtotal')
         items = self.saleItems.all()
         sub_total = decimal.Decimal("0.00")
         # calculates sub_total 
@@ -174,7 +171,6 @@ class Sale(models.Model):
 
     def get_discount_amount(self):
         # get discount obj
-        print('updating discount')
         amount = decimal.Decimal("0.00")
 
         s_discounts = self.saleDiscounts.filter(
@@ -198,7 +194,6 @@ class Sale(models.Model):
 
     def get_shipping_ammount(self):
         # get discount obj
-        print('updating shipping')
         ship_amount = decimal.Decimal("0.00")
         ship_discount_amount = decimal.Decimal("0.00")
         
@@ -236,7 +231,6 @@ class Sale(models.Model):
 
     # get tax amount
     def get_tax_amount(self):
-        print('getting tax amount')
         tax_amount = decimal.Decimal("0.00")
         # get jurisdiction
         # START HEREEEEEEEEEEEEEEEEEE
@@ -285,7 +279,6 @@ class Sale(models.Model):
                         taxrate__taxRateIsActive=True,
                     )
                     if jurisdiction_qs.count() == 0:
-                        print('no jurisdiction')
                         return jurisdiction_obj# , jurisdiction_exists
             # # if jurisdiction in db
             if jurisdiction_qs.count() == 1:
@@ -296,7 +289,6 @@ class Sale(models.Model):
                 return jurisdiction_obj# , jurisdiction_exists
             # if no tax rates for the jurisdiction
             if jurisdiction_qs.count() > 1:
-                print('error, multiple matching jurisdictions')
                 pass
 
     def update_sale_from_cart(self, cart_items):
@@ -334,7 +326,6 @@ class Sale(models.Model):
         return True
 
     def check_discount_conditions(self, discount):
-        print('checking discount conditions')
         # get discount_obj
         discount_obj = discount
         # get sale_items
