@@ -148,14 +148,13 @@ class Shipment(models.Model):
                 # get current EasypostID
                 return_easy_shipment_id, return_shipment_cost = self.create_return_shipment(easy_shipment_id)
             else:
-                print('could not create shipment for some reason')
+                pass
 
         return easy_shipment_id, shipment_cost, shipment_track_num, shipment_track_url, shipment_label_url, return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url
         
             
     def buy_shipment(self, from_address, to_address, parcel):
         # call buy_shipment
-        print('creating shipment')
         easy_shipment_id = None
         shipment_cost = None
         shipment_track_num = None
@@ -166,20 +165,13 @@ class Shipment(models.Model):
             from_address=from_address,
             parcel=parcel,
         )
-        print(shipment.id)
         # show rates
         for rate in shipment.rates:
-            print(rate.carrier)
-            print(rate.service)
-            print(rate.rate)
-            print(rate.id)
             if rate.carrier == self.shipmentCarrier and rate.service == self.shipmentRate:
                 shipment_cost = rate.rate
                 easy_shipment_id = shipment.id
 
-                print('buying shipping label')
                 shipment.buy(rate={'id': rate.id})
-                print('setting Label URL and tracking number')
                 shipment_label_url = shipment.postage_label.label_url
                 ## Print Tracking Code
                 shipment_track_num = shipment.tracking_code
@@ -188,7 +180,6 @@ class Shipment(models.Model):
 
     def create_shipment(self, from_address, to_address, parcel):
         # create_shipment
-        print('creating shipment')
         
         easy_shipment_id = None
         shipment_cost = None
@@ -197,18 +188,11 @@ class Shipment(models.Model):
             from_address=from_address,
             parcel=parcel,
         )
-        print(shipment.id)
         # show rates
         for rate in shipment.rates:
-            print(rate.carrier)
-            print(rate.service)
-            print(rate.rate)
-            print(rate.id)
             if rate.carrier == self.shipmentCarrier and rate.service == self.shipmentRate:
-                print('found matching rate, saving cost and id')
                 shipment_cost = rate.rate
                 easy_shipment_id = shipment.id
-                print(shipment_cost)
                 # call create_return_shipment
                 return easy_shipment_id, shipment_cost
 
@@ -216,7 +200,6 @@ class Shipment(models.Model):
 
 
     def create_return_shipment(self, shipment):
-        print('creating return label')
         return_easy_shipment_id = None
         # get passed shipmentid and get shipment
         shipment = easypost.Shipment.retrieve(shipment)
@@ -226,25 +209,17 @@ class Shipment(models.Model):
             parcel=shipment.parcel,
             is_return=True,
         )
-        print(return_shipment.id)
         
         # show rates
         for rate in return_shipment.rates:
-            print(rate.carrier)
-            print(rate.service)
-            print(rate.rate)
-            print(rate.id)
             if rate.carrier == self.shipmentCarrier and rate.service == self.shipmentRate:
-                print('found matching rate, saving cost and id')
                 return_shipment_cost = rate.rate
                 return_easy_shipment_id = return_shipment.id
-                print(return_shipment_cost)
                 # call create_return_shipment
         return return_easy_shipment_id, return_shipment_cost
 
 
     def buy_return_shipment(self, shipment):
-        print('creating return label')
         return_easy_shipment_id = None
         return_shipment_cost = None
         return_shipment_label_url = None
@@ -257,7 +232,6 @@ class Shipment(models.Model):
             parcel=shipment.parcel,
             is_return=True,
         )
-        print(return_shipment.id)
         
         # show rates
         for rate in return_shipment.rates:
@@ -265,9 +239,7 @@ class Shipment(models.Model):
                 return_shipment_cost = rate.rate
                 return_easy_shipment_id = return_shipment.id
 
-                print('buying shipping label')
                 return_shipment.buy(rate={'id': rate.id})
-                print('setting Label URL and tracking number')
                 return_shipment_label_url = return_shipment.postage_label.label_url
                 ## Print Tracking Code
                 return_shipment_track_num = return_shipment.tracking_code
@@ -275,7 +247,6 @@ class Shipment(models.Model):
         return return_easy_shipment_id, return_shipment_cost, return_shipment_track_num, return_shipment_label_url
 
     def get_from_address(self):
-        print('creating from address')
         # get warehouse address obj
         warehouse_address_obj = self.warehouseID.warehouseAddress
         # create address
@@ -287,11 +258,9 @@ class Shipment(models.Model):
             state=warehouse_address_obj.addressState,
             zip=warehouse_address_obj.addressPostalCode,
         )
-        print(from_address.id)
         return from_address
 
     def get_to_address(self):
-        print('creating to address')
         # create  to address
         shipping_address_obj = self.saleID.saleShippingAddress
         to_address = easypost.Address.create(
@@ -302,7 +271,6 @@ class Shipment(models.Model):
             zip=shipping_address_obj.addressPostalCode,
             name=shipping_address_obj.addressName,
         )
-        print(to_address.id)
         return to_address
 
     def get_parcel(self):
@@ -310,12 +278,10 @@ class Shipment(models.Model):
         parcel = self.parcel_set.first()
         # for parcel in parcels:
             # create parcel
-        print('creating parcel')
         parcel = easypost.Parcel.create(
             predefined_package=parcel.parcelName,
             weight=parcel.parcelWeight,
         )
-        print(parcel.id)
         return parcel
 
 class Parcel(models.Model):
@@ -353,7 +319,6 @@ class Parcel(models.Model):
 def post_save_create_shipment(sender, instance, *args, **kwargs):
     if instance.saleStatus == 'payed':
         # create shipment
-        print('creating shipment')
         Shipment.objects.create(
             shipmentDateRequested=timezone.now(),# change: add timezone import
             shipmentToAddress=instance.saleShippingAddress,

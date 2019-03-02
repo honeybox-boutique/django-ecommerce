@@ -36,12 +36,9 @@ def cart_remove_item(request):
     form = CartRemoveItemForm(request.POST)
 
     if form.is_valid():
-        print('form valid')
         prod_stock_id = form.cleaned_data.get('prod')
         prod_stock_obj = PurchaseItems.objects.get(prodStockID=prod_stock_id)
         cart_obj.shopCartItems.remove(prod_stock_obj)
-        print('should be removed')
-        print(cart_obj.shopCartItems.count())
 
 
     request.session['cart_count'] = cart_obj.shopCartItems.count()
@@ -137,8 +134,6 @@ def edit_card(request):
         sale_obj = Sale.objects.get(saleID=sale_id)
         if sale_obj.saleStatus == 'created':
             sale_obj.salePaymentCard = None
-            print('set card to None')
-            print(sale_obj.salePaymentCard)
             sale_obj.save()
     return redirect('shopcart:checkout')
 
@@ -153,7 +148,6 @@ def ship_method(request):
         sale_obj = Sale.objects.get(saleStringID=sale_id)
         sale_obj.customerShipMethodID = ship_method_id
         sale_obj.save()
-        print(sale_obj.customerShipMethodID)
     return redirect('shopcart:checkout')
 
 def checkout_home(request):

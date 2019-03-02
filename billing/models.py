@@ -228,38 +228,24 @@ class ChargeManager(models.Manager):
             )
         except stripe.error.CardError as e:
             # Problem with the card
-            print(e)
             return None, e
         except stripe.error.RateLimitError as e:
             # Too many requests made to the API too quickly
-            print(e)
             return None, e
         except stripe.error.InvalidRequestError as e:
             # Invalid parameters were supplied to Stripe API
-            print(e)
             return None, e
         except stripe.error.AuthenticationError as e:
             # Authentication Error: Authentication with Stripe API failed (maybe you changed API keys recently)
-            print(e)
             return None, e
         except stripe.error.APIConnectionError as e:
             # Network communication with Stripe failed
-            print(e)
             return None, e
         except stripe.error.StripeError as e:
             # Stripe Error
-            print(e)
             return None, e
         else:
             #success
-            print('success')
-        # c = stripe.Charge.create(
-            # amount=int(sale_obj.saleTotal * 100), #amount in cents
-            # currency='usd',
-            # customer=billing_profile.billingToken,
-            # source=card_obj.cardStripeID,
-            # metadata={'order_id': sale_obj.saleStringID},
-        # )
             new_charge_obj = self.model(
                 billingProfile=billing_profile,
                 chargeStripeID=c.id,
