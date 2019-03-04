@@ -31,28 +31,57 @@ Data models
 
 addresses  
 
-    addressBillingProfile - billing profile associated with address  
-    addressType - address type (billing or shipping)  
-    addressLine1  
-    addressLine2  
-    addressCity  
-    addressCountry  
-    addressState  
-    addressPostalCode  
-    addressName - Full name of individual associated with address  
-    addressActive - used to determine if address should be shown in existing addresses for user that is logged in  
-    addressEasyPostID - easypost address token  
+    address
+        addressBillingProfile - billing profile associated with address  
+        addressType - address type (billing or shipping)  
+        addressLine1  
+        addressLine2  
+        addressCity  
+        addressCountry  
+        addressState  
+        addressPostalCode  
+        addressName - Full name of individual associated with address  
+        addressActive - used to determine if address should be shown in existing addresses for user that is logged in  
+        addressEasyPostID - easypost address token  
 
 billing 
 
-    billingEmail = email associated with billing profile  
-    active = status of billing profile  
-    lastUpdated  
-    dateCreated  
-    profileType - either 'user' billing profile or 'guest'. guest billing profiles get marked inactive after transaction  
-    user = user associated with billing profile if any  
-    billingToken = stripe customer token  
-    
+    billingprofile
+        billingEmail = email associated with billing profile  
+        active = status of billing profile  
+        lastUpdated  
+        dateCreated  
+        profileType - either 'user' billing profile or 'guest'. guest billing profiles get marked inactive after transaction  
+        user = user associated with billing profile if any  
+        billingToken = stripe customer token  
+    card
+        billingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
+        cardStripeID = models.CharField(max_length=120)
+        cardBrand = models.CharField(max_length=120, null=True, blank=True)
+        cardCountry = models.CharField(max_length=20, null=True, blank=True)
+        cardExpMonth = models.IntegerField(null=True, blank=True)
+        cardExpYear = models.IntegerField(null=True, blank=True)
+        cardLast4 = models.CharField(max_length=4)
+        cardDefault = models.BooleanField(default=True)
+        cardActive = models.BooleanField(default=True)
+        cardDateAdded = models.DateTimeField(auto_now_add=True)
+
+        cardName = models.CharField(max_length=120, null=True, blank=True)
+        cardCity= models.CharField(max_length=120, null=True, blank=True)
+        cardAddressLine1 = models.CharField(max_length=120, null=True, blank=True)
+        cardAddressLine2 = models.CharField(max_length=120, null=True, blank=True)
+        cardState= models.CharField(max_length=120, null=True, blank=True)
+        cardPostalCode= models.CharField(max_length=120, null=True, blank=True)
+    charge
+        billingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
+        chargeStripeID = models.CharField(max_length=120)
+        chargePaid = models.BooleanField(default=False)
+        chargeRefunded = models.BooleanField(default=False)
+        chargeOutcome = models.TextField(max_length=255, blank=True, null=True)
+        chargeOutcomeType = models.CharField(max_length=120, blank=True, null=True)
+        chargeSellerMessage = models.CharField(max_length=120, blank=True, null=True)
+        chargeRiskLevel = models.CharField(max_length=120, blank=True, null=True)
+        
 homepage
 
     homepageimage  
