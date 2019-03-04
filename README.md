@@ -296,15 +296,51 @@ shipping
         shipmentID = models.ForeignKey(Shipment, on_delete=models.CASCADE)
         
 shopcart	
+
     shopcart  
-speedtest	
+        user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
+        shopCartDateCreated = models.DateTimeField(auto_now_add=True)
+        shopCartLastModified = models.DateTimeField(auto_now=True)
+
+        shopCartStatus = models.CharField(max_length=40, default=OPEN, choices=STATUS_CHOICES)
+
+        shopCartSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+
+        shopCartItems = models.ManyToManyField(PurchaseItems, blank=True)
+        objects = ShopCartManager()
 tax	 
+
     jurisdiction  
+        jurisdictionID = models.AutoField(primary_key=True)
+        jurisdictionLabel = models.CharField(max_length=70)
+
+        # unique for a jurisdiction
+        jurisdictionState = models.CharField(max_length=50, blank=True, null=True)
+        jurisdictionCity = models.CharField(max_length=50, blank=True, null=True)
+        jurisdictionZip = models.CharField(max_length=12, blank=True, null=True)
+        
     taxrate  
+        taxRateID = models.AutoField(primary_key=True)
+        taxRateName = models.CharField(max_length=50)
+        taxRateMultiplier = models.DecimalField(max_digits=12, decimal_places=4)
+        taxRateDateCreated = models.DateTimeField('date created', auto_now_add=True)
+        taxRateValidFrom = models.DateTimeField('start date')
+        taxRateValidUntil = models.DateTimeField('end date')
+        taxRateNote = models.TextField(max_length=200)
+        taxRateIsActive = models.BooleanField(default=False)
+
+        jurisdictionID = models.ForeignKey(Jurisdiction, on_delete=models.CASCADE)
     
 users	
+
     default django auth (want to override to make emails unique asap)  
+    
     guest  
+        guestEmail = models.EmailField()
+        guestActive = models.BooleanField(default=True)
+        guestDateLastUpdated = models.DateTimeField(auto_now=True)
+        guestDateCreated = models.DateTimeField(auto_now_add=True)
+        guestSendPromos = models.BooleanField(default=False)
 
 
 How to manage the site
