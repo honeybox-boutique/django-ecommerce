@@ -35,6 +35,7 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
 
 ## Things I need help with in order of importance:
      version control best practices for issues (bugs) and the resolution thereof?
+          point me to a good video or article I can watch for this. I'm brand new so I only know enough to do what you've seen here.
      billing
           make sure adding payment methods is seamless and error messages appear appropriately
      addresses
