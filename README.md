@@ -21,13 +21,27 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
 Things I need help with in order of importance:
 
      billing
-          
+          make sure adding payment methods is seamless and error messages appear appropriately
      addresses
+          make sure address adding and removing, active/inactive doesn't affect payment methods or sales
      shopcart
+          fix add to cart stuff by adding model manager method to do it correctly
+          make sure that when purchitems becomes unavailable that user carts will add the next available purchitem matching criteria
      sales
+          make sure historical data is preserved
+          optimize checkout process so it isn't redoing everything every time they reload the page
      users
+          make emails unique
+     testing apps in general
+          best software/way to test stuff
      emails
+          can we just attach images to emails and send them without worry? Have read warnings about transactional emails getting blocked by gmail servers
+          why would we use email sending service?
      shipping
+          make multi-shipment orders possible (will require salid to be editable on admin site)
+          do error handling
+     image/static content delivery optimization
+          best practices?
 
 Environment Setup  
 
