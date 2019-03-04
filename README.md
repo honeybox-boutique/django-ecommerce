@@ -42,13 +42,20 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
      shopcart
           fix add to cart stuff by adding model manager method to do it correctly
           make sure that when purchitems becomes unavailable that user carts will add the next available purchitem matching criteria
+          add quantity to add to cart form and add that logic to everywhere else
      sales
           make sure historical data is preserved
           optimize checkout process so it isn't redoing everything every time they reload the page
      users
-          make emails unique
+          I want to make emails unique
+     models settings stuff
+          When should I set null=True, blank=True, etc.
+          When to set models.CASCADE=PROTECT or other
      testing apps in general
           best software/way to test stuff
+     make admin more usable
+          how to show other fields other than self in listview
+          change purchases > purchaseitems so that it uses quantity field
      emails
           can we just attach images to emails and send them without worry? Have read warnings about transactional emails getting blocked by gmail servers
           why would we use email sending service?
