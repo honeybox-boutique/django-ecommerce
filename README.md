@@ -3,20 +3,31 @@ Clothing Store e-commerce site
 
 Apps
 
-addresses - manages addresses  
-billing - manages stripe stuff, payment info  
+*addresses - manages addresses  
+*billing - manages stripe stuff, payment info  
 coupons - used to process coupon codes  
-emails - manage contact us page functionality  
+*emails - manage contact us page functionality  
 homepage - manage home page images  
 pricing - manage product pricing and discounts  
 products - manage products  
-purchases	- manage product inventory purchases  
-sales - manage sales creation and stuff  
-shipping - manage easypost stuff, send shipping emails  
-shopcart - manage user shopcart as well as checkout home view  
+-purchases	- manage product inventory purchases  
+*sales - manage sales creation and stuff  
+*shipping - manage easypost stuff, send shipping emails  
+*shopcart - manage user shopcart as well as checkout home view  
 speedtest - main appp. want to rename to eccomerce, haven't had time to figure out how  
 tax - manages sales tax charged to customer based on shipping address and jurisdictions  
-users - manages users and guests, django.conrtib.auth mainly  
+*users - manages users and guests, django.conrtib.auth mainly  
+
+Things I need help with in order of importance:
+
+     billing
+          
+     addresses
+     shopcart
+     sales
+     users
+     emails
+     shipping
 
 Environment Setup  
 
