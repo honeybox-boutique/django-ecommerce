@@ -16,8 +16,8 @@ from addresses.models import Address
 from pricing.models import SDiscount
 
 import stripe
-STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '***REMOVED***')
-STRIPE_PUB_KEY = getattr(settings, 'STRIPE_PUB_KEY', '***REMOVED***')
+STRIPE_SECRET_KEY = settings.STRIPE_SECRET_KEY
+STRIPE_PUB_KEY = settings.STRIPE_PUB_KEY
 stripe.api_key = STRIPE_SECRET_KEY
 
 def cart_home(request):
@@ -47,7 +47,6 @@ def cart_remove_item(request):
 def cart_update(request):
     """ should use product-slug, color, and size as parameters to check if:
         purchitem with matching slug, color, and size exists,
-        AND does NOT have a sale transaction associated with it
     """
     # get cart
     cart_obj, new_obj = ShopCart.objects.get_or_new(request)
@@ -114,7 +113,7 @@ def edit_ship_method(request):
 
 
 def edit_billing(request):
-    """ removes prodStockItem from cart """
+    """ removes billing address from sale """
     form = EditSaleForm(request.POST)
 
     if form.is_valid():
@@ -126,7 +125,7 @@ def edit_billing(request):
     return redirect('shopcart:checkout')
 
 def edit_card(request):
-    """ removes prodStockItem from cart """
+    """ removes payment card and billing address from sale """
     form = EditSaleForm(request.POST)
 
     if form.is_valid():
@@ -134,11 +133,12 @@ def edit_card(request):
         sale_obj = Sale.objects.get(saleID=sale_id)
         if sale_obj.saleStatus == 'created':
             sale_obj.salePaymentCard = None
+            sale_obj.saleBillingAddress = None
             sale_obj.save()
     return redirect('shopcart:checkout')
 
 def ship_method(request):
-    """ removes prodStockItem from cart """
+    """ Removes shipping method from sale """
     form = CustomerShipMethodForm(request.POST)
 
     if form.is_valid():
@@ -167,7 +167,6 @@ def checkout_home(request):
     ship_method_form = None
     billing_address_id = request.session.get('billing_address_id', None)
     shipping_address_id = request.session.get('shipping_address_id', None)
-
     if cart_created or cart_items.count() == 0:# if cart was just created redirect to cart home
         return redirect('shopcart:home')
 

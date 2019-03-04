@@ -2,7 +2,7 @@ from django import forms
 from .models import Address
 
 class AddressForm(forms.ModelForm):
-    remember_address = forms.BooleanField(required=False, initial=False, label='Remember this? (If you are not signed in with an account, this will not be remembered)')
+    remember_address = forms.BooleanField(required=False, initial=True, label='Remember this? (If you are not signed in with an account, this will not be remembered)')
     class Meta:
         model = Address
         fields = (

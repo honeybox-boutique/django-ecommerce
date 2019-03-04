@@ -1,0 +1,31 @@
+
+
+# allowed hosts
+ALLOWED_HOSTS = ['127.0.0.1',]
+
+# email password
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'email@gmail.com'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_PORT = 587
+
+#secret key
+SECRET_KEY = 'secretkey'
+
+# API keys
+
+# Stripe test keys
+# put test api key from stripe account here
+STRIPE_SECRET_KEY = 'testsecretkey'
+STRIPE_PUB_KEY = 'testpubkey'
+
+# Easypost test key
+# put test api key from easypost here
+EASYPOST_SECRET_KEY = 'testsecretkey'
+
+# Database creds
+DB_NAME = 'dbname'
+DB_USER = 'dbuser'
+DB_PASSWORD = 'dbpass'
+DB_HOST = '127.0.0.1'
+DB_PORT = '5432'

@@ -23,4 +23,6 @@ class GuestSessionsMiddleware(MiddlewareMixin):
                         # set inactive
                         billing_profile.set_inactive()
                         del request.session['guest_email_id']
+                    if 'billing_address_id' in request.session:
+                        del request.session['billing_address_id']
         return response

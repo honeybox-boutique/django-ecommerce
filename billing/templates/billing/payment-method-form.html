@@ -13,5 +13,5 @@
     <p>{{ address_form.remember_address.label }}: {{ address_form.remember_address|add_class_and_placeholder:'data-remember_address' }}</p>
     </form>
     <div class="stripe-payment-form" data-token="{{ publish_key }}" data-next-url="{% if next_url %}
-    {{ next_url }}{% endif %}"></div>
+    {{ next_url }}{% else %}{{ request.build_absolute_uri }}{% endif %}"></div>
 </div>

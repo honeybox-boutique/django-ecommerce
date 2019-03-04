@@ -8,7 +8,6 @@ from addresses.models import Address
 
 
 import easypost
-# test key#  easypost.api_key = '***REMOVED***'
 easypost.api_key = settings.EASYPOST_SECRET_KEY
 
 

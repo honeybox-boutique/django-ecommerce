@@ -147,7 +147,7 @@ class Sale(models.Model):
                 item.save()
         return self.saleStatus
 
-    # calculates total based on present values. if ANY null return error?
+    # calculates total based on present values.
     def get_total(self):
         total = decimal.Decimal("0.00")
         sub_total = self.saleSubTotal
@@ -233,7 +233,6 @@ class Sale(models.Model):
     def get_tax_amount(self):
         tax_amount = decimal.Decimal("0.00")
         # get jurisdiction
-        # START HEREEEEEEEEEEEEEEEEEE
         jurisdiction_obj = self.get_jurisdiction()
         # jurisdiction_obj, jurisdiction_exists = self.get_jurisdiction()
         if jurisdiction_obj is not None:

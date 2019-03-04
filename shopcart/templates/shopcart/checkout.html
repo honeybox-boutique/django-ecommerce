@@ -148,48 +148,6 @@
             </div>
         </div>
 </div>
-    {% elif not sale_obj.saleBillingAddress %}
-
-<div class="container">
-        <div class="row">
-            <div class="col-12">
-                <h1>Billing Address</h1>
-                <hr/>
-            </div>
-            <div class="col-6">
-                {% if address_qs.exists %}
-                <h5>Use Existing Address</h5>
-                {% url 'addresses:checkout_address_reuse' as checkout_address_reuse %}
-                {% include 'addresses/prev_addresses.html' with address_qs=address_qs next=request.build_absolute_uri action_url=checkout_address_reuse addressType='billing' %}
-                {% endif %}
-
-                <a class="btn badge badge-secondary badge-pill" data-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false" aria-controls="collapseExample">Add an Address</a>
-                <div class="collapse" id="collapseForm">
-                    <div class="card card-body">
-                {% url 'addresses:checkout_address_create' as checkout_address_create_url %}
-                {% include 'addresses/form.html' with form=address_form next=request.build_absolute_uri action_url=checkout_address_create_url addressType='billing' %}
-                    </div>
-                </div>
-                <br>
-                <br>
-                <h5>Shipping Address</h5>
-                <p>{{ sale_obj.saleShippingAddress.addressLine1 }}, {{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
-                {% include 'shopcart/edit-shipping-form.html' with form=edit_form %}
-                <br>
-                <h5>Shipping Method</h5>
-                <p>{{ sale_obj.customerShipMethodID }}</p>
-                {% include 'shopcart/edit-ship-method-form.html' with form=edit_form %}
-                <br>
-            </div>
-
-        {% include 'shopcart/snippets/cart-display.html' %}
-        </div><!--End of row-->
-        <div class="row">
-            <div class="col-12 text-center">
-                <a class="btn badge badge-secondary" href="{% url 'shopcart:home' %}">Return to Cart</a>
-            </div>
-        </div>
-</div>
     {% elif not sale_obj.salePaymentCard %}
 <div class="container">
     <div class="row">
@@ -226,12 +184,6 @@
             <h1>Finalize Checkout</h1>
             <hr>
         </div>
-        <div class="col-12">
-            <form class="form" method="POST" action="{% url 'shopcart:checkout' %}">{% csrf_token %}
-                <button type="submit" class="btn btn-block badge-secondary">Complete Checkout and Authorize Payment</button>
-            </form>
-        <br>
-        </div>
         <div class="col-6">
             <h4>Shipping Address</h4>
             <p>{{ sale_obj.saleShippingAddress.addressLine1 }}, {{ sale_obj.saleShippingAddress.addressCity }}, {{ sale_obj.saleShippingAddress.addressState }} {{ sale_obj.saleShippingAddress.addressCountry }}</p>
@@ -241,19 +193,24 @@
             <p>{{ sale_obj.customerShipMethodID }}</p>
             {% include 'shopcart/edit-ship-method-form.html' with form=edit_form %}
             <br>
-            <h4>Billing Address</h4>
-            <p>{{ sale_obj.saleBillingAddress.addressLine1 }}, {{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
-            {% include 'shopcart/edit-billing-form.html' with form=edit_form %}
             <br>
-            <h4>Payment Method</h4>
+            <h4>Billing Information</h4>
+            <p>{{ sale_obj.saleBillingAddress.addressLine1 }}, {{ sale_obj.saleBillingAddress.addressCity }}, {{ sale_obj.saleBillingAddress.addressState }} {{ sale_obj.saleBillingAddress.addressCountry }}</p>
             <p>{{ sale_obj.salePaymentCard }}</p>
             {% include 'shopcart/edit-card-form.html' with form=edit_form %}
+            <br>
         </div>
         {% include 'shopcart/snippets/cart-display-finalize.html' %}
     </div>
     <div class="row">
-        <div class="col-12 text-center">
+        <div class="col-6 text-center">
             <a class="btn badge badge-secondary" href="{% url 'shopcart:home' %}">Return to Cart</a>
+        </div>
+        <div class="col-6 text-center">
+            <form class="form" method="POST" action="{% url 'shopcart:checkout' %}">{% csrf_token %}
+                <button type="submit" class="btn btn-small badge-secondary">Complete Checkout</button>
+            </form>
+        <br>
         </div>
     </div>
     </div>

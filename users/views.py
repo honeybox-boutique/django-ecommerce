@@ -100,8 +100,8 @@ def dashboard_payment_methods(request):
     # stripe stuff
     from django.conf import settings
     import stripe
-    STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '***REMOVED***')
-    STRIPE_PUB_KEY = getattr(settings, 'STRIPE_PUB_KEY', '***REMOVED***')
+    STRIPE_SECRET_KEY = settings.STRIPE_SECRET_KEY
+    STRIPE_PUB_KEY = settings.STRIPE_PUB_KEY
     stripe.api_key = STRIPE_SECRET_KEY
 
     #next url stuff

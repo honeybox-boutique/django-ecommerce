@@ -7,12 +7,13 @@ from addresses.forms import AddressForm
 from .forms import CardIDForm
 
 from .models import BillingProfile, Card
+from addresses.models import Address
 from sales.models import Sale
 from shopcart.models import ShopCart
 
 import stripe
-STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '***REMOVED***')
-STRIPE_PUB_KEY = getattr(settings, 'STRIPE_PUB_KEY', '***REMOVED***')
+STRIPE_SECRET_KEY = settings.STRIPE_SECRET_KEY
+STRIPE_PUB_KEY = settings.STRIPE_PUB_KEY
 stripe.api_key = STRIPE_SECRET_KEY
 
 
@@ -57,11 +58,18 @@ def payment_method_create_view(request):
                 request.session[instance.addressType + "_address_id"] = instance.id
                 token = request.POST.get('token')
                 if token:
-                    new_card_obj = Card.objects.add_new(billing_profile, token, instance, remember)
-                    sale_obj.salePaymentCard = new_card_obj
-                    sale_obj.saleBillingAddress = instance
-                    sale_obj.save()
-                    return JsonResponse({'message': 'Done'})
+                    new_card_obj, new_card_error = Card.objects.add_new(billing_profile, token, instance, remember)
+                    if new_card_obj:
+                        sale_obj.salePaymentCard = new_card_obj
+                        sale_obj.saleBillingAddress = instance
+                        sale_obj.save()
+                        return JsonResponse({'message': 'Success! Your card was added.'})
+                    else:
+                        print('deleted address')
+                        form.instance.delete()
+                        del request.session['billing_address_id']
+                        return JsonResponse({'message': str(new_card_error)})
+
 
 
     elif request.method == 'POST':
@@ -78,8 +86,24 @@ def payment_method_create_view(request):
                 )
                 # add card to sale
                 sale_obj.salePaymentCard = card_obj
-                # save sale
-                sale_obj.save()
+                # add corresponding address to sale
+                billing_address_qs = Address.objects.filter(
+                    addressBillingProfile=billing_profile,
+                    addressLine1=card_obj.cardAddressLine1,
+                    addressLine2=card_obj.cardAddressLine2,
+                    addressCity=card_obj.cardCity,
+                    addressState=card_obj.cardState,
+                    addressPostalCode=card_obj.cardPostalCode,
+                    addressName=card_obj.cardName,
+                )
+                if billing_address_qs.count() == 1:
+                    print('found address')
+                    # add address to sale
+                    sale_obj.saleBillingAddress = billing_address_qs.first()
+                    # save sale
+                    sale_obj.save()
+                else:
+                    print('no matching address')
                 return redirect('shopcart:checkout')
             else:
                 return redirect('shopcart:home')

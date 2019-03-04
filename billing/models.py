@@ -128,54 +128,76 @@ class CardManager(models.Manager):
     def add_new(self, billing_profile, token, address_obj=None, remember=False):
         if token:
             customer = stripe.Customer.retrieve(billing_profile.billingToken)
-            stripe_card = customer.sources.create(source=token)
-            if address_obj:
-                # set new info on card
-                stripe_card.address_city = address_obj.addressCity
-                stripe_card.address_country = address_obj.addressCountry 
-                stripe_card.address_line1 = address_obj.addressLine1 
-                stripe_card.address_line2 = address_obj.addressLine2 
-                stripe_card.address_state = address_obj.addressState
-                stripe_card.address_zip = address_obj.addressPostalCode
-                stripe_card.name = address_obj.addressName
-                stripe_card.save()
-
-            if remember:
-                new_card = self.model(
-                    billingProfile=billing_profile,
-                    cardStripeID=stripe_card.id,
-                    cardBrand=stripe_card.brand,
-                    cardCountry=stripe_card.country,
-                    cardExpMonth=stripe_card.exp_month,
-                    cardExpYear=stripe_card.exp_year,
-                    cardLast4=stripe_card.last4,
-                    cardAddressLine1=stripe_card.address_line1,
-                    cardAddressLine2=stripe_card.address_line2,
-                    cardCity=stripe_card.address_city,
-                    cardState=stripe_card.address_state,
-                    cardPostalCode=stripe_card.address_zip,
-                    cardName=stripe_card.name,
-                )
+            try:
+                stripe_card = customer.sources.create(source=token)
+            except stripe.error.CardError as e:
+                # Problem with the card
+                return None, e
+            except stripe.error.RateLimitError as e:
+                # Too many requests made to the API too quickly
+                return None, e
+            except stripe.error.InvalidRequestError as e:
+                # Invalid parameters were supplied to Stripe API
+                return None, e
+            except stripe.error.AuthenticationError as e:
+                # Authentication Error: Authentication with Stripe API failed (maybe you changed API keys recently)
+                return None, e
+            except stripe.error.APIConnectionError as e:
+                # Network communication with Stripe failed
+                return None, e
+            except stripe.error.StripeError as e:
+                # Stripe Error
+                return None, e
             else:
-                new_card = self.model(
-                    billingProfile=billing_profile,
-                    cardStripeID=stripe_card.id,
-                    cardBrand=stripe_card.brand,
-                    cardCountry=stripe_card.country,
-                    cardExpMonth=stripe_card.exp_month,
-                    cardExpYear=stripe_card.exp_year,
-                    cardLast4=stripe_card.last4,
-                    cardAddressLine1=stripe_card.address_line1,
-                    cardAddressLine2=stripe_card.address_line2,
-                    cardCity=stripe_card.address_city,
-                    cardState=stripe_card.address_state,
-                    cardPostalCode=stripe_card.address_zip,
-                    cardName=stripe_card.name,
-                    cardActive=False,
-                )
-            new_card.save()
-            return new_card
-        return None
+                #success
+
+                if address_obj:
+                    # set new info on card
+                    stripe_card.address_city = address_obj.addressCity
+                    stripe_card.address_country = address_obj.addressCountry 
+                    stripe_card.address_line1 = address_obj.addressLine1 
+                    stripe_card.address_line2 = address_obj.addressLine2 
+                    stripe_card.address_state = address_obj.addressState
+                    stripe_card.address_zip = address_obj.addressPostalCode
+                    stripe_card.name = address_obj.addressName
+                    stripe_card.save()
+
+                if remember:
+                    new_card = self.model(
+                        billingProfile=billing_profile,
+                        cardStripeID=stripe_card.id,
+                        cardBrand=stripe_card.brand,
+                        cardCountry=stripe_card.country,
+                        cardExpMonth=stripe_card.exp_month,
+                        cardExpYear=stripe_card.exp_year,
+                        cardLast4=stripe_card.last4,
+                        cardAddressLine1=stripe_card.address_line1,
+                        cardAddressLine2=stripe_card.address_line2,
+                        cardCity=stripe_card.address_city,
+                        cardState=stripe_card.address_state,
+                        cardPostalCode=stripe_card.address_zip,
+                        cardName=stripe_card.name,
+                    )
+                else:
+                    new_card = self.model(
+                        billingProfile=billing_profile,
+                        cardStripeID=stripe_card.id,
+                        cardBrand=stripe_card.brand,
+                        cardCountry=stripe_card.country,
+                        cardExpMonth=stripe_card.exp_month,
+                        cardExpYear=stripe_card.exp_year,
+                        cardLast4=stripe_card.last4,
+                        cardAddressLine1=stripe_card.address_line1,
+                        cardAddressLine2=stripe_card.address_line2,
+                        cardCity=stripe_card.address_city,
+                        cardState=stripe_card.address_state,
+                        cardPostalCode=stripe_card.address_zip,
+                        cardName=stripe_card.name,
+                        cardActive=False,
+                    )
+                new_card.save()
+                return new_card, 'Success!'
+        return None, 'No Customer found'
 
 class Card(models.Model):
     billingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)

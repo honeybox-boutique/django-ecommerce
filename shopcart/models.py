@@ -99,16 +99,13 @@ class ShopCart(models.Model):
         return is_empty
 
 
+# calculates shopcart subtotal on m2m change
 def m2m_changed_shopcart_receiver(sender, instance, action, *args, **kwargs):
     if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
         shopcart_items = instance.shopCartItems.all().select_related('productID')# may need optimizing
         subtotal = 0
-        for item in shopcart_items:# this loop needs optimizing, pretty sure querying for every loop
+        for item in shopcart_items:# may need optimizing
             subtotal += item.productID.productSalePrice
         instance.shopCartSubTotal = subtotal
         instance.save()
 m2m_changed.connect(m2m_changed_shopcart_receiver, sender=ShopCart.shopCartItems.through)
-
-# def pre_save_shopcart_receiver(sender, instance, *args, **kwargs):
-    # instance.
-# pre_save.connect(pre_save_shopcart_receiver, sender=ShopCart.shopCartItems.through)
