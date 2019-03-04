@@ -104,8 +104,9 @@ Shipping
 
      Currently, a sale can have one to many shipments
      Currently, a shipment can have one to many parcels
+     Easypost api calls do not have error handling currently
      I have only tested making one shipment with a single parcel per sale. 
-          I'm not sure how I'm going to implement multi-parcel shipments for when an order can't be shipped in one box. Using USPS through easypost.
+          Will need to make it so admin can create additional shipments if items can't fit in 1 shipment
           
 Data models  
 
