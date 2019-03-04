@@ -2,6 +2,10 @@
 
 Created using https://www.youtube.com/playlist?list=PLV2_Iivd4jxYVDWCcxmccusNaUx2kWCg1 as a guide. If I did anything weird look here to get some perspective on my methodology. I do cart stuff, and pricing differently to preserve historical data, allow for time based pricing, and allow for inventory management. Some other stuff might also be slightly different.
 
+## Note on variable naming in this project
+
+When I started this project I was unaware of best practices when naming variables in Python. As a result, the variable names are inconsistent in style. For the most part, I have used conventional Python styling in everything except the names of the model fields. Those use camelCase with the exception of some stuff in BillingProfile (I'm so sorry).
+
 ## Environment Setup  
 
      Have postgresql server setup  
