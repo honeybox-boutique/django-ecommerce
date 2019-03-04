@@ -28,10 +28,21 @@ enter appropriate info into base_keys.py
 run it  
 
 Things to note about functionality of site     
-     - stuff
-     -
-     -
-     
+     Products  
+          make sure you have added the following to display a product for sale:  
+               -add the product itself to products  
+               -add active pricing for product  
+               -productcolors imageset  
+               -applicable discounts  
+     Billing Profiles  
+          a billing profile is supposed to represent a stripe customer.  
+          It is created when clicking on 'checkout' in cart view and then continuing as guest or as user.  
+          There are 'user' billing profiles and 'guest' billing profiles  
+          user  
+               a billing profile can only be associated with one user  
+          guest  
+               same as user billing profile except profile type is guest and user association is null   
+               will be marked inactive if guest navigates away from checkout or upon checkout finish  
 
 Data models  
 
