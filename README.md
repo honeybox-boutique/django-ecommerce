@@ -1,6 +1,16 @@
 # Clothing Store e-commerce site
 Clothing Store e-commerce site
 
+Environment Setup  
+
+Have postgresql server setup  
+set up virtualenv
+Clone repo  
+Install requirements.txt  
+duplicate base_keys.template and rename to base_keys.py  
+enter appropriate info into base_keys.py  
+run it
+
 Apps
 
 *addresses - manages addresses  
@@ -43,14 +53,7 @@ Things I need help with in order of importance:
      image/static content delivery optimization
           best practices?
 
-Environment Setup  
 
-Have postgresql server setup
-Clone repo  
-Install requirements.txt  
-duplicate base_keys.template and rename to base_keys.py  
-enter appropriate info into base_keys.py  
-run it  
 
 Things to note about functionality of site     
 
