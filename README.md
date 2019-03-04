@@ -164,7 +164,7 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
         chargeSellerMessage = models.CharField(max_length=120, blank=True, null=True)
         chargeRiskLevel = models.CharField(max_length=120, blank=True, null=True)
         
-#### homepage
+### homepage
 
     homepageimage  
         homePageImagePath - 
@@ -174,7 +174,7 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
         bigHomePageImagePath = 
         bigHomePageImageAltText = 
         bigHomePageImageLink = 
-#### pricing
+### pricing
 
     pricing
         pricingBasePrice = models.DecimalField(max_digits=12, decimal_places=2)
