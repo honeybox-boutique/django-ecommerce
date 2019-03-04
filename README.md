@@ -130,12 +130,48 @@ pricing
 
 products
     color  
+        colorID = models.AutoField(primary_key=True)
+        colorName = models.CharField(max_length=50)
+        colorDescription = models.TextField(max_length=200)
     category  
+        categoryName = models.CharField(max_length=200)
+        categoryDescription = models.CharField(max_length=200)
     categoryimage  
+        categoryImageID = models.AutoField(primary_key=True)
+        categoryImagePath = models.ImageField(upload_to='categories')
+        categoryID = models.ForeignKey(Category, on_delete=models.CASCADE)
     size  
+        sizeID = models.AutoField(primary_key=True)
+        sizeName = models.CharField(max_length=200)
+        sizeDescription = models.TextField(max_length=200)
+        sizeNotes = models.TextField(max_length=255)
     product  
+        productID = models.AutoField(primary_key=True)
+        productName = models.CharField(max_length=200)
+        productDescription = models.TextField(max_length=200)
+        productSlug = models.SlugField(unique=True)
+        productCategories = models.ManyToManyField(Category)
+        productSizes = models.ManyToManyField(Size)
+
+        #Calculated fields
+        productDiscountAmount = models.DecimalField(null=True, max_digits=12, decimal_places=2)
+        productSalePrice = models.DecimalField(null=True, max_digits=12, decimal_places=2)
+        productBasePrice = models.DecimalField(null=True, max_digits=12, decimal_places=2)
+        productDiscountType = models.CharField(null=True, max_length=40)
+        productDiscountValue = models.DecimalField(null=True, max_digits=12, decimal_places=2)
+
+        colorID = models.ManyToManyField(Color, through='ProductColor')
     productcolor  
+        productColorID = models.AutoField(primary_key=True)
+        productColorName = models.CharField(max_length=120)
+
+        productID = models.ForeignKey(Product, on_delete=models.CASCADE)
+        colorID = models.ForeignKey(Color, on_delete=models.CASCADE)
     productimage  
+        productImageID = models.AutoField(primary_key=True)
+        productImagePath = models.ImageField(upload_to='products')
+        # will Add alt text field here - productImageAltText = models.CharField(max_length=40)
+        productColorID = models.ForeignKey(ProductColor, on_delete=models.CASCADE)
 purchases  
     vendor  
     purchase  
