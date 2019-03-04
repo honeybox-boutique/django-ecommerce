@@ -28,22 +28,51 @@ enter appropriate info into base_keys.py
 run it  
 
 Things to note about functionality of site     
-     Products  
+
+Products  
+     
           make sure you have added the following to display a product for sale:  
                -add the product itself to products  
                -add active pricing for product  
                -productcolors imageset  
                -applicable discounts  
-     Billing Profiles  
+
+Billing Profiles  
+     
           a billing profile is supposed to represent a stripe customer.  
           It is created when clicking on 'checkout' in cart view and then continuing as guest or as user.  
+          
           There are 'user' billing profiles and 'guest' billing profiles  
           user  
                a billing profile can only be associated with one user  
           guest  
                same as user billing profile except profile type is guest and user association is null   
                will be marked inactive if guest navigates away from checkout or upon checkout finish  
+Shopping Carts
 
+     Currently a user can have multiple shopping cart per the model, but I have written the code intending to make it a one-to-one relationship
+     Currently, shopcart status does absolutely nothing
+     Currently, adding a product to shopping cart adds the first purchaseitem from inventory that matches post criteria. 
+          This is causing issues when the item eventually gets purchased. 
+          Any other shoppers who have that purchase item in their cart will have it removed automatically by the model manager as it is no longer available.
+          Need to fix this somehow
+Sales
+     
+     -When user clicks checkout and continues as either guest or user, a sale gets created with a status of 'created'.
+          The users shopcart items get copied into the saleitems as well. 
+          Every request in the checkout process (even refreshing page)  will recopy items from cart. 
+          This is to recheck the availability of the items in the cart. 
+          If the item is no longer available, the item is automatically removed from the cart and the user is redirected to cart home.
+               Want to change this so it will check if another purchitem is available with same product attributes
+     -Sale status determines whether or not the saleitems, salediscounts and other related items will be modified.
+     -Upon checkout completion sale gets marked payed. as a result it is no longer changed by my code (I think)
+Shipping
+
+     Currently, a sale can have one to many shipments
+     Currently, a shipment can have one to many parcels
+     I have only tested making one shipment with a single parcel per sale. 
+          I'm not sure how I'm going to implement multi-parcel shipments for when an order can't be shipped in one box. Using USPS through easypost.
+          
 Data models  
 
 addresses  
