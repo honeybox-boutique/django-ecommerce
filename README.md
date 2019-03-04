@@ -70,20 +70,20 @@ pricing
         pricingIsActive = models.BooleanField(default=False)
     
     pdiscount
-        pDiscountID = models.AutoField(primary_key=True)
-        pDiscountName = models.CharField(max_length=40)
-        pDiscountDescription = models.TextField(max_length=200)
-        pDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)# change: add choices for percent and decimal
-        pDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)
-        pDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
-        pDiscountDateValidFrom = models.DateTimeField('valid from')
-        pDiscountDateValidUntil = models.DateTimeField('valid until')
-        pDiscountCouponCode = models.CharField(max_length=20)
-        pDiscountMaxDiscount = models.DecimalField(max_digits=12, decimal_places=2)
-        pDiscountMinOrderValue = models.DecimalField(max_digits=12, decimal_places=2)
-        pDiscountIsActive = models.BooleanField(default=False)
+        pDiscountID = models.AutoField(primary_key=True)  
+        pDiscountName = models.CharField(max_length=40)  
+        pDiscountDescription = models.TextField(max_length=200)  
+        pDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)  
+        pDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)  
+        pDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)  
+        pDiscountDateValidFrom = models.DateTimeField('valid from')  
+        pDiscountDateValidUntil = models.DateTimeField('valid until')  
+        pDiscountCouponCode = models.CharField(max_length=20)  
+        pDiscountMaxDiscount = models.DecimalField(max_digits=12, decimal_places=2)  
+        pDiscountMinOrderValue = models.DecimalField(max_digits=12, decimal_places=2)  
+        pDiscountIsActive = models.BooleanField(default=False)  
 
-        productID = models.ForeignKey(Product, on_delete=models.CASCADE)
+        productID = models.ForeignKey(Product, on_delete=models.CASCADE)  
     cdiscount
         cDiscountID = models.AutoField(primary_key=True)
         cDiscountName = models.CharField(max_length=40)
@@ -99,60 +99,65 @@ pricing
         cDiscountIsActive = models.BooleanField(default=False)
         categoryID = models.ForeignKey(Category, on_delete=models.CASCADE)
         sDiscountID = models.AutoField(primary_key=True)
-    sdiscount
-        sDiscountName = models.CharField(max_length=40)
-        sDiscountDescription = models.TextField(max_length=200)
-        sDiscountMessage = models.CharField(max_length=150)
-        sDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)
-        sDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)
-        sDiscountDateCreated = models.DateTimeField('date created')
-        sDiscountDateValidFrom = models.DateTimeField('valid from')
-        sDiscountDateValidUntil = models.DateTimeField('valid until')
-        sDiscountCouponCode = models.CharField('coupon code', max_length=20)
-        sDiscountMaxAmount = models.DecimalField(max_digits=8, decimal_places=3)
-        sDiscountMinSaleValue = models.DecimalField(max_digits=8, decimal_places=3)
-        sDiscountAutomatic = models.BooleanField(default=False)
-        sDiscountIsShippingDiscount = models.BooleanField(default=False)
-        sDiscountIsActive = models.BooleanField(default=False)
+    sdiscount  
+        sDiscountName = models.CharField(max_length=40)  
+        sDiscountDescription = models.TextField(max_length=200)  
+        sDiscountMessage = models.CharField(max_length=150)  
+        sDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)  
+        sDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)  
+        sDiscountDateCreated = models.DateTimeField('date created')  
+        sDiscountDateValidFrom = models.DateTimeField('valid from')  
+        sDiscountDateValidUntil = models.DateTimeField('valid until')  
+        sDiscountCouponCode = models.CharField('coupon code', max_length=20)  
+        sDiscountMaxAmount = models.DecimalField(max_digits=8, decimal_places=3)  
+        sDiscountMinSaleValue = models.DecimalField(max_digits=8, decimal_places=3)  
+        sDiscountAutomatic = models.BooleanField(default=False)  
+        sDiscountIsShippingDiscount = models.BooleanField(default=False)  
+        sDiscountIsActive = models.BooleanField(default=False)  
     sdiscountcondition
-        sDCID = models.AutoField(primary_key=True)
-        sDCName = models.CharField(max_length=50)
-        sDCFailMessage = models.TextField(max_length=200)
-        sDCType = models.CharField(max_length=50, choices=CONDITION_TYPE_CHOICES)
-        sDCFieldName = models.CharField(max_length=50, choices=FIELD_NAME_CHOICES)
-        sDCCompareOperator = models.CharField(max_length=50, choices=COMPARE_OPERATOR_CHOICES)
-        sDCValue = models.CharField(max_length=70)
-        sDCNumRequired = models.IntegerField(default=1)
+        sDCID = models.AutoField(primary_key=True)  
+        sDCName = models.CharField(max_length=50)  
+        sDCFailMessage = models.TextField(max_length=200)  
+        sDCType = models.CharField(max_length=50, choices=CONDITION_TYPE_CHOICES)  
+        sDCFieldName = models.CharField(max_length=50, choices=FIELD_NAME_CHOICES)  
+        sDCCompareOperator = models.CharField(max_length=50, choices=COMPARE_OPERATOR_CHOICES)  
+        sDCValue = models.CharField(max_length=70)  
+        sDCNumRequired = models.IntegerField(default=1)  
 
-        sDiscountID = models.ForeignKey(SDiscount, on_delete=models.CASCADE)
+        sDiscountID = models.ForeignKey(SDiscount, on_delete=models.CASCADE)  
     
 
 
 products
-    color
-    category
-    categoryimage
-    size
-    product
-    productcolor
-    productimage
+    color  
+    category  
+    categoryimage  
+    size  
+    product  
+    productcolor  
+    productimage  
 purchases  
-    vendor
-    purchase
-    purchaseitems
+    vendor  
+    purchase  
+    purchaseitems  
 sales	
-    customershipmethod
-    sale
-    saleitems
+    customershipmethod  
+    sale  
+    saleitems  
 shipping	
-    warehouse
-    shipment
-    parcel
+    warehouse  
+    shipment  
+    parcel  
 shopcart	
-    shopcart
+    shopcart  
 speedtest	
-tax	
+tax	 
+    jurisdiction  
+    taxrate  
+    
 users	
+    default django auth (want to override to make emails unique asap)  
+    guest  
 
 
 How to manage the site
