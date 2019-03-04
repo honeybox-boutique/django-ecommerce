@@ -1,9 +1,8 @@
 # Clothing Store e-commerce site
-Clothing Store e-commerce site
 
 Created using https://www.youtube.com/playlist?list=PLV2_Iivd4jxYVDWCcxmccusNaUx2kWCg1 as a guide. If I did anything weird look here to get some perspective on my methodology. I do cart stuff, and pricing differently to preserve historical data, allow for time based pricing, and allow for inventory management. Some other stuff might also be slightly different.
 
-Environment Setup  
+## Environment Setup  
 
      Have postgresql server setup  
      set up virtualenv  
@@ -13,7 +12,7 @@ Environment Setup
      enter valid info into base_keys.py  
      run it
 
-Apps
+## Apps
 
 *addresses - manages addresses  
 *billing - manages stripe stuff, payment info  
@@ -30,8 +29,8 @@ speedtest - main appp. want to rename to eccomerce, haven't had time to figure o
 tax - manages sales tax charged to customer based on shipping address and jurisdictions  
 *users - manages users and guests, django.conrtib.auth mainly  
 
-Things I need help with in order of importance:
-
+## Things I need help with in order of importance:
+     version control best practices for issues (bugs) and the resolution thereof?
      billing
           make sure adding payment methods is seamless and error messages appear appropriately
      addresses
@@ -57,15 +56,15 @@ Things I need help with in order of importance:
 
 
 
-Things to note about functionality of site     
+## Things to note about functionality of site     
 
-All
+### All
 
      The admin site has NOT been tested with invalid inputs at all. For the time being I'm going to save this for later and assume admin of site will enter everything correctly
      The public-facing stuff has been LIGHTLY tested. I haven't had time to do more. 
      I know for a fact there a couple views that are using uncleaned post data for things. Couldn't figure out how to add needed field to form and put it through cleaned_data method.
 
-Products  
+### Products  
      
           make sure you have added the following to display a product for sale:  
                -add the product itself to products  
@@ -73,7 +72,7 @@ Products
                -productcolors imageset  
                -applicable discounts  
 
-Billing Profiles  
+### Billing Profiles  
      
           a billing profile is supposed to represent a stripe customer.  
           It is created when clicking on 'checkout' in cart view and then continuing as guest or as user.  
@@ -84,7 +83,7 @@ Billing Profiles
           guest  
                same as user billing profile except profile type is guest and user association is null   
                will be marked inactive if guest navigates away from checkout or upon checkout finish  
-Shopping Carts
+### Shopping Carts
 
      Currently a user can have multiple shopping cart per the model, but I have written the code intending to make it a one-to-one relationship
      Currently, shopcart status does absolutely nothing
@@ -92,7 +91,7 @@ Shopping Carts
           This is causing issues when the item eventually gets purchased. 
           Any other shoppers who have that purchase item in their cart will have it removed automatically by the model manager as it is no longer available.
           Need to fix this somehow
-Sales
+### Sales
      
      -When user clicks checkout and continues as either guest or user, a sale gets created with a status of 'created'.
           The users shopcart items get copied into the saleitems as well. 
@@ -102,7 +101,7 @@ Sales
                Want to change this so it will check if another purchitem is available with same product attributes
      -Sale status determines whether or not the saleitems, salediscounts and other related items will be modified.
      -Upon checkout completion sale gets marked payed. as a result it is no longer changed by my code (I think)
-Shipping
+### Shipping
 
      Currently, a sale can have one to many shipments
      Currently, a shipment can have one to many parcels
@@ -110,9 +109,9 @@ Shipping
      I have only tested making one shipment with a single parcel per sale. 
           Will need to make it so admin can create additional shipments if items can't fit in 1 shipment
           
-Data models  
+## Data models  
 
-addresses  
+### addresses  
 
     address
         addressBillingProfile - billing profile associated with address  
@@ -127,7 +126,7 @@ addresses
         addressActive - used to determine if address should be shown in existing addresses for user that is logged in  
         addressEasyPostID - easypost address token  
 
-billing 
+### billing 
 
     billingprofile
         billingEmail = email associated with billing profile  
@@ -165,7 +164,7 @@ billing
         chargeSellerMessage = models.CharField(max_length=120, blank=True, null=True)
         chargeRiskLevel = models.CharField(max_length=120, blank=True, null=True)
         
-homepage
+#### homepage
 
     homepageimage  
         homePageImagePath - 
@@ -175,7 +174,7 @@ homepage
         bigHomePageImagePath = 
         bigHomePageImageAltText = 
         bigHomePageImageLink = 
-pricing
+#### pricing
 
     pricing
         pricingBasePrice = models.DecimalField(max_digits=12, decimal_places=2)
@@ -244,7 +243,7 @@ pricing
     
 
 
-products
+### products
     
     color  
         colorID = models.AutoField(primary_key=True)
@@ -292,7 +291,7 @@ products
         productImagePath = models.ImageField(upload_to='products')
         # will Add alt text field here - productImageAltText = models.CharField(max_length=40)
         productColorID = models.ForeignKey(ProductColor, on_delete=models.CASCADE)
-purchases  
+### purchases  
 
     vendor
         vendorID = models.AutoField(primary_key=True)
@@ -321,7 +320,7 @@ purchases
         vendorID = models.ForeignKey(Vendor, on_delete=models.CASCADE)
         # field to determine if item is available for sale
         piIsAvailable = models.BooleanField(default=True)
-sales	
+### sales	
 
     customershipmethod  
         cSMID = models.AutoField(primary_key=True)
@@ -365,7 +364,7 @@ sales
 
         saleID = models.ForeignKey(Sale, on_delete=models.CASCADE)
         prodStockID = models.ForeignKey(PurchaseItems, on_delete=models.PROTECT)
-shipping	
+### shipping	
 
     warehouse  
         warehouseID = models.AutoField(primary_key=True)
@@ -407,7 +406,7 @@ shipping
         parcelWeight = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
         shipmentID = models.ForeignKey(Shipment, on_delete=models.CASCADE)
         
-shopcart	
+### shopcart	
 
     shopcart  
         user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
@@ -420,7 +419,7 @@ shopcart
 
         shopCartItems = models.ManyToManyField(PurchaseItems, blank=True)
         objects = ShopCartManager()
-tax	 
+### tax	 
 
     jurisdiction  
         jurisdictionID = models.AutoField(primary_key=True)
@@ -443,7 +442,7 @@ tax
 
         jurisdictionID = models.ForeignKey(Jurisdiction, on_delete=models.CASCADE)
     
-users	
+### users	
 
     default django auth (want to override to make emails unique asap)  
     
@@ -455,28 +454,27 @@ users
         guestSendPromos = models.BooleanField(default=False)
 
 
-How to manage the site
+## How to manage the site
 
-Common tasks:
+### Common tasks:
 
-Add product for sale  
-  Add product itself  
-  Add product colorset (productcolors in admin site)  
-    Colorset is a set of images that correspond to a product color  
-    e.g. Test Top - Red  
-    Add product colorset images  
-      find colorset in productcolors admin page  
-      upload images as desired. First image will be displayed on listing  
+#### Add product for sale  
+
+     -Add product itself  
+     -Add product colorset (productcolors in admin site)  
+          Colorset is a set of images that correspond to a product color  
+               e.g. Test Top - Red  
+     -Add product colorset images  
+          find colorset in productcolors admin page  
+          upload images as desired. First image will be displayed on listing  
   
-  Add product pricing  
-  Record product stock purchases  
-  Add product discount  
-  Add product category discount  
-  Add sale discount  
-
-
-How to add a product to be displayed for sale on category page  
-
-1. Add product in admin/products  
+     -Add product pricing  
+     # if you want to be able to add item to cart, add purchase for product
+     -Record product stock purchases  
+     # product and category level discounts can be added in pricing>pdisctounts/cdiscounts
+     -Add product discount  
+     -Add product category discount
+     # sale level discounts can be added in pricing>sdiscounts. You will have to create salediscountcondition for sale discount. That code is really hacky and will need to be changed in the future probably.
+     -Add sale discount  
 
 
