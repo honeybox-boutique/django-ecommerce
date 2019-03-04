@@ -19,15 +19,15 @@ speedtest
 tax	
 users	
 
-Environment Setup
+Environment Setup  
 
-Clone it
-Install requirements.txt
-duplicate base_keys.template and rename to base_keys.py
-enter appropriate info into base_keys.py
-run it
+Clone it  
+Install requirements.txt  
+duplicate base_keys.template and rename to base_keys.py  
+enter appropriate info into base_keys.py  
+run it  
 
-Data models
+Data models  
 
 addresses  
     addressBillingProfile - billing profile associated with address  
@@ -69,24 +69,24 @@ How to manage the site
 
 Common tasks:
 
-Add product for sale
-  Add product itself
-  Add product colorset (productcolors in admin site)
-    Colorset is a set of images that correspond to a product color
-    e.g. Test Top - Red
-    Add product colorset images
-      find colorset in productcolors admin page
-      upload images as desired. First image will be displayed on listing
+Add product for sale  
+  Add product itself  
+  Add product colorset (productcolors in admin site)  
+    Colorset is a set of images that correspond to a product color  
+    e.g. Test Top - Red  
+    Add product colorset images  
+      find colorset in productcolors admin page  
+      upload images as desired. First image will be displayed on listing  
   
-  Add product pricing
-  Record product stock purchases
-  Add product discount
-  Add product category discount
-  Add sale discount
+  Add product pricing  
+  Record product stock purchases  
+  Add product discount  
+  Add product category discount  
+  Add sale discount  
 
 
-How to add a product to be displayed for sale on category page
+How to add a product to be displayed for sale on category page  
 
-1. Add product in admin/products
+1. Add product in admin/products  
 
 
