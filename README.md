@@ -27,6 +27,11 @@ duplicate base_keys.template and rename to base_keys.py
 enter appropriate info into base_keys.py  
 run it  
 
+Things to note about functionality of site     
+     - stuff
+     - things
+     
+
 Data models  
 
 addresses  
