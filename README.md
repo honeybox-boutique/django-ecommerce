@@ -3,31 +3,37 @@ Clothing Store e-commerce site
 
 Apps
 
-addresses
-assets
-billing
-coupons	
-emails	
-homepage	
-pricing	
-products	
-purchases	
-sales	
-shipping	
-shopcart	
-speedtest	
-tax	
-users	
+addresses - manages addresses
+billing - manages stripe stuff, payment info
+coupons - used to process coupon codes
+emails - manage contact us page functionality
+homepage - manage home page images
+pricing - manage product pricing and discounts
+products - manage products
+purchases	- manage product inventory purchases
+sales - manage sales creation and stuff
+shipping - manage easypost stuff, send shipping emails
+shopcart - manage user shopcart as well as checkout home view
+speedtest - main appp. want to rename to eccomerce, haven't had time to figure out how
+tax - manages sales tax charged to customer based on shipping address and jurisdictions
+users - manages users and guests, django.conrtib.auth mainly.
 
 Environment Setup  
 
-Clone it  
+Have postgresql server setup
+Clone repo  
 Install requirements.txt  
 duplicate base_keys.template and rename to base_keys.py  
 enter appropriate info into base_keys.py  
 run it  
 
 Things to note about functionality of site     
+
+All
+
+     The admin site has NOT been tested with invalid inputs at all. For the time being I'm going to save this for later and assume admin of site will enter everything correctly
+     The public-facing stuff has been LIGHTLY tested. I haven't had time to do more. 
+     I know for a fact there a couple views that are using uncleaned post data for things. Couldn't figure out how to add needed field to form and put it through cleaned_data method.
 
 Products  
      
