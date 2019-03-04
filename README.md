@@ -29,7 +29,8 @@ run it
 
 Things to note about functionality of site     
      - stuff
-     - things
+     -
+     -
      
 
 Data models  
