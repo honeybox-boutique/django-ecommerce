@@ -99,6 +99,9 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
           optimize checkout process so it isn't re-adding everything from cart, checking for discounts, checking sales tax stuff, etc.  every time the page is reloaded in checkout process
      users
           I want to make emails unique for users since that is the main way to identify unique customers via stripe
+     shipping
+          make multi-shipment orders possible (will require saleid to be editable for shipment on admin site)
+          do error handling     
           
      This stuff isn't as important-------------------------------------------------------------------------
      models settings stuff
@@ -112,9 +115,6 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
      emails
           can we just attach images to emails and send them without worry? Have read warnings about transactional emails getting blocked by gmail servers.
           why would we use email sending service like mailchimp?
-     shipping
-          make multi-shipment orders possible (will require saleid to be editable for shipment on admin site)
-          do error handling
      image/static content delivery optimization
           inform me of best practices in django with AWS s3
 
