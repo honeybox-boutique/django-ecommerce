@@ -67,8 +67,11 @@ make database migrations
 collect static files
 
      python manage.py collectstatic
-run it 
+Create admin user
+     
+     python manage.py createsuperuser username
 
+run it 
      python manage.py runserver  
 
 ## Apps
