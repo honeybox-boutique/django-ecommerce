@@ -486,54 +486,59 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
         parcelID = primary key
         parcelName = name of package selection. options hardcoded from USPS options
         parcelWeight = weight in ounces of package
+        
         #shipment parcel is associated with
         shipmentID = models.ForeignKey(Shipment, on_delete=models.CASCADE)
         
 ### shopcart	
 
     shopcart  - user/guest shopping cart
-        user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
+        user = user associated with shop cart. onetoone relation.
         shopCartDateCreated = models.DateTimeField(auto_now_add=True)
         shopCartLastModified = models.DateTimeField(auto_now=True)
-
-        shopCartStatus = models.CharField(max_length=40, default=OPEN, choices=STATUS_CHOICES)
-
-        shopCartSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-
+        shopCartStatus = not currently doing anything. may be useful to check if cart was changed.
+        shopCartSubTotal = subtotal of items in cart inclusive of discounts
+        
+        # items in shopping cart
         shopCartItems = models.ManyToManyField(PurchaseItems, blank=True)
-        objects = ShopCartManager()
+        
 ### tax	 
 
-    jurisdiction  
-        jurisdictionID = models.AutoField(primary_key=True)
-        jurisdictionLabel = models.CharField(max_length=70)
+    jurisdiction  -  shipping locations for which to charge applicable tax
+        jurisdictionID = primary key
+        jurisdictionLabel = label shown in admin site
 
-        # unique for a jurisdiction
-        jurisdictionState = models.CharField(max_length=50, blank=True, null=True)
-        jurisdictionCity = models.CharField(max_length=50, blank=True, null=True)
-        jurisdictionZip = models.CharField(max_length=12, blank=True, null=True)
+        # should unique for a jurisdiction
+        jurisdictionState = state. need to change so choices are same as other state fields in models
+        jurisdictionCity = city
+        jurisdictionZip = postal code
         
-    taxrate  
-        taxRateID = models.AutoField(primary_key=True)
-        taxRateName = models.CharField(max_length=50)
+    taxrate  -  tax rates associated with jurisdiction
+        taxRateID = primary key
+        taxRateName = name
+        # multiplier for tax rate
         taxRateMultiplier = models.DecimalField(max_digits=12, decimal_places=4)
         taxRateDateCreated = models.DateTimeField('date created', auto_now_add=True)
         taxRateValidFrom = models.DateTimeField('start date')
         taxRateValidUntil = models.DateTimeField('end date')
-        taxRateNote = models.TextField(max_length=200)
-        taxRateIsActive = models.BooleanField(default=False)
-
+        taxRateNote = not currently used other than basic note taking
+        taxRateIsActive = calculated field based on dates. calced in pre_save signal for taxrate
+        
+        # jurisdiction tax rate is associated with
         jurisdictionID = models.ForeignKey(Jurisdiction, on_delete=models.CASCADE)
     
 ### users	
 
-    default django auth (want to override to make emails unique asap)  
+    users - default django auth 
+        want to override to make emails unique asap
+        will add send promos field to mark if promotional emails should be sent to user email.
     
-    guest  
-        guestEmail = models.EmailField()
-        guestActive = models.BooleanField(default=True)
+    guest - created if checking out as guest
+        guestEmail = email
+        guestActive = is guest active? not sure if being used currently
         guestDateLastUpdated = models.DateTimeField(auto_now=True)
         guestDateCreated = models.DateTimeField(auto_now_add=True)
+        # not used currently. will be used to determine if promotional emails can be sent
         guestSendPromos = models.BooleanField(default=False)
 
 
