@@ -18,8 +18,8 @@ Give all permissions on database for user.
 
 ### Install virtualenv and setup create app environment
 
-install python 3
-install virtualenv  https://pypi.org/project/virtualenv/
+install python 3  
+install virtualenv  https://pypi.org/project/virtualenv/  
      
      pip install virtualenv
 create virtualenv  
@@ -49,7 +49,7 @@ enter db info from database created earlier into base_keys.py. Include API test 
      need api keys to test payment processing functionality and shipping label creation
      need valid gmail account to test email sending functionality
      
-run it - python manage.py runserver
+run it - python manage.py runserver  
 
 ## Apps
 
