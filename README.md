@@ -311,7 +311,7 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
 ### products
     
     color  
-        colorID = models.AutoField(primary_key=True)
+        colorID = primary key
         colorName = models.CharField(max_length=50)
         colorDescription = models.TextField(max_length=200)
     
@@ -320,52 +320,55 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
         categoryDescription = models.CharField(max_length=200)
     
     categoryimage  
-        categoryImageID = models.AutoField(primary_key=True)
+        categoryImageID = primary key
         categoryImagePath = models.ImageField(upload_to='categories')
         categoryID = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     size  
-        sizeID = models.AutoField(primary_key=True)
+        sizeID = primary key
         sizeName = models.CharField(max_length=200)
         sizeDescription = models.TextField(max_length=200)
         sizeNotes = models.TextField(max_length=255)
     
     product  
-        productID = models.AutoField(primary_key=True)
-        productName = models.CharField(max_length=200)
-        productDescription = models.TextField(max_length=200)
-        productSlug = models.SlugField(unique=True)
-        productCategories = models.ManyToManyField(Category)
-        productSizes = models.ManyToManyField(Size)
-        #Calculated fields
-        productDiscountAmount = models.DecimalField(null=True, max_digits=12, decimal_places=2)
-        productSalePrice = models.DecimalField(null=True, max_digits=12, decimal_places=2)
-        productBasePrice = models.DecimalField(null=True, max_digits=12, decimal_places=2)
-        productDiscountType = models.CharField(null=True, max_length=40)
-        productDiscountValue = models.DecimalField(null=True, max_digits=12, decimal_places=2)
+        productID = primary key
+        productName = product name
+        productDescription = product description
+        productSlug = product slug. currently not using unique slug generator
+        productCategories = categories product gets displayed in / discounts applied
+        productSizes = size options for product
+        #Calculated fields - calculated on pricing, pdiscount, and cdiscount signals I think
+        productDiscountAmount = current discount amount based on active pricing and active product and category discounts
+        productSalePrice = current final product sale price inclusive of highest between pdiscount/cdiscount
+        productBasePrice = current active product base price
+        productDiscountType = dollar amount or percentage. type of applied discount if any
+        productDiscountValue = discount value
+        
+        # colorID - relationship to many to many intermediary table productcolor. This is used to load image sets for every productcolor instance. This way each color will have unique image set. Should probably be renamed to productcolorimageset or something.
         colorID = models.ManyToManyField(Color, through='ProductColor')
         
     productcolor  
-        productColorID = models.AutoField(primary_key=True)
-        productColorName = models.CharField(max_length=120)
+        productColorID = primary key
+        productColorName = name of productcolor imageset. Have been using the following names: PRODUCT NAME - COLOR
 
-        productID = models.ForeignKey(Product, on_delete=models.CASCADE)
-        colorID = models.ForeignKey(Color, on_delete=models.CASCADE)
+        productID = product associated with color imageset
+        colorID = color associated with color imageset
     productimage  
-        productImageID = models.AutoField(primary_key=True)
-        productImagePath = models.ImageField(upload_to='products')
+        productImageID = primary key
+        productImagePath = path to image
         # will Add alt text field here - productImageAltText = models.CharField(max_length=40)
-        productColorID = models.ForeignKey(ProductColor, on_delete=models.CASCADE)
+        
+        productColorID = color imageset image is associated with
 ### purchases  
 
     vendor
-        vendorID = models.AutoField(primary_key=True)
+        vendorID = primary key
         vendorName = models.CharField(max_length=40)
         vendorDescription = models.TextField(max_length=200)
         vendorNotes = models.TextField(max_length=200)
         vendorWebsite = models.URLField(max_length=200)
     purchase  
-        purchaseID = models.AutoField(primary_key=True)
+        purchaseID = primary key
         purchaseDate = models.DateTimeField('date purchased')
         purchaseNote = models.TextField(max_length=200)
         purchaseStatus = models.CharField(max_length=40)
