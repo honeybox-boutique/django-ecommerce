@@ -48,6 +48,8 @@ class ShopCartManager(models.Manager):
                     cart_obj.user = request.user
                     cart_obj.save()
                     del request.session['cart_id']
+            # else: # if user is not authed and cart_obj.user is None:
+                # maybe add check for item availability here?
 
         else:# if session cart doesn't exist
             if not request.user.is_authenticated:           # and user is not authenticated

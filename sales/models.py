@@ -34,28 +34,29 @@ class SaleManager(models.Manager):
         )
         if qs.count() == 1:
             obj = qs.first()
-            sale_items = obj.saleItems.all()
+            # sale_items = obj.saleItems.all()
 
-            # check if cart_items and saleitems are still avail
-            for item in sale_items:
-                #check
-                if item.piIsAvailable == False:
-                    sale_item_qs = SaleItems.objects.filter(
-                        prodStockID=item.prodStockID,
-                        saleID=obj.saleID
-                    )
-                    if sale_item_qs.count() == 1:
-                        sale_item_qs.delete()
+            # # check if cart_items and saleitems are still avail
+            # for item in sale_items:
+                # #check
+                # if item.piIsAvailable == False:
+                    # sale_item_qs = SaleItems.objects.filter(
+                        # prodStockID=item.prodStockID,
+                        # saleID=obj.saleID
+                    # )
+                    # # if unavailable item, remove from sale
+                    # if sale_item_qs.count() == 1:
+                        # sale_item_qs.delete()
 
-            # if cart has changed
-                # update sale from 
+            # update sale from cart
             obj.update_sale_from_cart(cart_items)
             return obj, created
+
         elif qs.count() > 1:
+            #multiple sales in created status
             pass
 
 
-        #cart already used, checkout not finished
         else: # its a new order so make it and return it
             created = True
             obj = Sale(
@@ -291,20 +292,26 @@ class Sale(models.Model):
                 pass
 
     def update_sale_from_cart(self, cart_items):
+        """ clears saleitems and salediscounts, re-adds items passed in cart_items if available, and re-applies automatic discounts """
         # clear sale items
         self.saleDiscounts.clear()
         self.saleItems.clear()
         # re add items from cart
         for item in cart_items:
-            SaleItems.objects.create(
-                saleID=self,
-                prodStockID=item,
-                siBasePrice=item.productID.productBasePrice,
-                siDiscountAmount=item.productID.productDiscountAmount,
-                siSalePrice=item.productID.productSalePrice,
-                siNote=item.productID.productName
-                )
-        #save to recalc
+            # check if item available
+            if item.piIsAvailable:
+                SaleItems.objects.create(
+                    saleID=self,
+                    prodStockID=item,
+                    siBasePrice=item.productID.productBasePrice,
+                    siDiscountAmount=item.productID.productDiscountAmount,
+                    siSalePrice=item.productID.productSalePrice,
+                    siNote=item.productID.productName
+                    )
+            else:
+                #item unavailable, attempt to add identical from stock
+                pass
+        #save to recalc sale totals
         self.save()
         # update auto discounts
         self.apply_auto_discounts()
