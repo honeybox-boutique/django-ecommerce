@@ -40,7 +40,7 @@ cd into project and install requirements.txt
      
      pip install -r requirements.txt
        
-create copy of base_keys.template and rename to base_keys.py  
+create copy of base_keys.py.template and rename to base_keys.py  
 enter db info from database created earlier into base_keys.py. Include API test keys if testing API functionality.
 
      required: 
