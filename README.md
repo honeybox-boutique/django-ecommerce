@@ -10,22 +10,27 @@ When I started this project I was unaware of best practices when naming variable
 
 ### Have postgresql server setup
 
-Install postgresql
+Install postgresql  
 
-Create a database and database user.
-Give all permissions on database for user.
+Create a database and database user.  
+Give all permissions on database for user.  
 
 
 ### Install virtualenv and setup create app environment
 
-install python
-install virtualenv
-create virtualenv
+install python 3
+install virtualenv  https://pypi.org/project/virtualenv/
+     
+     pip install virtualenv
+create virtualenv  
+     
+     virtualenv myenv
 
 ### Clone repo in environment
 
 cd into virtualenv and clone
 
+     cd myenv
      git clone https://github.com/honeybox-boutique/django-ecommerce.git
 cd into project and install requirements.txt
      
