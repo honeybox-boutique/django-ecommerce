@@ -8,13 +8,37 @@ When I started this project I was unaware of best practices when naming variable
 
 ## Environment Setup  
 
-     Have postgresql server setup  
-     set up virtualenv  
-     Clone repo  
-     Install requirements.txt  
-     duplicate base_keys.template and rename to base_keys.py  
-     enter valid info into base_keys.py  
-     run it
+### Have postgresql server setup
+
+Install postgresql
+
+Create a database and database user.
+Give all permissions on database for user.
+
+
+### Install virtualenv and setup create app environment
+
+install python
+install virtualenv
+create virtualenv
+
+### Clone repo in environment
+
+cd into virtualenv and clone
+
+     git clone https://github.com/honeybox-boutique/django-ecommerce
+cd into project and install requirements.txt
+     
+     pip install -r requirements.txt
+       
+create copy of base_keys.template and rename to base_keys.py  
+enter valid info into base_keys.py
+
+     required: DB_*
+     need api keys to test payment processing functionality and shipping label creation
+     need valid gmail account to test email sending functionality
+     
+run it - python manage.py runserver
 
 ## Apps
 
