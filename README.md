@@ -33,7 +33,7 @@ create virtualenv
 cd into virtualenv, activate it, and clone repo
 
      cd myenv
-     source bin/activate # for linux
+     source bin/activate # for linux/unix/macos
      Scripts/activate # for windows
      git clone https://github.com/honeybox-boutique/django-ecommerce.git
 cd into project and install requirements.txt
