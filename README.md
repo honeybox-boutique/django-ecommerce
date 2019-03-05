@@ -26,7 +26,7 @@ create virtualenv
 
 cd into virtualenv and clone
 
-     git clone https://github.com/honeybox-boutique/django-ecommerce
+     git clone https://github.com/honeybox-boutique/django-ecommerce.git
 cd into project and install requirements.txt
      
      pip install -r requirements.txt
