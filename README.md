@@ -46,10 +46,19 @@ enter db info from database created earlier into base_keys.py. Include API test 
      DB_HOST = '127.0.0.1'
      DB_PORT = '5432'
      
+     set static path and media path where static files will be collected
      need api keys to test payment processing functionality and shipping label creation
      need valid gmail account to test email sending functionality
-     
-run it - python manage.py runserver  
+
+make database migrations
+
+     python manage.py migrate
+collect static files
+
+     python manage.py collectstatic
+run it 
+
+     python manage.py runserver  
 
 ## Apps
 
