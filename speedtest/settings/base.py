@@ -164,23 +164,17 @@ USE_TZ = True
 # STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets/"),
-    # # '/home/balsaroot/Desktop/speedtest/speedtest/assets/img',# ubuntu path
-    # # '/Users/derekherbert/Documents/Work/Honeybox/media/'
 ]
 
 
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'C:/Path/to/my/env/static-cdn/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets/"),
-    # # '/home/balsaroot/Desktop/speedtest/speedtest/assets/img',# ubuntu path
-    # # '/Users/derekherbert/Documents/Work/Honeybox/media/'
 ]
 
-STATIC_ROOT = 'C:/Users/Derek/Envs/honeyboxenv/static-cdn/static/'
-
-MEDIA_ROOT = 'C:/Users/Derek/Envs/honeyboxenv/static-cdn/media/'
-# # MEDIA_ROOT = '/Users/derekherbert/Documents/Work/Honeybox/media/'
+MEDIA_ROOT = 'C:/Path/to/my/env/static-cdn/media/'
 MEDIA_URL = '/media/'
 
 # Authentication
