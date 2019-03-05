@@ -46,10 +46,15 @@ enter db info from database created earlier into base_keys.py. Include API test 
      DB_HOST = '127.0.0.1'
      DB_PORT = '5432'
      
-     set static path and media path where static files will be collected
+     
      need api keys to test payment processing functionality and shipping label creation
      need valid gmail account to test email sending functionality
+set static root and media root in speedtest/settings/base.py to file path where static files will be collected. The file paths must end with static/ and media/ respectively.
 
+     STATIC_ROOT = 'C:/Users/Jondoe/Path/To/local/static-cdn/static/'
+
+     MEDIA_ROOT = 'C:/Users/Jondoe/Path/To/local/static-cdn/media/'
+     
 make database migrations
 
      python manage.py migrate
