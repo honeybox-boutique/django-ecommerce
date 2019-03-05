@@ -28,9 +28,10 @@ create virtualenv
 
 ### Clone repo in environment
 
-cd into virtualenv and clone
+cd into virtualenv, activate it, and clone repo
 
      cd myenv
+     source Scripts/activate
      git clone https://github.com/honeybox-boutique/django-ecommerce.git
 cd into project and install requirements.txt
      
