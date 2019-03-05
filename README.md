@@ -36,7 +36,8 @@ cd into virtualenv, activate it, and clone repo
      source bin/activate # for linux/unix/macos
      Scripts/activate # for windows
      git clone https://github.com/honeybox-boutique/django-ecommerce.git
-cd into project and install requirements.txt
+cd into project and install requirements.txt  
+Note! if installing on linux, unix, or mac and you get an error about pywin32 or pypiwin32 when attempting to install requirements.txt or running the server: pip uninstall both packages and try again. 
      
      pip install -r requirements.txt
        
