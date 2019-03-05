@@ -244,66 +244,67 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
         pricingValidFrom = models.DateTimeField('start date')
         pricingValidUntil = models.DateTimeField('end date')
         pricingNote = notes. currently what is being displayed in admin listview
-        pricingIsActive = calculated field. calculated on pre_save signal for pricing.
+        pricingIsActive = calculated field. calculated on pre_save signal for pricing based on dates
         
         productID = product the pricing is for
     
     pdiscount
-        pDiscountID = models.AutoField(primary_key=True)  
-        pDiscountName = models.CharField(max_length=40)  
-        pDiscountDescription = models.TextField(max_length=200)  
-        pDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)  
-        pDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)  
+        pDiscountID = primary key  
+        pDiscountName = name of discount. displayed in checkout cart display  
+        pDiscountDescription = description of discount
+        pDiscountType = dollar amount or percentage discount
+        pDiscountValue = discount value
         pDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)  
         pDiscountDateValidFrom = models.DateTimeField('valid from')  
         pDiscountDateValidUntil = models.DateTimeField('valid until')  
-        pDiscountCouponCode = models.CharField(max_length=20)  
-        pDiscountMaxDiscount = models.DecimalField(max_digits=12, decimal_places=2)  
-        pDiscountMinOrderValue = models.DecimalField(max_digits=12, decimal_places=2)  
-        pDiscountIsActive = models.BooleanField(default=False)  
+        pDiscountCouponCode = coupon code. currently not used, all product discounts are applied automatically. will eventually allow for non-automatic pdiscounts.  
+        pDiscountMaxDiscount = currently doesn't do anything. was thinking of adding something like this to make sure things remain profitable.
+        pDiscountMinOrderValue = currently doesn't do anything. was thinking of adding something like this to make sure things remain profitable. 
+        pDiscountIsActive = calculated field. calculated on pre_save signal for pdiscount based on dates
 
-        productID = models.ForeignKey(Product, on_delete=models.CASCADE)  
+        productID = product discount is associated with
     cdiscount
-        cDiscountID = models.AutoField(primary_key=True)
-        cDiscountName = models.CharField(max_length=40)
-        cDiscountDescription = models.TextField(max_length=200)
-        cDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)
-        cDiscountValue = models.DecimalField(max_digits=12, decimal_places=2)
+        cDiscountID = primary key
+        cDiscountName = discount name
+        cDiscountDescription = discount description
+        cDiscountType = dollar amount or percent
+        cDiscountValue = discount value
         cDiscountDateCreated = models.DateTimeField('date created', auto_now_add=True)
         cDiscountDateValidFrom = models.DateTimeField('valid from')
         cDiscountDateValidUntil = models.DateTimeField('valid until')
-        cDiscountCouponCode = models.CharField(max_length=20)
+        cDiscountCouponCode = coupon code. currently not used, all product discounts are applied automatically. will eventually allow for non-automatic pdiscounts.  
         cDiscountMaxDiscount = models.DecimalField(max_digits=12, decimal_places=2)
         cDiscountMinOrderValue = models.DecimalField(max_digits=12, decimal_places=2)
-        cDiscountIsActive = models.BooleanField(default=False)
-        categoryID = models.ForeignKey(Category, on_delete=models.CASCADE)
-        sDiscountID = models.AutoField(primary_key=True)
+        cDiscountIsActive = calculated field. calculated on pre_save signal for cdiscount based on dates
+        categoryID = category discount applies to
+        
     sdiscount  
-        sDiscountName = models.CharField(max_length=40)  
-        sDiscountDescription = models.TextField(max_length=200)  
-        sDiscountMessage = models.CharField(max_length=150)  
-        sDiscountType = models.CharField(max_length=30, choices=DISCOUNT_TYPE_CHOICES)  
-        sDiscountValue = models.DecimalField(max_digits=8, decimal_places=3)  
+        sDiscountID = primary key
+        sDiscountName = discount name
+        sDiscountDescription = discount description
+        sDiscountMessage = message displayed in checkout when discount applied  
+        sDiscountType = dollar amount or percent
+        sDiscountValue = discount value
         sDiscountDateCreated = models.DateTimeField('date created')  
         sDiscountDateValidFrom = models.DateTimeField('valid from')  
         sDiscountDateValidUntil = models.DateTimeField('valid until')  
-        sDiscountCouponCode = models.CharField('coupon code', max_length=20)  
-        sDiscountMaxAmount = models.DecimalField(max_digits=8, decimal_places=3)  
-        sDiscountMinSaleValue = models.DecimalField(max_digits=8, decimal_places=3)  
-        sDiscountAutomatic = models.BooleanField(default=False)  
-        sDiscountIsShippingDiscount = models.BooleanField(default=False)  
-        sDiscountIsActive = models.BooleanField(default=False)  
-    sdiscountcondition
-        sDCID = models.AutoField(primary_key=True)  
-        sDCName = models.CharField(max_length=50)  
-        sDCFailMessage = models.TextField(max_length=200)  
-        sDCType = models.CharField(max_length=50, choices=CONDITION_TYPE_CHOICES)  
-        sDCFieldName = models.CharField(max_length=50, choices=FIELD_NAME_CHOICES)  
-        sDCCompareOperator = models.CharField(max_length=50, choices=COMPARE_OPERATOR_CHOICES)  
-        sDCValue = models.CharField(max_length=70)  
-        sDCNumRequired = models.IntegerField(default=1)  
+        sDiscountCouponCode = coupon code. used to lookup active discounts when user attempts to add discount with coupon code
+        sDiscountMaxAmount = maximum discount for sale.
+        sDiscountMinSaleValue = minimum sale subtotal value
+        sDiscountAutomatic = determines if discount is automatically applied  
+        sDiscountIsShippingDiscount = is this a shipping cost discount? if so won't be displayed in discount in checkout
+        sDiscountIsActive = calculated field. calculated on pre_save signal for sdiscount based on dates
+    sdiscountcondition - conditions to check before adding applying sdiscount to sale
+        sDCID = primary key
+        sDCName = condition name
+        sDCFailMessage = message user sees if order doesn't meet conditions
+        sDCType = is condition based on an product attribute, sale attribute, or user attribute. User attribute based conditions don't currently work  
+        sDCFieldName = name of attribute field for product, sale or user
+        sDCCompareOperator = comparison operator to use in condition check
+        sDCValue = attribute value that needs to be set for condition check to pass 
+        sDCNumRequired = minimum number of items that need to pass condition check for discount to be applied
 
-        sDiscountID = models.ForeignKey(SDiscount, on_delete=models.CASCADE)  
+        sDiscountID = sale discount condition is associated with  
     
 
 
