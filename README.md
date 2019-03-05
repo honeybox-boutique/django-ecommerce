@@ -83,37 +83,37 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
 *users - manages users and guests, django.conrtib.auth mainly  
 
 ## Things I need help with in order of importance:
-     version control best practices for issues (bugs) and the resolution thereof?
-          point me to a good video or article I can watch for this. I'm brand new so I only know enough to do what you've seen here.
      billing
-          make sure adding payment methods is seamless and error messages appear appropriately
+          make sure adding payment methods adding/removing is seamless and error messages appear appropriately
      addresses
-          make sure address adding and removing, active/inactive doesn't affect payment methods or sales
+          make sure addresses application is running as expected
      shopcart
-          fix add to cart stuff by adding model manager method to do it correctly
+          fix add to cart stuff by adding model manager method to do it correctly (for details on bug scroll down to 'Thing to note...'> 'Shopping Cart')
           make sure that when purchitems becomes unavailable that user carts will add the next available purchitem matching criteria
           add quantity to add to cart form and add that logic to everywhere else
      sales
           make sure historical data is preserved
-          optimize checkout process so it isn't redoing everything every time they reload the page
+          optimize checkout process so it isn't re-adding everything from cart, checking for discounts, checking sales tax stuff, etc.  every time the page is reloaded in checkout process
      users
-          I want to make emails unique
+          I want to make emails unique for users since that is the main way to identify unique customers via stripe
+          
+     This stuff isn't as important-------------------------------------------------------------------------
      models settings stuff
-          When should I set null=True, blank=True, etc.
-          When to set models.CASCADE=PROTECT or other
+          When should I set null=True, blank=True, etc. on model?
+          When to set models.CASCADE=PROTECT or other?
      testing apps in general
-          best software/way to test stuff
+          best software/way to test stuff in Django?
      make admin more usable
-          how to show other fields other than self in listview
+          how to show other fields other than self in listview of admin site
           change purchases > purchaseitems so that it uses quantity field
      emails
-          can we just attach images to emails and send them without worry? Have read warnings about transactional emails getting blocked by gmail servers
-          why would we use email sending service?
+          can we just attach images to emails and send them without worry? Have read warnings about transactional emails getting blocked by gmail servers.
+          why would we use email sending service like mailchimp?
      shipping
-          make multi-shipment orders possible (will require salid to be editable on admin site)
+          make multi-shipment orders possible (will require saleid to be editable for shipment on admin site)
           do error handling
      image/static content delivery optimization
-          best practices?
+          inform me of best practices in django with AWS s3
 
 
 
