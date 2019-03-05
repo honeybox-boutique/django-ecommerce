@@ -32,9 +32,15 @@ cd into project and install requirements.txt
      pip install -r requirements.txt
        
 create copy of base_keys.template and rename to base_keys.py  
-enter valid info into base_keys.py
+enter db info from database created earlier into base_keys.py. Include API test keys if testing API functionality.
 
-     required: DB_*
+     required: 
+     DB_NAME = 'dbname'
+     DB_USER = 'dbuser'
+     DB_PASSWORD = 'dbpass'
+     DB_HOST = '127.0.0.1'
+     DB_PORT = '5432'
+     
      need api keys to test payment processing functionality and shipping label creation
      need valid gmail account to test email sending functionality
      
