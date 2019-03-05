@@ -189,61 +189,64 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
 
 ### billing 
 
-    billingprofile
+    billingprofile - represents stripe customer
         billingEmail = email associated with billing profile  
         active = status of billing profile  
         lastUpdated  
         dateCreated  
         profileType - either 'user' billing profile or 'guest'. guest billing profiles get marked inactive after transaction  
         user = user associated with billing profile if any  
-        billingToken = stripe customer token  
+        billingToken = stripe customer token. generated from pre save signal if token doesn't exist and email isn't blank 
     card
-        billingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
-        cardStripeID = models.CharField(max_length=120)
-        cardBrand = models.CharField(max_length=120, null=True, blank=True)
+        billingProfile = billing profile associated with card
+        cardStripeID = cards stripe id. Generated in model manager method add_new
+        cardBrand = brand of card
         cardCountry = models.CharField(max_length=20, null=True, blank=True)
-        cardExpMonth = models.IntegerField(null=True, blank=True)
-        cardExpYear = models.IntegerField(null=True, blank=True)
-        cardLast4 = models.CharField(max_length=4)
-        cardDefault = models.BooleanField(default=True)
-        cardActive = models.BooleanField(default=True)
+        cardExpMonth = probably removing this, can't think of reason to store it
+        cardExpYear = probably removing this, can't think of reason to store it
+        cardLast4 = last 4 of card
+        cardDefault = i don't think this currently does anything. Would like to allow setting one default card in user dashboard eventually 
+        cardActive = determines if card shows up in existing payment methods when user is authenticated. Inactive cards can still be charged I think.
         cardDateAdded = models.DateTimeField(auto_now_add=True)
-
-        cardName = models.CharField(max_length=120, null=True, blank=True)
-        cardCity= models.CharField(max_length=120, null=True, blank=True)
+        
+        This stuff is pretty much the billing address. creating a relation between card and addresses posed to much of a problem so I just duplicated the data on the card model. Not sure what happens if customer removes (makes inactive) the address associated with the card. 
+        cardName = full name on card
+        cardCity= city on card
         cardAddressLine1 = models.CharField(max_length=120, null=True, blank=True)
         cardAddressLine2 = models.CharField(max_length=120, null=True, blank=True)
         cardState= models.CharField(max_length=120, null=True, blank=True)
         cardPostalCode= models.CharField(max_length=120, null=True, blank=True)
-    charge
-        billingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
-        chargeStripeID = models.CharField(max_length=120)
-        chargePaid = models.BooleanField(default=False)
-        chargeRefunded = models.BooleanField(default=False)
-        chargeOutcome = models.TextField(max_length=255, blank=True, null=True)
-        chargeOutcomeType = models.CharField(max_length=120, blank=True, null=True)
-        chargeSellerMessage = models.CharField(max_length=120, blank=True, null=True)
-        chargeRiskLevel = models.CharField(max_length=120, blank=True, null=True)
+    charge - represents an attempt to charge a card. currently only saving successful charges to model
+        billingProfile = billing profile associated with charge
+        chargeStripeID = charge stripe id
+        chargePaid = was charge paid successfully?
+        chargeRefunded = was charge refunded?
+        chargeOutcome = charge outcome from stripe
+        chargeOutcomeType = outcome type from stripe
+        chargeSellerMessage = seller message from stripe
+        chargeRiskLevel = risk level from stripe
         
 ### homepage
 
-    homepageimage  
+    homepageimage - smaller images displayed on home page 
         homePageImagePath - 
         homePageImageAltText = 
         homePageImageLink =
-    bighomepageimage   
+    bighomepageimage - banner image on home page
         bigHomePageImagePath = 
         bigHomePageImageAltText = 
         bigHomePageImageLink = 
 ### pricing
 
-    pricing
-        pricingBasePrice = models.DecimalField(max_digits=12, decimal_places=2)
+    pricing - a pricing for specific period of time for specific product
+        pricingBasePrice = base price of product, not including any discounts.
         pricingDateCreated = models.DateTimeField('date created', auto_now_add=True)
         pricingValidFrom = models.DateTimeField('start date')
         pricingValidUntil = models.DateTimeField('end date')
-        pricingNote = models.TextField(max_length=200)
-        pricingIsActive = models.BooleanField(default=False)
+        pricingNote = notes. currently what is being displayed in admin listview
+        pricingIsActive = calculated field. calculated on pre_save signal for pricing.
+        
+        productID = product the pricing is for
     
     pdiscount
         pDiscountID = models.AutoField(primary_key=True)  
