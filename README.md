@@ -367,116 +367,131 @@ tax - manages sales tax charged to customer based on shipping address and jurisd
         vendorDescription = models.TextField(max_length=200)
         vendorNotes = models.TextField(max_length=200)
         vendorWebsite = models.URLField(max_length=200)
-    purchase  
+    purchase - inventory purchase from vendor
         purchaseID = primary key
         purchaseDate = models.DateTimeField('date purchased')
-        purchaseNote = models.TextField(max_length=200)
-        purchaseStatus = models.CharField(max_length=40)
-
+        purchaseNote = purchase note. currently what is displayed in admin listview
+        purchaseStatus = status of purchase.
+        
+        # This related table represent one item in inventory. Whether or not someone can add something to cart depends on if there is a purchaseitem that is available
         productID = models.ManyToManyField(Product, through='PurchaseItems')
+        # User that logged purchase. probably need to make this require administrative user somehow
         userID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     purchaseitems  
-        prodStockID = models.AutoField(primary_key=True)
-        piPrice = models.DecimalField(max_digits=8, decimal_places=3)
-        piCondition = models.CharField(max_length=50)
-        piNotes = models.TextField(max_length=200)
-        piBarcode = models.ImageField(upload_to='barcodes', blank=True, null=True)
+        prodStockID = primary key
+        piPrice = price inventory item was purchased for
+        piCondition = current condition. not used for anything right now
+        piNotes = notes. not used for anything right now
+        piBarcode = not used right now. may eventually implement barcodes here or on product model
+        # size of purch item
         piSize = models.ForeignKey(Size, on_delete=models.CASCADE)
+        # color of purch item
         piColor = models.ForeignKey(Color, on_delete=models.CASCADE)
+        # purchase associated with purchitem
         purchaseID = models.ForeignKey(Purchase, on_delete=models.CASCADE)
+        # product that purchitem is
         productID = models.ForeignKey(Product, on_delete=models.CASCADE)
-        vendorID = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-        # field to determine if item is available for sale
-        piIsAvailable = models.BooleanField(default=True)
+        # vendor of purchitem
+        vendorID = models.ForeignKey(Vendor, on_delete=models.CASCADE) 
+        piIsAvailable = field to determine if item is available for sale. marked unavailable if included in sale
 ### sales	
 
-    customershipmethod  
-        cSMID = models.AutoField(primary_key=True)
-        cSMName = models.CharField(max_length=120)
-        cSMDescription = models.TextField(max_length=200)
-        cSMChargeAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+    customershipmethod  - shipping method options for customers on site
+        cSMID = primary key
+        cSMName = ship method name
+        cSMDescription = ship method description. This will probably be used to display ship method options in checkout
+        cSMChargeAmount = amount to charge for this ship method
         
     sale  
-        saleID = models.AutoField(primary_key=True)
-        saleStringID = models.CharField(max_length=120, blank=True)
+        saleID = primary key
+        saleStringID = ID generated from util that is more readable/usable to lookup stuff
         saleDate = models.DateTimeField('sale date', auto_now_add=True)
-        saleNote = models.CharField(max_length=120, default='Sale')
-        saleStatus = models.CharField(max_length=120, default='created', choices=SALE_STATUS_CHOICES) # purchaseDate = models.DateTimeField('date purchased')
-        saleSubTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# Amount should be sum(saleitemprice - p-cDiscount)
-        saleDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-        saleTaxAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-
-        # change: add saleShippingMethod
+        saleNote = currently not used. may add something here
+        saleStatus = status of sale. defuault is created. anything created can be modified, else changes won't  be applied (i think) choices=SALE_STATUS_CHOICES)
+        
+        #calculated fields
+        saleSubTotal = sum of sale item sale prices (inclusive of p/cdiscounts), sum(saleitemprice - p-cDiscount). this is retrieved from cart subtotal I think on sale save
+        saleDiscountAmount = discount amount for sale level discounts applied. calculated on sale save
+        saleTaxAmount = tax amount charged. calculated on sale save. Based on shipping state, city, and zip.        
+        # customer ship method selection
         customerShipMethodID = models.ForeignKey(CustomerShipMethod, on_delete=models.PROTECT, null=True, blank=True)
         # customer shipping and total
-        saleShipCostAmountCharged = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: integrate shipping API
-        # saleCustomerTotal - not inclusive of shipping cost that we are paying
+        saleShipCostAmountCharged = shipping cost charged to customer. retrieved from shipmethod selection
 
-        # actual total
-        saleTotal = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-        # saleTotalShippingCost - total shipping cost including portion we are paying
-
+        saleTotal = actual total for sale
+        # might include saleTotalShippingCost - total shipping cost including portion we are paying
+        # shipping address associated with sale
         saleShippingAddress = models.ForeignKey(Address, related_name='saleShippingAddress', null=True, blank=True, on_delete=models.PROTECT)
+        # billing address associated with sale
         saleBillingAddress = models.ForeignKey(Address, related_name='saleBillingAddress', null=True, blank=True, on_delete=models.PROTECT)
+        # applied discounts for sale
         saleDiscounts = models.ManyToManyField(SDiscount, blank=True)
+        # sale items included in sale
         saleItems = models.ManyToManyField(PurchaseItems, through='SaleItems')
+        # billing profile associated with sale
         saleBillingProfile = models.ForeignKey(BillingProfile, on_delete=models.CASCADE)
+        # payment card associated with sale
         salePaymentCard = models.ForeignKey(Card, on_delete=models.CASCADE, blank=True, null=True)
         
-    saleitems  
-        saleItemID = models.AutoField(primary_key=True)
-        siBasePrice = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-        siDiscountAmount = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-        siSalePrice = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)# change: add sensor to calculate this
-        siNote = models.CharField(default='SaleItem', max_length=120, blank=True)# change: add sensor to populate this
-
+    saleitems  - items in sale
+        saleItemID = primary key
+        siBasePrice = sale item base price
+        siDiscountAmount = amount discounted
+        siSalePrice = sale item sale price
+        siNote = not used currently. might add something here
+        # sale saleitem is associated with
         saleID = models.ForeignKey(Sale, on_delete=models.CASCADE)
+        # inventory item associated with sale
         prodStockID = models.ForeignKey(PurchaseItems, on_delete=models.PROTECT)
 ### shipping	
 
-    warehouse  
-        warehouseID = models.AutoField(primary_key=True)
-        warehouseName = models.CharField(max_length=120)
+    warehouse - used in shipping label 'from' address
+        warehouseID = primary key
+        warehouseName = warehouse name
+        # currently associated with address model. forces address to be associated with user. might change this since it really doesn't  make sense
         warehouseAddress = models.ForeignKey(Address, on_delete=models.PROTECT)
         
-    shipment  
-        shipmentID = models.AutoField(primary_key=True)
-        shipmentDateRequested = models.DateTimeField('shipment date created')
-        shipmentDateLabelPrinted = models.DateTimeField('shipment date label printed', blank=True, null=True)
-        shipmentNote = models.CharField(max_length=120, default='Default Shipment Note')
+    shipment  - shipment associated with sale. currently created automatically when sale is marked payed
+        shipmentID = primary key
+        shipmentDateRequested = date shipment was automatically generated from sale payment
+        shipmentDateLabelPrinted = date shipment label was printed
+        shipmentNote = currently not used. might use in future
+        # warehouse product will come from. used as from address in shipping label
         warehouseID = models.ForeignKey(Warehouse, on_delete=models.PROTECT, blank=True, null=True)
+        # to address in shipping label. address is pulled from sale
         shipmentToAddress = models.ForeignKey(Address, related_name='shipmentToAddress', null=True, blank=True, on_delete=models.PROTECT)
-        # shipmentToAddress = models.ForeignKey(Address, on_delete=models.PROTECT)
-        shipmentLabelIsBought = models.BooleanField(default=False)
+        shipmentLabelIsBought = used to determine whether the shipping label should be bought. If checked, label is bought and shipment status is changed to 'printed'. 
 
-        # maybe add shipmentStatus to clarify IsBought
-        shipmentStatus = models.CharField(max_length=120, default='in progress', choices=SHIPMENT_STATUS_CHOICES)
-
+        shipmentStatus = used to send email to customer. if marked 'printed' an email will be sent out. Could pose problems with multi-shipment orders. may need to add bool field to allow create shipment without sending email.
+        #sale associated with shipment
         saleID = models.ForeignKey(Sale, on_delete=models.CASCADE)
 
-        shipmentCarrier = models.CharField(max_length=120, choices=CARRIER_OPTIONS)
-        shipmentRate = models.CharField(max_length=120, choices=RATE_OPTIONS)
+        shipmentCarrier = shipping carrier. have hardcoded these options.
+        shipmentRate = shipping rate. hardcoded these options.
+        
         # easypost providedstuff
         shipmentEasyPostID = models.CharField(max_length=120, blank=True, null=True)
-        shipmentCost = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-        shipmentTrackingNumber = models.CharField(max_length=120, blank=True, null=True)
-        shipmentTrackingURL = models.URLField(verbose_name='tracking url', blank=True, null=True)
-        shipmentLabelURL = models.URLField(blank=True, null=True)
-
-        shipmentReturnEasyPostID = models.CharField(max_length=120, blank=True, null=True)
-        shipmentReturnLabelCost = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
-        shipmentReturnTrackingNumber = models.CharField(max_length=120, blank=True, null=True)
-        shipmentReturnLabelURL = models.URLField(blank=True, null=True)
+        shipmentCost = cost if label is used
+        shipmentTrackingNumber = tracking number
+        shipmentTrackingURL = tracking url
+        shipmentLabelURL = label url for printing
         
-    parcel  
-        parcelID = models.AutoField(primary_key=True)
-        parcelName = models.CharField(max_length=120, choices=PARCEL_NAME_CHOICES)# change: add predefined package names as choices
-        parcelWeight = models.DecimalField(default=0.00, max_digits=12, decimal_places=2)
+        # currently return labels are being bought for every sale. might change this so customers will have to enter a saleid on returns page and will then get a link to the label via email or something.
+        shipmentReturnEasyPostID = return label id
+        shipmentReturnLabelCost = return label cost if used
+        shipmentReturnTrackingNumber = return label tracking number
+        shipmentReturnLabelURL = return label url for printing
+        
+    parcel - package included in shipment. currently shipment can have multiple parcels per model definition. USPS doesn't allow this so only one parcel can be added per shipment. might change relationship accordingly depending on what other carriers do and whether they allow multi-parcel shipments.
+        parcelID = primary key
+        parcelName = name of package selection. options hardcoded from USPS options
+        parcelWeight = weight in ounces of package
+        #shipment parcel is associated with
         shipmentID = models.ForeignKey(Shipment, on_delete=models.CASCADE)
         
 ### shopcart	
 
-    shopcart  
+    shopcart  - user/guest shopping cart
         user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
         shopCartDateCreated = models.DateTimeField(auto_now_add=True)
         shopCartLastModified = models.DateTimeField(auto_now=True)
