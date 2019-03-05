@@ -50,7 +50,9 @@ enter db info from database created earlier into base_keys.py. Include API test 
      
      need api keys to test payment processing functionality and shipping label creation
      need valid gmail account to test email sending functionality
-set static root and media root in speedtest/settings/base.py to file path where static files will be collected. The file paths must end with static/ and media/ respectively.
+set static root and media root in speedtest/settings/base.py to file path where static files will be collected.  
+The file paths must end with static/ and media/ respectively.  
+Make sure the files at that path exist. If not create them.  
 
      STATIC_ROOT = 'C:/Users/Jondoe/Path/To/local/static-cdn/static/'
 
